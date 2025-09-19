@@ -244,6 +244,11 @@ a > img:active,
     }
 }
 
+.main-grid-block:hover {
+    background: linear-gradient(90deg, #A7182D 25%, #e9eaeec7 100%);
+    color: #fff;
+}
+
 .main-grid-less {
     display: grid;
     grid-template-columns: 1fr 1fr;
