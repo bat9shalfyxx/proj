@@ -69,7 +69,7 @@ a > img:hover,
 
 a:active,
 h1:active,
-a > p:active,
+a > p:active,   
 a > img:active,
 .form-button:active,
 .header-left-info:active,
@@ -113,7 +113,7 @@ a > img:active,
 .registration-form {
     display: grid;
     margin: 0 auto;
-    row-gap: 45px;
+    row-gap: 145px;
 
     input {
         width: 640px;
@@ -124,6 +124,12 @@ a > img:active,
     p {
         margin-bottom: 30px;    
     }
+}
+
+.sign-in-form,
+.sign-up-form {
+    display: grid;
+    row-gap: 45px;
 }
 
 .form-button {
