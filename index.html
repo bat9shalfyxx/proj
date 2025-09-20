@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./css/main.css"></link>
     <link rel="icon" href="./src/section1/stonks.svg" type="image/x-icon">
     <script src="./scripts/dropdown.js" defer></script>
+    <script src="./scripts/registration.js"></script>
     <script src="./scripts/switch.js" defer></script>
 
     <body>
@@ -149,13 +150,9 @@
             <div class="registration">
                 <div class="registration-block">
                     <div class="registration-header">
-                        <div class="sign-in">
-                            <p>Вход</p>
-                        </div>
+                            <a href="#!" class="sign-in active">Вход</a>
     
-                        <div class="sign-up">
-                            <p>Регистрация</p>
-                        </div>
+                            <a href="#!" class="sign-up">Регистрация</a>
                     </div>
     
                     <form class="registration-form" action="">
@@ -165,6 +162,7 @@
                             <input type="password" placeholder="Введите пароль" required>
                             <input class="form-button" type="submit" value="войти">
                         </div>
+                        
                         <div class="sign-up-form">
                             <input type="input" placeholder="Фамилия" required>
                             <input type="input" placeholder="Имя" required>
