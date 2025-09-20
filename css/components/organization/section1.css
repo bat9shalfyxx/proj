@@ -15,9 +15,13 @@
 }
 
 .header-left-info {
+    display: flex;
+    align-items: center;
     margin-left: 90px;
     font-size: 19px;
-    a {
+    a, p {
+        font-size: 25px;
+        margin: 0 10px;
         color: var(--dark-gray-col);
     }
 }
@@ -164,7 +168,7 @@
 .main-for-buisness {
     margin: 20px 0 50px 110px;
     font-size: 40px;
-    max-width: 390px;
+    max-width: 410px;
     padding: 7px 80px;
     border-radius: 35px;
 
@@ -179,9 +183,6 @@
     justify-content: space-between;
 }
 
-.main-content-info {
-    /* max-width: 1300px; */
-}
 .main-input {
     input {
         padding: 22px 40px;

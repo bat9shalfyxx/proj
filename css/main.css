@@ -1,13 +1,13 @@
 @import url(../css/reset.css);
 @import url(../css/media.css);
-@import url(./components/section1.css);
-@import url(./components/section2.css);
-@import url(./components/section3.css);
-@import url(./components/section4.css);
+@import url(./components/organization/section1.css);
+@import url(./components/organization/section2.css);
+@import url(./components/organization/section3.css);
+@import url(./components/organization/section4.css);
 
 @font-face {
     font-family: AA Stetica;
-    src: url(../fonts/AAStetica.ttf);
+    src: url('../fonts/AA Stetica/AA Stetica Medium.otf');
     font-weight: 500px;
 }
 
@@ -22,9 +22,11 @@
 
 body {
     background: linear-gradient(to bottom, var(--light-red-col) 30%, var(--light-col));
+    background-repeat: no-repeat;
 }
 
 .container {
+    position: relative;
     background-color: var(--light-col);
     color: var(--light-red-col);
     font-size: 25px;
@@ -42,6 +44,7 @@ a,
 h1,
 a > p,
 a > img,
+.form-button,
 .header-left-info,
 .header-right-info,
 .link {
@@ -53,13 +56,14 @@ a:hover,
 h1:hover,
 a > p:hover,
 a > img:hover,
+.form-button:hover,
 .header-left-info:hover,
 .header-right-info:hover,
 .link:hover {
     h1 {
         color: var(--dark-red-col);
     }
-    filter: brightness(0.7);
+    filter: brightness(0.9);
     transform: scale(1.03) !important;
 }
 
@@ -67,12 +71,63 @@ a:active,
 h1:active,
 a > p:active,
 a > img:active,
+.form-button:active,
 .header-left-info:active,
 .header-right-info:active,
 .link:active {
     h1 {
         color: var(--dark-red-col, 0.5);
     }
-    filter: brightness(0.5);
+    filter: brightness(0.7);
     transform: scale(0.99) !important;
+}
+
+/* РЕГИСТРАЦИЯ */
+.registration {
+    z-index: 1000000;
+    align-self: center;
+    display: grid;
+    margin: auto;
+    padding: 100px;
+
+    background: linear-gradient(to bottom, var(--light-red-col), var(--light-col), var(--light-red-col))
+}
+
+.registration-block {
+    display: grid;
+    margin: 0 auto;
+    padding: 86px 42px 30px;
+    width: 750px;
+    background-color: var(--light-col);
+    border-radius: 30px;
+    color: var(--dark-gray-col);
+}
+
+.registration-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 60px;
+    margin-bottom: 120px;
+}
+
+.registration-form {
+    display: grid;
+    margin: 0 auto;
+    row-gap: 45px;
+
+    input {
+        width: 640px;
+        padding: 21px 35px;
+        border-radius: 20px;
+        border: 1px solid var(--dark-gray-col);
+    }
+    p {
+        margin-bottom: 30px;    
+    }
+}
+
+.form-button {
+    font-size: 29px;
+    color: var(--light-col);
+    background: linear-gradient(to bottom, var(--light-red-col), var(--dark-gray-col)) !important;
 }
