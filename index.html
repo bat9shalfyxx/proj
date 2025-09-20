@@ -38,7 +38,7 @@
                     </div>
 
                     <div class="header-right-profile">
-                        <a class="link" href="#!" class="header-right-profile-button">Войти</a>
+                        <a href="#!" class="header-right-profile-button link">Войти</a>
                         <a class="link" href="#!"><img src="./src/section1/profile-icon.svg" alt="profile" /></a>
                     </div>
                 </div>
@@ -148,29 +148,31 @@
             </nav>
 
             <div class="registration">
-                <div class="registration-block">
+                <div class="registration-block reg-sign-in">
                     <div class="registration-header">
-                            <a href="#!" class="sign-in active">Вход</a>
-    
-                            <a href="#!" class="sign-up">Регистрация</a>
+                        <a href="#!" class="sign-in active" style="color: black;">Вход</a>
+                        
+                        <a href="#!" class="sign-up">Регистрация</a>
                     </div>
-    
+                    
                     <form class="registration-form" action="">
-
                         <div class="sign-in-form">
                             <input type="input" placeholder="Телефон, электронная почта или СНИЛС" required>
-                            <input type="password" placeholder="Введите пароль" required>
+                            <input type="password" placeholder="Введите пароль" autocomplete="on" required>
                             <input class="form-button" type="submit" value="войти">
                         </div>
-                        
+                    </form>
+
+                    <form class="registration-form" action="">
                         <div class="sign-up-form">
                             <input type="input" placeholder="Фамилия" required>
                             <input type="input" placeholder="Имя" required>
                             <input type="input" placeholder="Отчество">
                             <input type="email" placeholder="Электронная почта*" required>
                             <input type="input" placeholder="Номер мобильного телефона*" required>
-                            <input type="password" placeholder="Придумайте пароль" required>
+                            <input type="password" placeholder="Придумайте пароль" autocomplete="on" required>
                             <p>Минимум 8 символов</p>
+                            <input type="password" placeholder="Подтвердите пароль" autocomplete="on" required>
                             <input class="form-button" type="submit" value="Зарегистрироваться">
                         </div>
                     </form>
