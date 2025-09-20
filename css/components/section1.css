@@ -77,12 +77,13 @@
 
 /* DROPDOWN */
 .nav-dropdown {
-    /* position: absolute; */
+    position: absolute;
     z-index: 1000;
-    display: flex;
+    display: none;
     flex-wrap: wrap;
     justify-content: space-between;
     row-gap: 50px;
+    top: 50px;
 
     padding: 53px 80px;
     background: var(--light-gray-col);
@@ -97,6 +98,11 @@
         font-weight: 600;
         margin-bottom: 30px;
     }
+}
+
+.nav-dropdown.dropdown-right-aligned {
+    left: auto;
+    right: 0;
 }
 
 .nav-dropdown-left {
