@@ -80,7 +80,6 @@
     position: absolute;
     z-index: 1000;
     display: none;
-    flex-wrap: wrap;
     justify-content: space-between;
     row-gap: 50px;
     top: 50px;
@@ -110,6 +109,7 @@
     padding: 27px;
     text-align: left;
     margin-right: 100px;
+    min-width: 351px;
 
     border: 2px solid var(--light-red-col);
     border-radius: 30px;

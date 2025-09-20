@@ -13,7 +13,7 @@ function hideAllDropdowns() {
 
 function positionDropdown(element, dropdown) {
     const rect = element.getBoundingClientRect();
-    const dropdownWidth = 600;
+    const dropdownWidth = 600; 
     const viewportWidth = window.innerWidth;
 
     dropdown.classList.remove("dropdown-right-aligned");
