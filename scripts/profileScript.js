@@ -9,9 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const sidebarList = parsedProfilePage.querySelectorAll(".sidebar-list");
     const sidebarEl = parsedProfilePage.querySelector(".sidebar-el");
     console.log(sidebarEl.textContent);
-    sidebarEl.innerHTML = `${"sa"}`;
 
-    profileContainer.innerHTML = sidebarEl;
     sidebarEl.addEventListener("click", (e) => {
         e.preventDefault();
         if (e.target == sidebarEl) console.log(1);
