@@ -1,3 +1,43 @@
+const container = document.querySelector(".switch-content");
+const hubIcon = document.querySelector(".header-left-logo");
+const profileIcon = document.querySelector(".header-right-profile-logo");
+
+const pullOut = async () => {
+    const hubPage = await fetch("./content/hubPage.html");
+    const profilePage = await fetch("./content/profilePage.html");
+
+    const hubContent = await hubPage.text();
+    const profileContent = await profilePage.text();
+
+    return { hubContent, profileContent };
+};
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const { hubContent, profileContent } = await pullOut();
+
+    container.innerHTML = `${hubContent}`;
+
+    profileIcon.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        if (e.target == profileIcon && !profileIcon.classList.contains("active")) {
+            hubIcon.classList.remove("active");
+            profileIcon.classList.add("active");
+            container.innerHTML = `${profileContent}`;
+        }
+    });
+
+    hubIcon.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        if (e.target == hubIcon && !hubIcon.classList.contains("active")) {
+            hubIcon.classList.add("active");
+            profileIcon.classList.remove("active");
+            container.innerHTML = `${hubContent}`;
+        }
+    });
+});
+
 // class ContentSwitcher {
 //     constructor() {
 //         this.currentContent = "organization";
@@ -79,44 +119,3 @@
 // });
 
 // window.contentSwitcher = contentSwitcher;
-
-const container = document.querySelector(".switch-content");
-const hubIcon = document.querySelector(".header-left-logo");
-const profileIcon = document.querySelector(".header-right-profile-logo");
-
-const pullOut = async () => {
-    const hubPage = await fetch("./content/hubPage.html");
-    const profilePage = await fetch("./content/profilePage.html");
-
-    const hubContent = await hubPage.text();
-    const profileContent = await profilePage.text();
-
-    return { hubContent, profileContent };
-};
-
-document.addEventListener("DOMContentLoaded", async () => {
-    const { hubContent, profileContent } = await pullOut();
-    console.log(profileContent);
-
-    container.innerHTML = `${hubContent}`;
-
-    profileIcon.addEventListener("click", (e) => {
-        e.preventDefault();
-
-        if (e.target == profileIcon && !profileIcon.classList.contains("active")) {
-            hubIcon.classList.remove("active");
-            profileIcon.classList.add("active");
-            container.innerHTML = `${profileContent}`;
-        }
-    });
-
-    hubIcon.addEventListener("click", (e) => {
-        e.preventDefault();
-
-        if (e.target == hubIcon && !hubIcon.classList.contains("active")) {
-            hubIcon.classList.add("active");
-            profileIcon.classList.remove("active");
-            container.innerHTML = `${hubContent}`;
-        }
-    });
-});

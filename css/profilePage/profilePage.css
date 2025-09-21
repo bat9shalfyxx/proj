@@ -1,0 +1,220 @@
+/* Общий контейнер: сетка с 2 колонками */
+.container-2 {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    height: 100vh;
+    background: linear-gradient(to bottom, #fff, #c0c0c0);
+    font-family: "Arial", sans-serif;
+}
+
+/*ЛЕВОЕ МЕНЮ*/
+.sidebar {
+    background: #fff;
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-right: 1px solid #ddd;
+}
+
+.sidebar button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 20px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 15px;
+    text-align: left;
+    transition: background 0.3s ease;
+}
+
+.sidebar button:hover {
+    background: #f3f3f3;
+}
+
+.sidebar button.active {
+    background: #e8e8e8;
+    font-weight: bold;
+}
+
+/*ПРАВАЯ ЧАСТЬ*/
+.content {
+    padding: 20px 30px;
+    overflow-y: auto;
+}
+
+/* Заголовок профиля */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.profile-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Кнопка редактирования (справа вверху) надо расположение доработать */
+.profile-edit {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 18px;
+    color: #a00;
+}
+
+/* Блок "Добавьте организацию" */
+.add-org-card {
+    background: #fff;
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 500px;
+}
+
+.add-org-text {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    color: #555;
+}
+
+.add-org-text strong {
+    font-size: 16px;
+    margin-bottom: 4px;
+    color: #000;
+}
+
+.add-org-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background: #a00;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.add-org-btn:hover {
+    background: #c00;
+}
+
+/* Секции */
+.section {
+    display: none;
+}
+.section.active {
+    display: block;
+}
+
+/* Фильтры заявок */
+.filters {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+.filters select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* Кнопки статусов */
+.status-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+.status-filters button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 20px;
+    background: #eee;
+    cursor: pointer;
+}
+.status-filters button.active {
+    background: #a00;
+    color: #fff;
+}
+
+/* Пустой блок заявок */
+.empty-block {
+    text-align: center;
+    margin-top: 40px;
+    color: #555;
+}
+.empty-block img {
+    width: 80px;
+    margin-bottom: 15px;
+}
+.reset-btn {
+    margin-top: 15px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background: #a00;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* Мероприятия */
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0 20px;
+}
+.tabs button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 20px;
+    background: #eee;
+    cursor: pointer;
+}
+.tabs button.active {
+    background: #a00;
+    color: #fff;
+}
+
+.events-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.events-controls input,
+.events-controls select,
+.events-controls button {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.events-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.event-card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}

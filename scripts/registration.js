@@ -6,10 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
     regButton.addEventListener("click", (e) => {
         e.preventDefault();
 
-        if (regContent.hasAttribute(".active")) {
-            console.log(q);
-        }
-
         if (e.target === regButton && !regContent.classList.contains("active")) {
             regContent.classList.add("active");
             mainContent.style.display = "none";

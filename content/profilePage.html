@@ -1,85 +1,82 @@
-<section class="section-1">
-    <div class="container">
-            <div class="profile">
-                <button class="profile-left">Профиль</button>
-                
-                <div class="profile-header">
-                    <img src="" alt="Профиль" class="profile-avatar"/>
-                    <h2>Иван Иванов Иванович</h2>
-                </div>
-                <div class="profile-actions">
-                    <button class="profile-add-org">Добавьте организацию</button>
-                    <button class="profile-edit"><img src="" alt></button>
-                </div>
-            </div>
-            
-            <div class="application">
-                <button class="application-btn">Заявки</button>
-                <h2>Заявки</h2>
-                <div class="application-content">
-                    <button class="app-accounts">Аккаунты</button>
-                    <button class="app-type-of-service">Тип услуги</button>
-                    <button class="app-num">Номер заявки</button>
-                    <button class="app-under-consideration">На рассмотрении</button>
-                    <button class="app-approved">Одобренные</button>
-                    <button class="app-rejected">Отклонённые</button>
-                    <button class="app-drafts">Черновики</button>
-                </div>
-                <div class="app-under">
-                    <img src="" alt="Nothing founded" class="app-under-img"/>
-                    <p>Ничего не найдено</p>
-                    <button class="reset-filters">Сбросить фильтры</button>
-                </div>
-            </div>
-            
-            <div class="services">
-                <button class="services-btn">Услуги</button>
-                <h2>Сервисы</h2>
-            </div>
+<div class="container-2">
+    <!-- ЛЕВОЕ МЕНЮ -->
+    <div class="sidebar">
+        <button class="menu-btn active" data-target="profile">Профиль</button>
+        <button class="menu-btn" data-target="applications">Заявки</button>
+        <button class="menu-btn" data-target="services">Сервисы</button>
+        <button class="menu-btn" data-target="events">Мероприятия</button>
+        <button class="menu-btn" data-target="education">Обучение</button>
+        <button class="menu-btn" data-target="support">Поддержка</button>
+    </div>
 
-            <div class="events">
-                <button class="events-btn">Мероприятия</button>
-                <h2>Мероприятия</h2>
-                    <div class="events-controls">
-                        <button class="my-events-btn">Мои мероприятия</button>
-                        <button class="all-events-btn">Все мероприятия</button>
-                        <input type="text" class="events-search" placeholder="Поиск по мероприятиям" />
-                        <select class="events-type-dropdown">
-                            <option value="">Все типы</option>
-                            <option value="conference">Конференция</option>
-                            <option value="seminar">Семинар</option>
-                            <option value="workshop">Воркшоп</option>
-                            <option value="webinar">Вебинар</option>
-                        </select>
-                        <div class="events-date-picker">
-                            <button class="date-btn" onclick="showCalendar()">Дата</button>
-                            <input type="date" class="date-selector" style="display:none;" />
-                        </div>
-                    </div>
-                <div class="events-panels">
-                    <div class="events-panel events-panel-main">
-                        <h3>Информация о мероприятии</h3>
-                        <p>Здесь будет отображаться информация о выбранном мероприятии.</p>
-                    </div>
-                    <div class="events-panel events-panel-details">
-                        <h3>Детали мероприятия</h3>
-                        <p>Здесь будут детали и дополнительная информация.</p>
-                    </div>
+    <!-- ПРАВАЯ ЧАСТЬ -->
+    <div class="content">
+        <!-- Профиль -->
+        <section id="profile" class="section active">
+            
+            <div class="profile-header">
+                <div class="profile-avatar">👤</div>
+                <h2>Иванов Василий Александрович</h2>
+                <button class="profile-edit">✏️</button>
+            </div>
+            <div class="add-org-card">
+                <div class="add-org-text">
+                    <strong>Добавьте организацию</strong>
+                    Чтобы использовать все возможности ЦНП
                 </div>
+                <button class="add-org-btn">Добавить</button>
             </div>
-            <script>
-                function showCalendar() {
-                document.querySelector('.date-selector').style.display = 'inline-block';
-            }
-            </script>
+        </section>
 
-            <div class="education">
-                <button class="education-btn">Обучение</button>
+        <!-- Заявки -->
+        <section id="applications" class="section">
+            <h2>Заявки</h2>
+            <div class="filters">
+                <select><option>Аккаунты</option></select>
+                <select><option>Тип услуги</option></select>
+                <select><option>Номер заявки</option></select>
             </div>
-           
-            <div class="support">
-                <button class="support-btn">Поддержка</button>
-            </div>    
-        
-        </div>
-</section>
+            <div class="status-filters">
+                <button class="active">Все</button>
+                <button>На рассмотрении</button>
+                <button>Ждёт ответа</button>
+                <button>Одобренные</button>
+                <button>Отклонённые</button>
+                <button>Черновики</button>
+            </div>
+            <div class="empty-block">
+                <img src="search.png" alt="Поиск" />
+                <p><strong>Ничего не найдено</strong></p>
+                <p>Попробуйте изменить условия поиска</p>
+                <button class="reset-btn">Сбросить фильтры</button>
+            </div>
+        </section>
+
+        <!-- Мероприятия -->
+        <section id="events" class="section">
+            <h2>Мероприятия</h2>
+            <div class="tabs">
+                <button>Мои мероприятия</button>
+                <button class="active">Все мероприятия</button>
+            </div>
+            <div class="events-controls">
+                <input type="text" placeholder="Поиск по мероприятиям">
+                <select>
+                    <option value="">Все типы</option>
+                    <option value="conference">Конференция</option>
+                    <option value="seminar">Семинар</option>
+                    <option value="workshop">Воркшоп</option>
+                    <option value="webinar">Вебинар</option>
+                </select>
+                <button class="date-btn" onclick="showCalendar()">Дата</button>
+                    <input type="date" class="date-selector" style="display:none;" />
+            </div>
+            <div class="events-list">
+                <div class="event-card">Нет информации<br>Нет информации</div>
+                <div class="event-card">Нет информации<br>Нет информации</div>
+            </div>
+        </section>
+    </div>
+</div>
+
+
