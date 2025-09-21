@@ -1,82 +1,166 @@
-<div class="container-2">
-    <!-- ЛЕВОЕ МЕНЮ -->
-    <div class="sidebar">
-        <button class="menu-btn active" data-target="profile">Профиль</button>
-        <button class="menu-btn" data-target="applications">Заявки</button>
-        <button class="menu-btn" data-target="services">Сервисы</button>
-        <button class="menu-btn" data-target="events">Мероприятия</button>
-        <button class="menu-btn" data-target="education">Обучение</button>
-        <button class="menu-btn" data-target="support">Поддержка</button>
-    </div>
-
-    <!-- ПРАВАЯ ЧАСТЬ -->
-    <div class="content">
-        <!-- Профиль -->
-        <section id="profile" class="section active">
-            
-            <div class="profile-header">
-                <div class="profile-avatar">👤</div>
-                <h2>Иванов Василий Александрович</h2>
-                <button class="profile-edit">✏️</button>
-            </div>
-            <div class="add-org-card">
-                <div class="add-org-text">
-                    <strong>Добавьте организацию</strong>
-                    Чтобы использовать все возможности ЦНП
+<div class="profile-container">
+    <div class="profile-main-content">
+        <aside class="sidebar">
+            <div class="sidebar-list">
+                <div class="sidebar-el link">
+                    <img src="../src/profile/user.svg" alt="user" class="sidebar-img">
+                    <p>Профиль</p>
                 </div>
-                <button class="add-org-btn">Добавить</button>
-            </div>
-        </section>
 
-        <!-- Заявки -->
-        <section id="applications" class="section">
-            <h2>Заявки</h2>
-            <div class="filters">
-                <select><option>Аккаунты</option></select>
-                <select><option>Тип услуги</option></select>
-                <select><option>Номер заявки</option></select>
-            </div>
-            <div class="status-filters">
-                <button class="active">Все</button>
-                <button>На рассмотрении</button>
-                <button>Ждёт ответа</button>
-                <button>Одобренные</button>
-                <button>Отклонённые</button>
-                <button>Черновики</button>
-            </div>
-            <div class="empty-block">
-                <img src="search.png" alt="Поиск" />
-                <p><strong>Ничего не найдено</strong></p>
-                <p>Попробуйте изменить условия поиска</p>
-                <button class="reset-btn">Сбросить фильтры</button>
-            </div>
-        </section>
+                <div class="sidebar-el link">
+                    <img src="../src/profile/folder.svg" alt="folder" class="sidebar-img">
+                    <p>Заявки</p>
+                </div>
+                
+                <div class="sidebar-el link">
+                    <img src="../src/profile/calendar.svg" alt="calendar" class="sidebar-img">
+                    <p>Мероприятия</p>
+                </div>
 
-        <!-- Мероприятия -->
-        <section id="events" class="section">
-            <h2>Мероприятия</h2>
-            <div class="tabs">
-                <button>Мои мероприятия</button>
-                <button class="active">Все мероприятия</button>
+                <div class="sidebar-el link">
+                    <img src="../src/profile/server.svg" alt="server" class="sidebar-img">
+                    <p>Сервисы</p>
+                </div>
+
+                <div class="sidebar-el link">
+                    <img src="../src/profile/educate.svg" alt="educate" class="sidebar-img">
+                    <p>Обучение</p>
+                </div>
+                
+                <div class="sidebar-el link">
+                    <img src="../src/profile/dialog.svg" alt="dialog" class="sidebar-img">
+                    <p>Поддержка</p>
+                </div>
             </div>
-            <div class="events-controls">
-                <input type="text" placeholder="Поиск по мероприятиям">
-                <select>
-                    <option value="">Все типы</option>
-                    <option value="conference">Конференция</option>
-                    <option value="seminar">Семинар</option>
-                    <option value="workshop">Воркшоп</option>
-                    <option value="webinar">Вебинар</option>
-                </select>
-                <button class="date-btn" onclick="showCalendar()">Дата</button>
-                    <input type="date" class="date-selector" style="display:none;" />
+        </aside>
+
+        <div class="profile-block">
+            <div class="profile-block block-1">
+                <div class="profile-header">
+                    <div class="profile-header-left">
+                        <img src="../src/profile/img-placeholder.svg" alt="img-placeholder" class="profile-header-img">
+                        <h2>Здесь будет <br>ваше имя</h2>
+                    </div>
+                    <img src="../src/profile/pen.svg" alt="pen" class="link pen">
+                </div>
+
+                <div class="add-organization">
+                    <p><span>Добавьте организацию</span><br>Чтобы использовать все возможности ЦНП</p>
+                    <a href="#!">
+                        <button>Добавить</button>
+                    </a>
+                </div>
             </div>
-            <div class="events-list">
-                <div class="event-card">Нет информации<br>Нет информации</div>
-                <div class="event-card">Нет информации<br>Нет информации</div>
+
+            <div class="profile-block block-2" style="display: none;">
+                <h2>Заявки</h2>
+
+                <ul class="profile-second-select-list">
+                    <li class="profile-second-select">
+                        <p>Аккаунты</p>
+                        <select name="Аккаунты" id="fitsr">Аккаунты</select>
+                    </li>
+
+                    <li class="profile-second-select">
+                        <p>Тип усслуги</p>
+                        <select name="Тип усслуги" id="second">Тип усслуги</select>
+                    </li>
+
+                    <li class="profile-second-select">
+                        <p>Номер заявки</p>
+                        <select name="Номер заявки" id="fird">Номер заявки</select>
+                    </li>
+                    
+                </ul>
+
+                <div class="profile-second-btn-row">
+                    <a href="#!" class="profile-row-el">Все</a>
+                    <a href="#!" class="profile-row-el">На рассмотрении</a>
+                    <a href="#!" class="profile-row-el">Ждет вашего ответа</a>
+                    <a href="#!" class="profile-row-el">Одобренные</a>
+                    <a href="#!" class="profile-row-el">Отклоненные</a>
+                    <a href="#!" class="profile-row-el">Черновики</a>
+                </div>
+
+                <div class="profile-second-text" style="display: none;">
+                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Enim ut laborum nesciunt ratione quis magni nihil nobis. Fugit sequi impedit laboriosam, voluptas recusandae saepe beatae sint ab eum voluptatem reiciendis!
+                </div>
+
+                <div class="profile-second-not-found">
+                    <div class="not-found-block">
+                        <img src="../src/profile/search.svg" alt="">
+                        <h2>Ничего не найдено</h2>
+                    </div>
+                    <p>Попробуйте изменить условия поиска</p>
+                    <a href="#!">
+                        <button class="reset-filters">Сбросить фильтры</button>
+                    </a>
+                </div>
             </div>
-        </section>
+
+            <div class="profile-block block-3" style="display: none;">
+                <div class="profile-third-1st-row">
+                    <h2>Мероприятия</h2>
+                    <div>
+                        <p>Мои мероприятия</p>
+                        <p>Все мероприятия</p>
+                    </div>
+                </div>
+
+                <div class="profile-third-search">
+                    <input type="input" placeholder="Поиск по мероприятиям">
+                    <a href="#!">
+                        <img src="../src/profile/lupka.svg" alt="искать">
+                    </a>
+                </div>
+
+                <div class="profile-third-last-row">
+                    <div class="profile-third-last-block select">
+                            <p>Все типы мероприятий</p>
+                            <select name="мероприятия" id="1">
+                                <option value="Выставка"></option>
+                                <option value="Вебинар "></option>
+                                <option value="Мероприятие"></option>
+                                <option value="Встреча"></option>
+                                <option value="Конференция"></option>
+                                <option value="Обучение"></option>
+                            </select>
+                    </div>
+
+                    <div class="profile-third-last-block">
+                        <p>Дата</p>
+                        <a href="#!">
+                            <img src="../src/profile/calendar.svg" alt="calendar">
+                        </a>
+                    </div>
+                </div>
+
+                <div class="profile-third-info">
+                    <div class="profile-third-info-block">
+                        <h2>Нет информации</h2>
+                        <p>Нет информации</p>
+                        <h3>Нет информации</h3>
+                    </div>
+                    
+                    <div class="profile-third-info-block">
+                        <h2>Нет информации</h2>
+                        <p>Нет информации</p>
+                        <h3>Нет информации</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-block block-4" style="display: none;">
+
+            </div>
+
+            <div class="profile-block block-5" style="display: none;">
+
+            </div>
+
+            <div class="profile-block block-6" style="display: none;">
+
+            </div>
+        </div>
     </div>
 </div>
-
-

@@ -15,7 +15,7 @@ const pullOut = async () => {
 document.addEventListener("DOMContentLoaded", async () => {
     const { hubContent, profileContent } = await pullOut();
 
-    container.innerHTML = `${hubContent}`;
+    container.innerHTML = `${profileContent}`;
 
     profileIcon.addEventListener("click", (e) => {
         e.preventDefault();
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (e.target == hubIcon && !hubIcon.classList.contains("active")) {
             hubIcon.classList.add("active");
             profileIcon.classList.remove("active");
-            container.innerHTML = `${hubContent}`;
+            container.innerHTML = `${profileContent}`;
         }
     });
 });
