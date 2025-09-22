@@ -6,8 +6,8 @@ const hubIcon = document.querySelector(".header-left-logo");
 const profileIcon = document.querySelector(".header-right-profile-logo");
 
 document.addEventListener("DOMContentLoaded", () => {
-    profilePage.style.display = "block";
-    hubPage.style.display = "none";
+    hubIcon.style.display = "block";
+    profilePage.style.display = "none";
 
     hubIcon.addEventListener("click", (e) => {
         e.preventDefault();

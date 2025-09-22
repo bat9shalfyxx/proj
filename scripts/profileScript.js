@@ -1,13 +1,15 @@
-const switchContent = (blockNum) => {
-    const block1 = document.querySelector(`.block-${blockNum}`);
-    block1.style.display = "block";
+const switchContent = (blockNum, target) => {
+    if (target.classList.contains(`el-${blockNum}`)) {
+        const block1 = document.querySelector(`.block-${blockNum}`);
+        block1.style.display = "grid";
 
-    for (let i = 1; i < 7; i++) {
-        if (i === blockNum) {
-            continue;
+        for (let i = 1; i < 7; i++) {
+            if (i === blockNum) {
+                continue;
+            }
+            const blockToHide = document.querySelector(`.block-${i}`);
+            blockToHide.style.display = "none";
         }
-        const blockToHide = document.querySelector(`.block-${i}`);
-        blockToHide.style.display = "none";
     }
 };
 
@@ -19,24 +21,12 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
 
         if (e.target.classList.contains("sidebar-el") || e.target.classList.contains("sidebar-onclick")) {
-            if (e.target.classList.contains("el-1")) {
-                switchContent(1);
-            }
-            if (e.target.classList.contains("el-2")) {
-                switchContent(2);
-            }
-            if (e.target.classList.contains("el-3")) {
-                switchContent(3);
-            }
-            if (e.target.classList.contains("el-4")) {
-                switchContent(4);
-            }
-            if (e.target.classList.contains("el-5")) {
-                switchContent(5);
-            }
-            if (e.target.classList.contains("el-6")) {
-                switchContent(6);
-            }
+            switchContent(1, e.target);
+            switchContent(2, e.target);
+            switchContent(3, e.target);
+            switchContent(4, e.target);
+            switchContent(5, e.target);
+            switchContent(6, e.target);
         }
     });
 });
