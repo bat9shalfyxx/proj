@@ -21,6 +21,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 });
 
-
 // const el = document.querySelector(".sidebar-el");
 // console.log(el.textContent);
