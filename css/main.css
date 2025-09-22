@@ -107,7 +107,6 @@ a > img:active,
     display: grid;
     margin: 0 auto;
     padding: 86px 42px 30px;
-    width: 750px;
     background-color: var(--light-col);
     border-radius: 30px;
     color: var(--dark-gray-col);

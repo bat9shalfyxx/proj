@@ -25,16 +25,18 @@
 .sidebar-el {
     display: flex;
     align-items: center;
-    column-gap: 17px;
     font-size: 21px;
     width: 235px;
     
     
-    padding: 4px 19px;  
     color: var(--dark-col);
     border-radius: 20px;
     cursor: pointer;
     background: var(--light-col);
+}
+
+.sidebar-onclick   {
+    padding: 4px 19px;  
 }
 
 .profile-block {
