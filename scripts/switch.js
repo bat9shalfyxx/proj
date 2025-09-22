@@ -15,7 +15,7 @@ const pullOut = async () => {
 document.addEventListener("DOMContentLoaded", async () => {
     const { hubContent, profileContent } = await pullOut();
 
-    container.innerHTML = `${hubContent}`;
+    container.innerHTML = `${profileContent}`;
 
     profileIcon.addEventListener("click", (e) => {
         e.preventDefault();
@@ -37,6 +37,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 });
+
+
 
 // class ContentSwitcher {
 //     constructor() {
