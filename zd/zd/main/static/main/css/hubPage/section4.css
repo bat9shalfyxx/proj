@@ -1,110 +1,92 @@
 /* SECTION4 */
 .section-4 {
-    padding: 70px;
+  padding: 70px;
 }
 
 .sec4-join-us {
-    width: 100%;
-    position: relative;
-    padding: 105px 60px;
-    border-radius: 30px;
-    background: linear-gradient(to right, var(--light-red-col), 15%, var(--light-gray-col));
-    margin-bottom: 60px;
-
-    img {
-        position: absolute;
-        border-radius: 30px;
-    }
+  width: 100%;
+  position: relative;
+  padding: 105px 60px;
+  border-radius: 30px;
+  background: linear-gradient(to right, var(--light-red-col), 15%, var(--light-gray-col));
+  margin-bottom: 60px;
 }
-
+.sec4-join-us img {
+  position: absolute;
+  border-radius: 30px;
+}
 .sec4-right-now {
-    display: grid;
-    text-align: center;
-    p {
-        font-size: 54px;
-        margin-bottom: 15px;
-        color: var(--dark-col);
-    }
+  display: grid;
+  text-align: center;
 }
-
-.sec4-button:hover {
-    transform: scale(1.01);
-}
-.sec4-button:active {
-    transform: scale(0.99);
+.sec4-right-now p {
+  font-size: 54px;
+  margin-bottom: 15px;
+  color: var(--dark-col);
 }
 .sec4-button {
-    font-size: 34px;
-    margin: auto;
-    padding: 8px 36px;
-
-    color: var(--dark-col, 0.5);
-    background-color: color-mix(in srgb, var(--light-red-col) 50%, transparent);
-    border: 3px solid var(--dark-red-col);
-    border-radius: 20px;
-
-    transition: all 0.3s ease;
+  font-size: 34px;
+  margin: auto;
+  padding: 8px 36px;
+  color: var(--dark-col, 0.5);
+  background-color: color-mix(in srgb, var(--light-red-col) 50%, transparent);
+  border: 3px solid var(--dark-red-col);
+  border-radius: 20px;
+  transition: all 0.3s ease;
 }
-
+.sec4-button:hover {
+  transform: scale(1.01);
+}
+.sec4-button:active {
+  transform: scale(0.99);
+}
 .sec4-person1 {
-    top: 86px;
-    left: -30px;
+  top: 86px;
+  left: -30px;
 }
 .sec4-person2 {
-    top: -36px;
-    left: 230px;
+  top: -36px;
+  left: 230px;
 }
 .sec4-person3 {
-    bottom: -36px;
-    left: 330px;
+  bottom: -36px;
+  left: 330px;
 }
 .sec4-person4 {
-    top: -6px;
-    left: 530px;
+  top: -6px;
+  left: 530px;
 }
 .sec4-person5 {
-    bottom: -16px;
-    left: 630px;
+  bottom: -16px;
+  left: 630px;
 }
-
-.sec4-news {
-    p {
-        font-size: 60px;
-        font-weight: bold;
-        color: var(--dark-col);
-        margin-bottom: 33px;
-    }
-
-    img {
-        border-radius: 30px;
-    }
+.sec4-news p {
+  font-size: 60px;
+  font-weight: bold;
+  color: var(--dark-col);
+  margin-bottom: 33px;
 }
-
+.sec4-news img {
+  border-radius: 30px;
+}
 .sec4-news-block {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 45px;
-    justify-content: space-between;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 45px;
+  justify-content: space-between;
 }
-
+.sec4-info p {
+  font-size: 23px;
+}
+.sec4-info span {
+  font-size: 23px;
+  color: var(--light-red-col);
+}
 .sec4-info-bar {
-    display: grid;
-    flex-wrap: wrap;
-    margin-right: 130px;
-    p {
-        font-size: 60px;
-    }
+  display: grid;
+  flex-wrap: wrap;
+  margin-right: 130px;
 }
-
-.sec4-info-list {
-}
-
-.sec4-info {
-    p {
-        font-size: 23px;
-    }
-    span {
-        font-size: 23px;
-        color: var(--light-red-col);
-    }
-}
+.sec4-info-bar p {
+  font-size: 30px;
+}/*# sourceMappingURL=section4.css.map */
