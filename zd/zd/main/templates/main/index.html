@@ -6,19 +6,19 @@
         <title>ЦНП</title>
     </head>
 
-    <link rel="stylesheet" href="../../static/main/css/style.css"></link>
-    <link rel="icon" href="../../static/main/src/section1/stonks.svg" type="image/x-icon">
+    <link rel="stylesheet" href="./css/style.css"></link>
+    <link rel="icon" href="./src/section1/stonks.svg" type="image/x-icon">
 
-    <script src="../../static/main/scripts/dropdown.js" defer></script>
-    <script src="../../static/main/scripts/profileScript.js" defer></script>
-    <script src="../../static/main/scripts/registration.js" defer></script>
-    <script src="../../static/main/scripts/switch.js" defer></script>
+    <script src="./scripts/switch.js" defer></script>
+    <script src="./scripts/dropdown.js" defer></script>
+    <script src="./scripts/registration.js" defer></script>
+    <script src="./scripts/profileScript.js" defer></script>
 
     <body>
         <div class="container">
             <header class="header">
                 <div class="header-left">
-                    <a class="link active" href="./hub"><img class="header-left-logo" src="../../static/main/src/section1/цнп.svg" alt="Цифровая научная платформа" /></a>
+                    <a class="link active" href="#!"><img class="header-left-logo" src="./src/section1/цнп.svg" alt="Цифровая научная платформа" /></a>
 
                     <div class="header-left-info">
                         <a class="link" href="#!">Организациям и ИП</a>
@@ -33,14 +33,14 @@
                     </div>
 
                     <div class="header-right-links">
-                        <a class="link" href="#!"><img src="../../static/main/src/section1/stonks.svg" alt="Цифровая научная платформа" /></a>
-                        <img class="arrow" src="../../static/main/src/section1/right-arrow.svg" alt="right-arrow" />
-                        <a class="link" href="#!"><img src="../../static/main/src/section1/tg.svg" alt="telegram" /></a>
+                        <a class="link" href="#!"><img src="./src/section1/stonks.svg" alt="Цифровая научная платформа" /></a>
+                        <img class="arrow" src="./src/section1/right-arrow.svg" alt="right-arrow" />
+                        <a class="link" href="#!"><img src="./src/section1/tg.svg" alt="telegram" /></a>
                     </div>
 
                     <div class="header-right-profile">
                         <a href="#!" class="header-right-profile-button link">Войти</a>
-                        <a class="link" href="./profile"><img class="header-right-profile-logo" src="../../static/main/src/section1/profile-icon.svg" alt="profile"/></a>
+                        <a class="link" href="#!"><img class="header-right-profile-logo" src="./src/section1/profile-icon.svg" alt="profile"/></a>
                     </div>
                 </div>
             </header>
@@ -57,7 +57,7 @@
                                 <p>Венчурный центр для <br />стартапов и инвесторов</p>
 
                                 <button class="nav-dropdown-button">Перейти</button>
-                                <img src="../../static/main/src/section1/invest.svg" />
+                                <img src="./src/section1/invest.svg" />
                             </div>
 
                             <div class="nav-dropdown-right">
@@ -77,7 +77,7 @@
                                 <p>Развитие и передвижение <br />жизни</p>
 
                                 <button class="nav-dropdown-button">Перейти</button>
-                                <img src="../../static/main/src/section1/hands.svg" />
+                                <img src="./src/section1/hands.svg" />
                             </div>
 
                             <div class="nav-dropdown-right">
@@ -97,7 +97,7 @@
                                 <p>Финансовые меры <br />поддержки</p>
 
                                 <button class="nav-dropdown-button">Перейти</button>
-                                <img src="../../static/main/src/section1/money.svg" />
+                                <img src="./src/section1/money.svg" />
                             </div>
 
                             <div class="nav-dropdown-right">
@@ -117,7 +117,7 @@
                                 <p>Современное пространство <br />для бизнеса</p>
 
                                 <button class="nav-dropdown-button">Перейти</button>
-                                <img src="../../static/main/src/section1/building.svg" />
+                                <img src="./src/section1/building.svg" />
                             </div>
 
                             <div class="nav-dropdown-right">
@@ -135,7 +135,7 @@
                                 <p>Онлайн-курсы и <br />трудоустройства</p>
 
                                 <button class="nav-dropdown-button">Перейти</button>
-                                <img src="../../static/main/src/section1/book.svg" />
+                                <img src="./src/section1/book.svg" />
                             </div>
 
                             <div class="nav-dropdown-right">
@@ -148,7 +148,7 @@
                 </ul>
             </nav>
 
-            <div class="registration">
+            <!-- <div class="registration">
                 <div class="registration-block reg-sign-in">
                     <div class="registration-header">
                         <a href="#!" class="sign-in active" style="color: black;">Вход</a>
@@ -178,7 +178,137 @@
                         </div>
                     </form>
                 </div>
+            </div> -->
+
+            
+            <div class="registration">
+                <div class="registration-block reg-sign-in">
+                    <div class="registration-header">
+                        <a href="#!" class="sign-in active" style="color: black;">Вход</a>
+                        <a href="#!" class="sign-up">Регистрация</a>
+                    </div>
+                    
+                     <form class="registration-form" method="post" action="{% url 'home' %}" id="login-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="login_submit" value="1">
+                        <div class="sign-in-form">
+                            <input type="text" 
+                                   name="username" 
+                                   placeholder="Телефон, электронная почта" 
+                                   value="{{ login_form.username.value|default:'' }}"
+                                   required
+                                   class="form-input">
+                            {% if login_form.username.errors %}
+                                <div class="error">{{ login_form.username.errors }}</div>
+                            {% endif %}
+                            
+                            <input type="password" 
+                                   name="password" 
+                                   placeholder="Введите пароль" 
+                                   autocomplete="on" 
+                                   required
+                                   class="form-input">
+                            {% if login_form.password.errors %}
+                                <div class="error">{{ login_form.password.errors }}</div>
+                            {% endif %}
+                            
+                            <!-- Общие ошибки формы входа -->
+                            {% if login_form.non_field_errors %}
+                                <div class="error login-error">
+                                    {% for error in login_form.non_field_errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <input class="form-button" type="submit" value="Войти" id="login-submit">
+                        </div>
+                    </form>
+
+                    <form class="registration-form" method="post" action="{% url 'home' %}" id="registration-form" style="display: none;">
+                        {% csrf_token %}
+                        <input type="hidden" name="registration_submit" value="1">
+                        <div class="sign-up-form">
+                            <!-- Исправьте все form. на registration_form. -->
+                            <input type="text" 
+                                   name="last_name" 
+                                   placeholder="Фамилия" 
+                                   value="{{ registration_form.last_name.value|default:'' }}">
+                            {% if registration_form.last_name.errors %}
+                                <div class="error">{{ registration_form.last_name.errors }}</div>
+                            {% endif %}
+                            
+                            <input type="text" 
+                                   name="first_name" 
+                                   placeholder="Имя" 
+                                   value="{{ registration_form.first_name.value|default:'' }}">
+                            {% if registration_form.first_name.errors %}
+                                <div class="error">{{ registration_form.first_name.errors }}</div>
+                            {% endif %}
+                            
+                            <input type="text" 
+                                   name="middle_name" 
+                                   placeholder="Отчество" 
+                                   value="{{ registration_form.middle_name.value|default:'' }}">
+                            {% if registration_form.middle_name.errors %}
+                                <div class="error">{{ registration_form.middle_name.errors }}</div>
+                            {% endif %}
+                            
+                            <input type="email" 
+                                   name="email" 
+                                   id="email-input"
+                                   placeholder="Электронная почта*" 
+                                   required
+                                   value="{{ registration_form.email.value|default:'' }}">
+                            <div id="email-error" class="error"></div>
+                            {% if registration_form.email.errors %}
+                                <div class="error">{{ registration_form.email.errors }}</div>
+                            {% endif %}
+                            
+                            <input type="tel" 
+                                   name="phone_number" 
+                                   id="phone-input"
+                                   placeholder="Номер мобильного телефона*" 
+                                   required
+                                   value="{{ registration_form.phone_number.value|default:'' }}">
+                            <div id="phone-error" class="error"></div>
+                            {% if registration_form.phone_number.errors %}
+                                <div class="error">{{ registration_form.phone_number.errors }}</div>
+                            {% endif %}
+                            
+                            <input type="password" 
+                                   name="password1" 
+                                   placeholder="Придумайте пароль" 
+                                   autocomplete="on" 
+                                   required>
+                            {% if registration_form.password1.errors %}
+                                <div class="error">{{ registration_form.password1.errors }}</div>
+                            {% endif %}
+                            <p>Минимум 8 символов</p>
+                            
+                            <input type="password" 
+                                   name="password2" 
+                                   placeholder="Подтвердите пароль" 
+                                   autocomplete="on" 
+                                   required>
+                            {% if registration_form.password2.errors %}
+                                <div class="error">{{ registration_form.password2.errors }}</div>
+                            {% endif %}
+                            
+                            {% if registration_form.non_field_errors %}
+                                <div class="error">
+                                    {% for error in registration_form.non_field_errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <input class="form-button" type="submit" value="Зарегистрироваться">
+                        </div>
+                    </form>
+                </div>
             </div>
+
 
             <div class="switch-content">
                 <div class="hubPage">
@@ -191,126 +321,106 @@
                                 </p>
                                 <p class="main-for-buisness">для бизнеса</p>
                             </div>
-                
+                    
                             <div class="main-content">
                                 <div class="main-content-info">
                                     <div class="main-input">
                                         <input type="text" placeholder="Поиск" />
                                     </div>
-                
+                    
                                     <div class="main-grid">
                                         <div class="main-grid-less">
                                             <div class="main-grid-block">
                                                 <p>Инвестиции</p>
-                                                <img
-                                                    src="../../static/main/src/section1/invest.svg "
-                                                    alt="Инвестиции"
-                                                    class="grid-img"
-                                                />
+                                                <img src="./src/section1/invest.svg " alt="Инвестиции" class="grid-img" />
                                             </div>
-                
+                    
                                             <div class="main-grid-block">
                                                 <p>Спрос <br />и кооперация</p>
-                                                <img
-                                                    src="../../static/main/src/section1/hands.svg"
-                                                    alt="Спрос и кооперация"
-                                                    class="grid-img"
-                                                />
+                                                <img src="./src/section1/hands.svg" alt="Спрос и кооперация" class="grid-img" />
                                             </div>
-                
+                    
                                             <div class="main-grid-block">
                                                 <p>Гранты <br />и кредиты</p>
-                                                <img
-                                                    src="../../static/main/src/section1/money.svg"
-                                                    alt="Гранты и кредиты"
-                                                    class="grid-img"
-                                                />
+                                                <img src="./src/section1/money.svg" alt="Гранты и кредиты" class="grid-img" />
                                             </div>
-                
+                    
                                             <div class="main-grid-block">
                                                 <p>Инфраструктура</p>
-                                                <img
-                                                    src="../../static/main/src/section1/building.svg"
-                                                    alt="Инфраструктура"
-                                                    class="grid-img"
-                                                />
+                                                <img src="./src/section1/building.svg" alt="Инфраструктура" class="grid-img" />
                                             </div>
                                         </div>
-                
+                    
                                         <div class="main-grid-greater">
                                             <div class="main-grid-block">
                                                 <p>Обучение <br />и карьера</p>
-                                                <img
-                                                    src="../../static/main/src/section1/book.svg"
-                                                    alt="Инфраструктура"
-                                                    class="grid-img"
-                                                />
+                                                <img src="./src/section1/book.svg" alt="Инфраструктура" class="grid-img" />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                
+                    
                                 <div class="main-img">
-                                    <img src="../../static/main/src/section1/bot.png" alt="reading-robot :)" />
+                                    <img src="./src/section1/bot.png" alt="reading-robot :)" />
                                 </div>
                             </div>
                         </main>
                     </section>
-                
+                    
                     <section class="section-2">
                         <div class="sec2-ellipse">
-                            <img src="../../static/main/src/section2/ellipse.svg" />
-                
+                            <img src="./src/section2/ellipse.svg" />
+                    
                             <div class="sec2-blur"></div>
-                
+                    
                             <div class="sec2-circle">
                                 <div class="sec2-circle-block block1">
                                     <div class="circle-wrapper">
-                                        <img src="../../static/main/src/section2/invest.svg" alt="invest" />
+                                        <img src="./src/section2/invest.svg" alt="invest" />
                                     </div>
                                     <h3>Инвестиции от фондов <br />и бизнес ангелов</h3>
                                 </div>
-                
+                    
                                 <div class="sec2-circle-block block2">
                                     <div class="circle-wrapper">
-                                        <img src="../../static/main/src/section2/group.svg" alt="group" />
+                                        <img src="./src/section2/group.svg" alt="group" />
                                     </div>
                                     <h3>Поиск новых заказчиков <br />и партнеров</h3>
                                 </div>
-                
+                    
                                 <div class="sec2-circle-block block3">
                                     <div class="circle-wrapper">
-                                        <img src="../../static/main/src/section2/generous.svg" alt="generous" />
+                                        <img src="./src/section2/generous.svg" alt="generous" />
                                     </div>
                                     <h3>Субсидии и гранты на <br />развитие бизнеса</h3>
                                 </div>
-                
+                    
                                 <div class="sec2-circle-block block4">
                                     <div class="circle-wrapper">
-                                        <img src="../../static/main/src/section2/cloud.svg" alt="cloud" />
+                                        <img src="./src/section2/cloud.svg" alt="cloud" />
                                     </div>
                                     <h3>Сервисы для <br />маштабирования бизнеса</h3>
                                 </div>
-                
+                    
                                 <div class="sec2-circle-block square block5">
                                     <div class="circle-wrapper">
-                                        <img src="../../static/main/src/section2/square.svg" alt="square" />
-                                        <img src="../../static/main/src/section2/square.svg" alt="square" />
-                                        <img src="../../static/main/src/section2/square.svg" alt="square" />
-                                        <img src="../../static/main/src/section2/square.svg" alt="square" />
+                                        <img src="./src/section2/square.svg" alt="square" />
+                                        <img src="./src/section2/square.svg" alt="square" />
+                                        <img src="./src/section2/square.svg" alt="square" />
+                                        <img src="./src/section2/square.svg" alt="square" />
                                     </div>
                                     <h3>Предложения от Деловых <br />партнеров</h3>
                                 </div>
-                
+                    
                                 <div class="sec2-circle-block block6">
                                     <div class="circle-wrapper">
-                                        <img src="../../static/main/src/section2/part.svg" alt="man" />
+                                        <img src="./src/section2/part.svg" alt="man" />
                                     </div>
                                     <h3>Стать участником</h3>
                                 </div>
                             </div>
                         </div>
-                
+                    
                         <div class="sec2-content">
                             <div class="sec2-content-text">
                                 <span>ЦНП</span> - место, где рождаются <br />
@@ -318,23 +428,23 @@
                                 технологические проекты <br />
                                 и раскрываются таланты
                             </div>
-                
+                    
                             <div class="sec2-content-grid">
                                 <div class="sec2-content-block">
                                     <h4><span>7,5</span> тыс.</h4>
                                     <p>участников кластера получили поддержку</p>
                                 </div>
-                
+                    
                                 <div class="sec2-content-block">
                                     <h4><span>3,4</span> млн.</h4>
                                     <p>средний размер поддержки на 1 компанию</p>
                                 </div>
-                
+                    
                                 <div class="sec2-content-block">
                                     <h4><span>12,2</span> млн.</h4>
                                     <p>сумма одобренных грантов и субсидий</p>
                                 </div>
-                
+                    
                                 <div class="sec2-content-block">
                                     <h4><span>32,2</span> млн.</h4>
                                     <p>суммарный прирост выручки участников кластера</p>
@@ -342,7 +452,7 @@
                             </div>
                         </div>
                     </section>
-                
+                    
                     <section class="section-3">
                         <div class="sec3-header">
                             <p>
@@ -351,61 +461,55 @@
                             </p>
                             <a class="sec3-header-link">
                                 Смотреть все проекты
-                                <img src="../../static/main/src/section3/right-arrow.svg" alt="arrow" />
+                                <img src="./src/section3/right-arrow.svg" alt="arrow" />
                             </a>
                         </div>
-                
+                    
                         <div class="sec3-content">
                             <ul class="sec3-content-list">
                                 <li class="sec3-content-block">
-                                    <div class="sec3-content-img">
-                                        <img src="../../static/main/src/section3/3-1.png" alt="cars" loading="lazy" />
-                                    </div>
+                                    <div class="sec3-content-img"><img src="./src/section3/3-1.png" alt="cars" loading="lazy" /></div>
                                     <p class="sec3-content-text">НЕТ ИНФОРМАЦИИ</p>
                                 </li>
-                
+                    
                                 <li class="sec3-content-block">
-                                    <div class="sec3-content-img">
-                                        <img src="../../static/main/src/section3/3-2.png" alt="trains" loading="lazy" />
-                                    </div>
+                                    <div class="sec3-content-img"><img src="./src/section3/3-2.png" alt="trains" loading="lazy" /></div>
                                     <p class="sec3-content-text">НЕТ ИНФОРМАЦИИ</p>
                                 </li>
-                
+                    
                                 <li class="sec3-content-block">
-                                    <div class="sec3-content-img">
-                                        <img src="../../static/main/src/section3/3-3.png" alt="robot" loading="lazy" />
-                                    </div>
+                                    <div class="sec3-content-img"><img src="./src/section3/3-3.png" alt="robot" loading="lazy" /></div>
                                     <p class="sec3-content-text">НЕТ ИНФОРМАЦИИ</p>
                                 </li>
                             </ul>
                         </div>
                     </section>
-                
+                    
                     <section class="section-4">
                         <div class="sec4-join-us">
-                            <img src="../../static/main/src/section4/4-1.png" alt="person" class="sec4-person1" loading="lazy" />
-                            <img src="../../static/main/src/section4/4-2.png" alt="person" class="sec4-person2" loading="lazy" />
-                            <img src="../../static/main/src/section4/4-3.png" alt="person" class="sec4-person3" loading="lazy" />
-                            <img src="../../static/main/src/section4/4-4.png" alt="person" class="sec4-person4" loading="lazy" />
-                            <img src="../../static/main/src/section4/4-5.png" alt="person" class="sec4-person5" loading="lazy" />
-                
+                            <img src="./src/section4/4-1.png" alt="person" class="sec4-person1" loading="lazy" />
+                            <img src="./src/section4/4-2.png" alt="person" class="sec4-person2" loading="lazy" />
+                            <img src="./src/section4/4-3.png" alt="person" class="sec4-person3" loading="lazy" />
+                            <img src="./src/section4/4-4.png" alt="person" class="sec4-person4" loading="lazy" />
+                            <img src="./src/section4/4-5.png" alt="person" class="sec4-person5" loading="lazy" />
+                    
                             <div class="sec4-right-now">
                                 <p>Присоединяйтесь прямо сейчас</p>
                                 <button class="sec4-button">Бесплатно</button>
                             </div>
                         </div>
-                
+                    
                         <div class="sec4-news">
                             <p>Новости</p>
-                
+                    
                             <div class="sec4-news-block">
                                 <div class="sec4-news-img">
-                                    <img src="../../static/main/src/section4/4-train.png" alt="train" />
+                                    <img src="./src/section4/4-train.png" alt="train" />
                                 </div>
-                
+                    
                                 <div class="sec4-info-bar">
                                     <p>НЕТ ИНФОРМАЦИИ</p>
-                
+                    
                                     <ul class="sec4-info-list">
                                         <li class="sec4-info">
                                             <span>05.09.2025</span>
@@ -437,115 +541,81 @@
                     </section>
                 </div>
 
-                <div class="profilePage"  style="display: none;">
+                <div class="profilePage" style="display: none;">
                     <div class="profile-container">
                         <div class="profile-main-content">
                             <aside class="sidebar">
                                 <div class="sidebar-list">
                                     <div class="sidebar-el el-1 link">
-                                        <img
-                                            src="../../static/main/src/profile/user.svg"
-                                            alt="user"
-                                            class="sidebar-img sidebar-onclick el-1"
-                                        />
+                                        <img src="./src/profile/user.svg" alt="user" class="sidebar-img sidebar-onclick el-1">
                                         <p class="sidebar-onclick el-1">Профиль</p>
                                     </div>
-                
+                    
                                     <div class="sidebar-el el-2 link">
-                                        <img
-                                            src="../../static/main/src/profile/folder.svg"
-                                            alt="folder"
-                                            class="sidebar-img sidebar-onclick el-2"
-                                        />
+                                        <img src="./src/profile/folder.svg" alt="folder" class="sidebar-img sidebar-onclick el-2">
                                         <p class="sidebar-onclick el-2">Заявки</p>
                                     </div>
-                
+                                    
                                     <div class="sidebar-el el-3 link">
-                                        <img
-                                            src="../../static/main/src/profile/calendar.svg"
-                                            alt="calendar"
-                                            class="sidebar-img sidebar-onclick el-3"
-                                        />
+                                        <img src="./src/profile/calendar.svg" alt="calendar" class="sidebar-img sidebar-onclick el-3">
                                         <p class="sidebar-onclick el-3">Мероприятия</p>
                                     </div>
-                
+                    
                                     <div class="sidebar-el el-4 link">
-                                        <img
-                                            src="../../static/main/src/profile/server.svg"
-                                            alt="server"
-                                            class="sidebar-img sidebar-onclick el-4"
-                                        />
+                                        <img src="./src/profile/server.svg" alt="server" class="sidebar-img sidebar-onclick el-4">
                                         <p class="sidebar-onclick el-4">Сервисы</p>
                                     </div>
-                
+                    
                                     <div class="sidebar-el el-5 link">
-                                        <img
-                                            src="../../static/main/src/profile/educate.svg"
-                                            alt="educate"
-                                            class="sidebar-img sidebar-onclick el-5"
-                                        />
+                                        <img src="./src/profile/educate.svg" alt="educate" class="sidebar-img sidebar-onclick el-5">
                                         <p class="sidebar-onclick el-5">Обучение</p>
                                     </div>
-                
+                                    
                                     <div class="sidebar-el el-6 link">
-                                        <img
-                                            src="../../static/main/src/profile/dialog.svg"
-                                            alt="dialog"
-                                            class="sidebar-img sidebar-onclick el-6"
-                                        />
+                                        <img src="./src/profile/dialog.svg" alt="dialog" class="sidebar-img sidebar-onclick el-6">
                                         <p class="sidebar-onclick el-6">Поддержка</p>
                                     </div>
                                 </div>
                             </aside>
-                
+                    
                             <div class="profile-block">
                                 <div class="profile-block block-1">
                                     <div class="profile-header">
                                         <div class="profile-header-left">
-                                            <img
-                                                src="../../static/main/src/profile/img-placeholder.svg"
-                                                alt="img-placeholder"
-                                                class="profile-header-img"
-                                            />
-                                            <h2>Здесь будет <br />ваше имя</h2>
+                                            <img src="./src/profile/img-placeholder.svg" alt="img-placeholder" class="profile-header-img">
+                                            <h2>Здесь будет <br>ваше имя</h2>
                                         </div>
-                                        <img src="../../static/main/src/profile/pen.svg" alt="pen" class="link pen" />
+                                        <img src="./src/profile/pen.svg" alt="pen" class="link pen">
                                     </div>
-                
+                    
                                     <div class="add-organization">
-                                        <p><span>Добавьте организацию</span><br />Чтобы использовать все возможности ЦНП</p>
+                                        <p><span>Добавьте организацию</span><br>Чтобы использовать все возможности ЦНП</p>
                                         <a href="#!">
                                             <button>Добавить</button>
                                         </a>
                                     </div>
                                 </div>
-                
-                                <div class="profile-block block-2" style="display: none">
+                    
+                                <div class="profile-block block-2" style="display: none;">
                                     <h2>Заявки</h2>
-                
+                    
                                     <ul class="profile-second-select-list">
                                         <li class="profile-second-select">
                                             <p>Аккаунты</p>
-                                            <select name="Аккаунты" id="fitsr">
-                                                Аккаунты
-                                            </select>
+                                            <select name="Аккаунты" id="fitsr">Аккаунты</select>
                                         </li>
-                
+                    
                                         <li class="profile-second-select">
                                             <p>Тип усслуги</p>
-                                            <select name="Тип усслуги" id="second">
-                                                Тип усслуги
-                                            </select>
+                                            <select name="Тип усслуги" id="second">Тип усслуги</select>
                                         </li>
-                
+                    
                                         <li class="profile-second-select">
                                             <p>Номер заявки</p>
-                                            <select name="Номер заявки" id="fird">
-                                                Номер заявки
-                                            </select>
+                                            <select name="Номер заявки" id="fird">Номер заявки</select>
                                         </li>
                                     </ul>
-                
+                    
                                     <div class="profile-second-btn-row">
                                         <a href="#!" class="profile-row-el">Все</a>
                                         <a href="#!" class="profile-row-el">На рассмотрении</a>
@@ -554,16 +624,14 @@
                                         <a href="#!" class="profile-row-el">Отклоненные</a>
                                         <a href="#!" class="profile-row-el">Черновики</a>
                                     </div>
-                
-                                    <div class="profile-second-text" style="display: none">
-                                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Enim ut laborum nesciunt ratione quis
-                                        magni nihil nobis. Fugit sequi impedit laboriosam, voluptas recusandae saepe beatae sint ab eum
-                                        voluptatem reiciendis!
+                    
+                                    <div class="profile-second-text" style="display: none;">
+                                        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Enim ut laborum nesciunt ratione quis magni nihil nobis. Fugit sequi impedit laboriosam, voluptas recusandae saepe beatae sint ab eum voluptatem reiciendis!
                                     </div>
-                
+                    
                                     <div class="profile-second-not-found">
                                         <div class="not-found-block">
-                                            <img src="../../static/main/src/profile/search.svg" alt="" />
+                                            <img src="./src/profile/search.svg" alt="">
                                             <h2>Ничего не найдено</h2>
                                         </div>
                                         <p>Попробуйте изменить условия поиска</p>
@@ -572,8 +640,8 @@
                                         </a>
                                     </div>
                                 </div>
-                
-                                <div class="profile-block block-3" style="display: none">
+                    
+                                <div class="profile-block block-3" style="display: none;">
                                     <div class="profile-third-1st-row">
                                         <h2>Мероприятия</h2>
                                         <div>
@@ -581,42 +649,42 @@
                                             <p>Все мероприятия</p>
                                         </div>
                                     </div>
-                
+                    
                                     <div class="profile-third-search">
-                                        <input type="input" placeholder="Поиск по мероприятиям" />
+                                        <input type="input" placeholder="Поиск по мероприятиям">
                                         <a href="#!">
-                                            <img src="../../static/main/src/profile/lupka.svg" alt="искать" />
+                                            <img src="./src/profile/lupka.svg" alt="искать">
                                         </a>
                                     </div>
-                
+                    
                                     <div class="profile-third-last-row">
                                         <div class="profile-third-last-block select">
-                                            <p>Все типы мероприятий</p>
-                                            <select name="мероприятия" id="1">
-                                                <option value="Выставка"></option>
-                                                <option value="Вебинар "></option>
-                                                <option value="Мероприятие"></option>
-                                                <option value="Встреча"></option>
-                                                <option value="Конференция"></option>
-                                                <option value="Обучение"></option>
-                                            </select>
+                                                <p>Все типы мероприятий</p>
+                                                <select name="мероприятия" id="1">
+                                                    <option value="Выставка"></option>
+                                                    <option value="Вебинар "></option>
+                                                    <option value="Мероприятие"></option>
+                                                    <option value="Встреча"></option>
+                                                    <option value="Конференция"></option>
+                                                    <option value="Обучение"></option>
+                                                </select>
                                         </div>
-                
+                    
                                         <div class="profile-third-last-block">
                                             <p>Дата</p>
                                             <a href="#!">
-                                                <img src="../../static/main/src/profile/calendar.svg" alt="calendar" />
+                                                <img src="./src/profile/calendar.svg" alt="calendar">
                                             </a>
                                         </div>
                                     </div>
-                
+                    
                                     <div class="profile-third-info">
                                         <div class="profile-third-info-block">
                                             <h2>Нет информации</h2>
                                             <p>Нет информации</p>
                                             <h3>Нет информации</h3>
                                         </div>
-                
+                                        
                                         <div class="profile-third-info-block">
                                             <h2>Нет информации</h2>
                                             <p>Нет информации</p>
@@ -624,12 +692,150 @@
                                         </div>
                                     </div>
                                 </div>
-                
-                                <div class="profile-block block-4" style="display: none"></div>
-                
-                                <div class="profile-block block-5" style="display: none"></div>
-                
-                                <div class="profile-block block-6" style="display: none"></div>
+                    
+                                <div class="profile-block block-4"  style="display: none;">
+                                        <div class="block-4-first-line">
+                                        <h2>Мои сервисы</h2>
+                                        <div class="block-4-first-line-info">
+                                            <p>Начните использовать сервисы и информация о них появится здесь</p>
+                                            <svg>
+
+                                            </svg>
+                                            <img src="./src/profile/cog.svg" alt="cog" class="cog-1">
+                                            <img src="./src/profile/cog.svg" alt="cog" class="cog-2">
+                                        </div>
+                                    </div>
+
+                                    <div class="block-4-second-line">
+                                        <h2>Мои сервисы</h2>
+                                        <div class="block-4-second-line-search">
+                                            <input type="search" placeholder="Найти">
+                                            <img src="./src/profile/lupka.svg" alt="лупа" class="link">
+                                        </div>
+                                    </div>
+
+                                    <div class="block-4-main">
+                                        <div class="block-4-main-block">
+                                            <img src="./src/profile/brain.png" alt="smart people looking at smart big brain">
+                                            <p>Нет информации</p>
+                                            <button>
+                                                Перейти в сервис
+                                            </button>
+                                        </div>
+                                        <div class="block-4-main-block">
+                                            <img src="./src/profile/brain.png" alt="smart people looking at smart big brain">
+                                            <p>Нет информации</p>
+                                            <button>
+                                                Перейти в сервис
+                                            </button>
+                                        </div>
+                                        <div class="block-4-main-block">
+                                            <img src="./src/profile/brain.png" alt="smart people looking at smart big brain">
+                                            <p>Нет информации</p>
+                                            <button>
+                                                Перейти в сервис
+                                            </button>
+                                        </div>
+                                        <div class="block-4-main-block">
+                                            <img src="./src/profile/brain.png" alt="smart people looking at smart big brain">
+                                            <p>Нет информации</p>
+                                            <button>
+                                                Перейти в сервис
+                                            </button>
+                                        </div>
+                                        <div class="block-4-main-block">
+                                            <img src="./src/profile/brain.png" alt="smart people looking at smart big brain">
+                                            <p>Нет информации</p>
+                                            <button>
+                                                Перейти в сервис
+                                            </button>
+                                        </div>
+                                        <div class="block-4-main-block">
+                                            <img src="./src/profile/brain.png" alt="smart people looking at smart big brain">
+                                            <p>Нет информации</p>
+                                            <button>
+                                                Перейти в сервис
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                    
+                                <!-- <div class="profile-block block-5"  style="display: none;"> -->
+                                <div class="profile-block block-5">
+                                    <div class="block-5-first-line">
+                                        <h2>Мое обучение</h2>
+                                        <div class="block-5-first-line-info">
+                                            <p>Начните обучение и информация о нем появится здесь</p>
+                                            <img src="./src/profile/encyclopedia.svg" alt="encyclopedia" class="encyclopedia">
+                                        </div>
+                                    </div>
+
+                                    <div class="block-5-second-line">
+                                        <h2>Доступное обучение</h2>
+                                    </div>
+
+                                    <div class="block-5-main">
+                                        <div class="block-5-main-block">
+                                            <img src="./src/profile/education-brain.png" alt="smart people looking at smart big brain">
+                                            <p>Нет информации</p>
+                                            <button>
+                                                Перейти в сервис
+                                            </button>
+                                        </div>
+                                        <div class="block-5-main-block">
+                                            <img src="./src/profile/education-brain.png" alt="smart people looking at smart big brain">
+                                            <p>Нет информации</p>
+                                            <button>
+                                                Перейти в сервис
+                                            </button>
+                                        </div>
+                                        <div class="block-5-main-block">
+                                            <img src="./src/profile/education-brain.png" alt="smart people looking at smart big brain">
+                                            <p>Нет информации</p>
+                                            <button>
+                                                Перейти в сервис
+                                            </button>
+                                        </div>
+                                        <div class="block-5-main-block">
+                                            <img src="./src/profile/education-brain.png" alt="smart people looking at smart big brain">
+                                            <p>Нет информации</p>
+                                            <button>
+                                                Перейти в сервис
+                                            </button>
+                                        </div>
+                                        <div class="block-5-main-block">
+                                            <img src="./src/profile/education-brain.png" alt="smart people looking at smart big brain">
+                                            <p>Нет информации</p>
+                                            <button>
+                                                Перейти в сервис
+                                            </button>
+                                        </div>
+                                        <div class="block-5-main-block">
+                                            <img src="./src/profile/education-brain.png" alt="smart people looking at smart big brain">
+                                            <p>Нет информации</p>
+                                            <button>
+                                                Перейти в сервис
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                    
+                                <div class="profile-block block-6" style="display: none;">
+                                    <p>Служба поддержки</p>
+                                    <div class="block-6-chat-bot">
+                                        <div class="block-6-chat-bot-text">
+                                            <h2>Скоро здесь будет наш новый чат-бот</h2>
+                                            <p>А пока вы можете обратиться в нашу службу поддержки</p>
+                                            
+                                            <div class="block-6-chat-bot-text-tech">
+                                                <p>Вопросы по сервисам</p>
+                                                <p>Техническая поддержка</p>
+                                                <p>Телефон</p>
+                                            </div>
+                                        </div>
+                                        <img src="./src/profile/cog-block-6.svg" alt="cog">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
