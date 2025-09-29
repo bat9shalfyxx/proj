@@ -1,10 +1,41 @@
-@media screen and (max-width: 1680px) {
+@media screen and (max-width: 1830px) {
     .main-img {
         display: none;
     }
 }
 
 @media screen and (max-width: 980px) {
+    //HEADER
+    .header {
+        padding-inline: clamp(10px, 4vw, 50px);
+        &-left {
+            &-info {
+                display: none;
+            }
+            &-logo {
+                width: clamp(90px, 20vw, 140px);
+            }
+        }
+        &-right {
+            &-info {
+                display: none;
+            }
+            &-links {
+                &:not(.tg) {
+                    //ну и че он не работает
+                    // display: none;
+                }
+            }
+            &-profile {
+                margin-left: clamp(30px, 7vw, 70px) !important;
+            }
+        }
+        // &-
+        // &-
+        // &-
+    }
+
+
     //REGISTRATION
     .registration {
         &-block,
@@ -27,9 +58,25 @@
         }
     }
     
+
     // SECTION 1
     .main {
         margin-bottom: 60px;
+
+        &-text {
+            width: 95vw;
+        }
+        &-for-buisness {
+            padding: 7px 40px;
+            margin: 10px 0 25px 20px;
+        }
+        &-input {
+            border-radius: 10px;
+            margin-bottom: 40px;
+            input{
+                padding: 6px 20px;
+            }
+        }
         &-grid {
             gap: clamp(20px, 8vw, 40px);
             &-block {
@@ -55,6 +102,30 @@
             }
         }
     }
+
+
+    // SECTION 2
+    .circle-wrapper {
+        margin-right: 20px !important;
+        transform: scale(0.7);
+    }
+    .ellipse-img {
+        display: none;
+    }
+    .sec2 {
+        &-circle {
+            position: relative !important;
+            display: grid !important;
+            margin-left: 5vw;
+            gap: 50px;
+            &-block { 
+                h3 {
+                    text-align: left;
+                }
+            }
+        }
+    }
+
 
     // SECTION 3
     .section-3 {
@@ -116,7 +187,6 @@
                 }
             }
         }
-        
         &-person {
                 &5 {
                     @media (max-width: 830px) {
@@ -138,30 +208,6 @@
                         display: none;
                     }
                 }
-        }
-    }
-}
-
-
-//ПОЛУКРУГ ВО ВТОРОЙ СЕКЦИИ
-@media screen and (max-width: 870px) {
-    .circle-wrapper {
-        margin-right: 20px !important;
-    }
-    .ellipse-img {
-        display: none;
-    }
-    .sec2 {
-        &-circle {
-            position: relative !important;
-            display: grid !important;
-            margin-left: 5vw;
-            gap: 50px;
-            &-block { 
-                h3 {
-                    text-align: left;
-                }
-            }
         }
     }
 }

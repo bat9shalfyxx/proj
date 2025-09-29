@@ -157,7 +157,7 @@
 
     &-text {
         margin-top: 30px;
-        font-size: clamp(24px, 4vw, 50px);
+        font-size: clamp(20px, 4vw, 50px);
         color: var(--dark-col);
 
         &::first-line {
@@ -171,10 +171,13 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
+
     }
 
     &-input {
-        height: 70px;
+        display: flex;
+        justify-content: space-between;
+        padding-right: 10px;
         font-size: clamp(12px, 2vw, 23px);
         color: var(--dark-col);
         opacity: 0.5;
@@ -190,7 +193,7 @@
 
     &-for-buisness {
         margin: 20px 0 50px 110px;
-        font-size: clamp(24px, 3.7vw, 40px);
+        font-size: clamp(14px, 3.7vw, 40px);
         max-width: 410px;
         padding: 7px 80px;
         border-radius: 35px;
