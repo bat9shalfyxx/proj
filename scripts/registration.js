@@ -2,6 +2,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const regButton = document.querySelector(".header-right-profile-button");
     const mainContent = document.querySelector(".switch-content");
     const regContent = document.querySelector(".registration");
+    const header = document.querySelector('.header')
+
+    header.addEventListener('click', (e) => {
+        if (e.target.classList.contains('header-left-logo') || e.target.classList.contains('header-right-profile-logo')) {
+            if (regContent.classList.contains('active')) {
+                regContent.classList.remove("active")
+                regContent.style.display = "none";
+                mainContent.style.display = "block";
+            }
+        }
+    })
 
     regButton.addEventListener("click", (e) => {
         e.preventDefault();
