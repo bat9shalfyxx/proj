@@ -2,7 +2,7 @@
 .header {
     display: flex;
     flex-wrap: wrap;
-    gap: 25px;
+    gap: clamp(8px, 2vw, 25px);
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid var(--dark-col);
@@ -15,12 +15,12 @@
         &-info {
             display: flex;
             align-items: center;
-            margin-left: 90px;
+            margin-left:  clamp(20px, 5vw, 90px);
             font-size: clamp(14px, 3vw, 19px);
             
             a,
             p {
-                font-size: clamp(16px, 3.5vw, 25px);
+                font-size: clamp(13px, 3vw, 25px);
                 margin: 0 10px;
                 color: var(--dark-gray-col);
             }
@@ -35,16 +35,15 @@
             a {
                 color: var(--light-red-col);
             }
-            font-size: clamp(14px, 3vw, 19px);
+            font-size: clamp(10px, 2vw, 15px) !important;
             padding: 14px 31px;
             border: 2px solid var(--dark-col);
             border-radius: 26px;
         }
 
         &-links {
-            .arrow {
-                margin-top: 13px;
-            }
+            display: flex;
+            align-items: center;
             margin-left: 11px;
             padding: 5px 22px;
             border: 2px solid var(--light-red-col);
@@ -53,7 +52,7 @@
 
         &-profile {
             display: flex;
-            column-gap: 20px;
+            column-gap: clamp(10px, 3vw, 20px);
             margin-left: 140px;
             a {
                 color: var(--dark-gray-col);

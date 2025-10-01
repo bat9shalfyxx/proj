@@ -11,7 +11,7 @@
 
     <script src="./scripts/switch.js" defer></script>
     <script src="./scripts/dropdown.js" defer></script>
-    <script src="./scripts/registration.js" defer></script>
+    <script src="./scripts/formPage.js" defer></script>
     <script src="./scripts/profileScript.js" defer></script>
 
     <body>
@@ -148,24 +148,53 @@
                 </ul>
             </nav>
 
-            <div class="registration">
-                <div class="registration-block reg-sign-in">
-                    <div class="registration-header">
-                        <a href="#!" class="sign-in active" style="color: black;">Вход</a>
-                        
-                        <a href="#!" class="sign-up">Регистрация</a>
+
+            <div class="formPage">
+                <div class="formPage-block">
+                    <!-- /// ЗАЯВКИ -->
+                    <div class="formPage-header request-head">
+                        <p href="#!" class="link" style="color: black;">Заявка</p>
+                    </div>
+
+                    <form class="formPage-form" action="">
+                        <div class="form-request">
+                            <p>Организация</p>
+                            <input type="input" placeholder="Наименование организации" required>
+                            <input type="input" placeholder="ИНН организации" required>
+                            <input type="input" placeholder="Сайт организации" required>
+                            
+                            <p>Предлагаемое решение</p>
+                            <input type="input" placeholder="Краткое наименование" required>
+                            <input type="input" placeholder="Описание предлагаемого решения" required>
+                            <input type="input" placeholder="Релевантный опыт применения подобного решения" required>
+                            
+                            <p>Контакты для обратной связи</p>
+                            <input type="input" placeholder="Имя " required>
+                            <input type="input" placeholder="Фамилия" required>
+                            <input type="input" placeholder="Отчество" required>
+                            <input type="input" placeholder="Телефон" required>
+                            <input type="input" placeholder="электронная почта" required>
+                            
+                            <input class="form-button" type="submit" value="Подать заявку">
+                        </div>
+                    </form>
+
+                    <!-- /// ВХОД-РЕГИСТРАЦИЯ -->
+                    <div class="formPage-header reg-head">
+                        <p href="#!" class="sign-in active link" style="color: black;">Вход</p>
+                        <p href="#!" class="sign-up link">Регистрация</p>
                     </div>
                     
-                    <form class="registration-form" action="">
-                        <div class="sign-in-form">
+                    <form class="formPage-form" action="">
+                        <div class="form-sign-in">
                             <input type="input" placeholder="Телефон, электронная почта или СНИЛС" required>
                             <input type="password" placeholder="Введите пароль" autocomplete="on" required>
                             <input class="form-button" type="submit" value="войти">
                         </div>
                     </form>
 
-                    <form class="registration-form" action="">
-                        <div class="sign-up-form">
+                    <form class="formPage-form" action="">
+                        <div class="form-sign-up">
                             <input type="input" placeholder="Фамилия" required>
                             <input type="input" placeholder="Имя" required>
                             <input type="input" placeholder="Отчество">
@@ -544,6 +573,10 @@
                     <div class="profile-container">
                         <div class="profile-main-content">
                             <aside class="sidebar">
+                                <div class="sidebar-menu-header">
+                                    <p>Меню</p>
+                                </div>
+
                                 <div class="sidebar-list">
                                     <div class="sidebar-el el-1 link">
                                         <img src="./src/profile/user.svg" alt="user" class="sidebar-img sidebar-onclick el-1">
@@ -835,6 +868,13 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <button class="profile-menu-btn menu-btn">
+                                <img src="./src/section2/square.svg" class="menu-btn">
+                                <img src="./src/section2/square.svg" class="menu-btn">
+                                <img src="./src/section2/square.svg" class="menu-btn">
+                                <img src="./src/section2/square.svg" class="menu-btn">
+                            </button>
                         </div>
                     </div>
                 </div>

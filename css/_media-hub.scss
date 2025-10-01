@@ -5,6 +5,9 @@
 }
 
 @media screen and (max-width: 980px) {
+    .nav  {
+        display: none;
+    }
     //HEADER
     .header {
         padding-inline: clamp(10px, 4vw, 50px);
@@ -13,48 +16,67 @@
                 display: none;
             }
             &-logo {
-                width: clamp(90px, 20vw, 140px);
+                width: clamp(70px, 15vw, 140px);
             }
         }
         &-right {
-            &-info {
-                display: none;
-            }
-            &-links {
-                &:not(.tg) {
-                    //ну и че он не работает
-                    // display: none;
+            display: flex;
+            gap: clamp(5px, 2vw, 15px);
+            &-profile {
+                margin-left: clamp(5px, 2vw, 50px) !important;
+                &-logo {
+                    width: clamp(30px, 5vw, 58px);
                 }
             }
-            &-profile {
-                margin-left: clamp(30px, 7vw, 70px) !important;
+            &-info {
+                padding: clamp(3px, 1vw, 14px) clamp(6px, 1.5vw, 15px) !important;
+            }
+            &-links {
+                margin-left: 5px;
+                gap: 2vw;
+                border: none;
+                padding: 0 !important;
+                .arrow {
+                    display: none;
+                }
+                img {
+                    height: 5vw;
+                    max-height: 40px;
+                }
             }
         }
-        // &-
-        // &-
-        // &-
     }
 
 
-    //REGISTRATION
-    .registration {
-        &-block,
-        &-header,
-        &-form
-        {
-            width: fit-content;
+    //formPage
+    .form {
+        cursor: pointer;
+        color: var(--dark-gray-col);
+        &-sign-up,
+        &-sign-in,
+        &-request {
+            row-gap: clamp(10px, 4vw, 35px) !important;
         }
-        
-        &-block {
-            padding: 40px 40px 30px !important;
-            width: 95vw !important;
+        &Page {
+            &-header {
+                max-height: 50px !important;
+                margin-bottom: clamp(30px, 10vw, 100px) !important;
+            }
+            &-form {
+                input {
+                    padding: clamp(6px, 2vw, 19px) clamp(10px, 3vw, 30px) !important;
+                    width: 80vw !important;
+                    max-width: 600px;
+                }
+            }
+            &-block {
+                padding: clamp(20px, 4vw, 40px) clamp(15px, 3vw, 30px)!important;
+            }
         }
-    }
-    .sign-up-form,
-    .sign-in-form
-    {
-        input {
-            width: 85vw !important;
+        &-button {
+            font-size: clamp(12px, 2vw, 29px);
+            color: var(--light-col);
+            background: linear-gradient(to bottom, var(--light-red-col), var(--dark-gray-col)) !important;
         }
     }
     
@@ -62,7 +84,6 @@
     // SECTION 1
     .main {
         margin-bottom: 60px;
-
         &-text {
             width: 95vw;
         }

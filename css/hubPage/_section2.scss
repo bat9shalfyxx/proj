@@ -34,10 +34,6 @@
                 font-size: clamp(15px, 4vw, 32px);    
                 color: var(--dark-col);
             }
-            &.square {
-                display: flex;
-                align-items: center;
-            }
         }
     }
     

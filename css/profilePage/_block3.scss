@@ -6,7 +6,7 @@
 
 .profile-third {
     &-1st-row {
-        display: flex;
+        display: grid;
         align-items: center;
         flex-wrap: wrap;
         justify-content: space-between;
@@ -81,22 +81,24 @@
             text-align-last: left;
             border-radius: 30px;
             box-shadow: 5px 5px 15px gray;
-            width: 500px;
-            height: 340px;
+            // width: 500px;
+            // height: 340px;
         
             h2 {
-                font-size: 30px;
+                margin-right: clamp(70px, 12vw, 200px);
+                font-size: clamp(19px, 4.5vw, 30px) !important;
                 color: var(--dark-col);
                 margin-bottom: 10px;
             }
             p {
-                font-size: 20px;
+                font-size: clamp(14px, 3vw, 20px) !important;
                 color: var(--dark-gray-col);
                 margin-bottom: 20px;
             }
             h3 {
-                font-size: 25px;
+                font-size: clamp(15px, 3.5vw, 25px) !important;
                 color: var(--dark-col);
+                margin-bottom: clamp(50px, 12vw, 270px);
             }
         }
     }

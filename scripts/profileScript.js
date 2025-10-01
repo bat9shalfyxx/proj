@@ -1,3 +1,31 @@
+//// HIDING MENU
+const menu = document.querySelectorAll(".menu-btn");
+const menuBlock = document.querySelectorAll(".profile-menu-btn");
+
+const sidebar = document.querySelector(".sidebar");
+const profileBlock = document.querySelector(".profile-block");
+
+menu.forEach((el) => {
+    el.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        if (window.innerWidth <= 1200) {
+            if (e.target === el && !sidebar.classList.contains("visible")) {
+                sidebar.classList.add("visible");
+
+                sidebar.style.display = "block";
+                profileBlock.style.display = "none";
+            } else if (e.target === el) {
+                sidebar.classList.remove("visible");
+
+                sidebar.style.display = "none";
+                profileBlock.style.display = "block";
+            }
+        }
+    });
+});
+
+/// SWITCHING BLOCK-CONTENT
 const switchContent = (blockNum, target) => {
     if (target.classList.contains(`el-${blockNum}`)) {
         const block1 = document.querySelector(`.block-${blockNum}`);
@@ -20,6 +48,12 @@ document.addEventListener("DOMContentLoaded", () => {
     sidebarEl.addEventListener("click", (e) => {
         e.preventDefault();
 
+        if (window.innerWidth <= 1200) {
+            sidebar.classList.remove("visible");
+            sidebar.style.display = "none";
+            profileBlock.style.display = "block";
+        }
+
         if (e.target.classList.contains("sidebar-el") || e.target.classList.contains("sidebar-onclick")) {
             switchContent(1, e.target);
             switchContent(2, e.target);
@@ -30,27 +64,3 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
-
-// document.addEventListener("DOMContentLoaded", async () => {
-//     const container = document.querySelector(".switch-content");
-//     const profilePage = await fetch("./content/profilePage.html");
-//     const profileContent = await profilePage.text();
-
-//     const parser = new DOMParser();
-//     const parsedProfilePage = parser.parseFromString(profileContent, "text/html");
-
-//     const profileContainer = parsedProfilePage.querySelectorAll(".profileContainer");
-//     const sidebarList = parsedProfilePage.querySelectorAll(".sidebar-list");
-//     const sidebarEl = parsedProfilePage.querySelector(".sidebar-el");
-
-//     container.innerHTML = `${profilePage}`
-//     console.log(sidebarEl.textContent);
-
-//     sidebarEl.addEventListener("click", (e) => {
-//         e.preventDefault();
-//         if (e.target == sidebarEl) console.log(1);
-//     });
-// });
-
-// const el = document.querySelector(".sidebar-el");
-// console.log(el.textContent);
