@@ -34,11 +34,11 @@
         &-info {
             a {
                 color: var(--light-red-col);
+                padding: 14px 31px;
+                font-size: clamp(10px, 2vw, 15px) !important;
+                border: 2px solid var(--dark-col);
+                border-radius: 26px;
             }
-            font-size: clamp(10px, 2vw, 15px) !important;
-            padding: 14px 31px;
-            border: 2px solid var(--dark-col);
-            border-radius: 26px;
         }
 
         &-links {

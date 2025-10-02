@@ -30,14 +30,12 @@
   display: flex;
   align-items: center;
 }
-.header-right-info {
-  font-size: clamp(10px, 2vw, 15px) !important;
-  padding: 14px 31px;
-  border: 2px solid var(--dark-col);
-  border-radius: 26px;
-}
 .header-right-info a {
   color: var(--light-red-col);
+  padding: 14px 31px;
+  font-size: clamp(10px, 2vw, 15px) !important;
+  border: 2px solid var(--dark-col);
+  border-radius: 26px;
 }
 .header-right-links {
   display: flex;
@@ -923,8 +921,8 @@
   .header-right-profile-logo {
     width: clamp(30px, 5vw, 58px);
   }
-  .header-right-info {
-    padding: clamp(3px, 1vw, 14px) clamp(6px, 1.5vw, 15px) !important;
+  .header-right-info a {
+    margin: clamp(3px, 1vw, 14px) clamp(6px, 1.5vw, 15px) !important;
   }
   .header-right-links {
     margin-left: 5px;
