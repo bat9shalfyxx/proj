@@ -140,4 +140,76 @@
     
     ////////
     //BLOCK4-5
+    .block-4,
+    .block-5 {
+        gap: clamp(20px, 7vw, 40px);
+        h2 {
+            font-size: clamp(23px, 9vw, 53px);
+        }
+        &-first-line {
+            gap: clamp(12px, 3vw, 24px);
+            &-info {
+                font-size: 35px;
+                font-size: clamp(18px, 6vw, 30px);
+                border-radius: 20px;
+                padding: clamp(10px, 6vw, 35px);
+            }
+        }
+        &-second-line {
+            gap: 20px;
+            &-search {
+                input {
+                    width: 80vw;
+                    height: fit-content;
+                    margin: 15px;
+                }
+                border-radius: 20px;
+            }
+        }
+        &-main {
+            gap: clamp(30px, 10vw, 50px);
+            &-block {
+                padding: 23px;
+                padding: clamp(8px, 4vw, 20px);
+                border-radius: 20px;
+                p {
+                    font-size: clamp(14px, 5vw, 25px);
+                    margin-bottom: 40px;
+                }
+                button {
+                    font-size: 15px;
+                    font-size: clamp(10px, 3vw, 15px);
+                    max-width: 160px;
+                    padding: 6px 8px;
+                    border-radius: 10px;
+                }
+            }
+        }
+    }
+    
+    ////////
+    //BLOCK6
+    .block-6 {
+        font-size: clamp(23px, 9vw, 50px);
+        &-chat-bot {
+            padding: clamp(10px, 5vw, 30px);
+            margin-top: 18px;
+            font-size: clamp(20px, 8vw, 48px);
+            &-text {
+                margin-right: 20px;
+                font-size: clamp(16px, 6vw, 38px);
+                p {
+                    font-size: 19px;
+                    font-size: clamp(10px, 4vw, 18px);
+                }
+                &-tech {
+                    column-gap: 50px;
+                    margin-top: 20px;
+                    p {
+                        line-height: 2;
+                    }
+                }
+            }
+        }
+    }
 }

@@ -1199,6 +1199,87 @@
   .profile-third-info-block h3 {
     font-size: 25px;
   }
+  .block-4,
+  .block-5 {
+    gap: clamp(20px, 7vw, 40px);
+  }
+  .block-4 h2,
+  .block-5 h2 {
+    font-size: clamp(23px, 9vw, 53px);
+  }
+  .block-4-first-line,
+  .block-5-first-line {
+    gap: clamp(12px, 3vw, 24px);
+  }
+  .block-4-first-line-info,
+  .block-5-first-line-info {
+    font-size: 35px;
+    font-size: clamp(18px, 6vw, 30px);
+    border-radius: 20px;
+    padding: clamp(10px, 6vw, 35px);
+  }
+  .block-4-second-line,
+  .block-5-second-line {
+    gap: 20px;
+  }
+  .block-4-second-line-search,
+  .block-5-second-line-search {
+    border-radius: 20px;
+  }
+  .block-4-second-line-search input,
+  .block-5-second-line-search input {
+    width: 80vw;
+    height: -moz-fit-content;
+    height: fit-content;
+    margin: 15px;
+  }
+  .block-4-main,
+  .block-5-main {
+    gap: clamp(30px, 10vw, 50px);
+  }
+  .block-4-main-block,
+  .block-5-main-block {
+    padding: 23px;
+    padding: clamp(8px, 4vw, 20px);
+    border-radius: 20px;
+  }
+  .block-4-main-block p,
+  .block-5-main-block p {
+    font-size: clamp(14px, 5vw, 25px);
+    margin-bottom: 40px;
+  }
+  .block-4-main-block button,
+  .block-5-main-block button {
+    font-size: 15px;
+    font-size: clamp(10px, 3vw, 15px);
+    max-width: 160px;
+    padding: 6px 8px;
+    border-radius: 10px;
+  }
+  .block-6 {
+    font-size: clamp(23px, 9vw, 50px);
+  }
+  .block-6-chat-bot {
+    padding: clamp(10px, 5vw, 30px);
+    margin-top: 18px;
+    font-size: clamp(20px, 8vw, 48px);
+  }
+  .block-6-chat-bot-text {
+    margin-right: 20px;
+    font-size: clamp(16px, 6vw, 38px);
+  }
+  .block-6-chat-bot-text p {
+    font-size: 19px;
+    font-size: clamp(10px, 4vw, 18px);
+  }
+  .block-6-chat-bot-text-tech {
+    -moz-column-gap: 50px;
+         column-gap: 50px;
+    margin-top: 20px;
+  }
+  .block-6-chat-bot-text-tech p {
+    line-height: 2;
+  }
 }
 @font-face {
   font-family: AA Stetica;
