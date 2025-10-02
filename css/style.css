@@ -922,7 +922,7 @@
     width: clamp(30px, 5vw, 58px);
   }
   .header-right-info a {
-    margin: clamp(3px, 1vw, 14px) clamp(6px, 1.5vw, 15px) !important;
+    padding: clamp(3px, 1vw, 14px) clamp(6px, 1.5vw, 15px) !important;
   }
   .header-right-links {
     margin-left: 5px;
