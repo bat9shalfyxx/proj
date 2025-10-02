@@ -21,12 +21,14 @@
         display: grid;
         text-align: center;
         p {
+            z-index: 100;
             font-size: 54px;
             margin-bottom: 15px;
             color: var(--dark-col);
         }
     }
     &-button {
+        z-index: 100;
         font-size: 34px;
         margin: auto;
         padding: 8px 36px;
@@ -49,7 +51,7 @@
         #{$direction}: $direction-val;
         left: $left;
     }
-    &-person {
+    &-person {     
         &1 {
             @include persons(top, 86px, -30px);
         }
@@ -89,10 +91,10 @@
 
     &-info {
         p {
-            font-size: 20px;
+            font-size: 23px;
         }
         span {
-            font-size: 20px;
+            font-size: 23px;
             color: var(--light-red-col);
         }
         &-bar {

@@ -1,6 +1,5 @@
 @use "./index";
 @import url(./reset.css);
-@import url(./media.css);
 
 @font-face {
     font-family: AA Stetica;
@@ -23,10 +22,11 @@ body {
 }
 
 .container {
+    overflow: hidden;        
     position: relative;
     background-color: var(--light-col);
     color: var(--light-red-col);
-    font-size: 25px;
+    font-size: clamp(12px, 2vw, 25px);
     font-family: AA Stetica, sans-serif;
     max-width: 2560px;
     height: 100%;
@@ -35,7 +35,7 @@ body {
 }
 
 h1 {
-    font-size: 25px;
+    font-size: clamp(12px, 2vw, 25px);
     color: var(--dark-col);
 }
 
@@ -43,6 +43,7 @@ a,
 h1,
 a > p,
 a > img,
+button,
 .form-button,
 .header-left-info,
 .header-right-info,
@@ -50,7 +51,7 @@ a > img,
     position: relative;
     transition: all 0.4s ease, transform 0.3s ease;
     cursor: pointer;
-
+    
     &:active {
         h1 {
             color: var(--dark-red-col);
@@ -68,76 +69,79 @@ a > img,
 }
 
 /* РЕГИСТРАЦИЯ */
-.registration {
-    z-index: 1000000;
-    display: none;
-    align-self: center;
-    margin: auto;
-    padding: 100px;
-    width: 100%;
-    height: 100%;
-    min-height: 100vh;
-    background: linear-gradient(to bottom, var(--light-red-col), var(--light-col), var(--light-red-col));
-
-    &-block {
-        display: grid;
-        margin: 0 auto;
-        padding: 86px 42px 30px;
-        background-color: var(--light-col);
-        border-radius: 30px;
-        color: var(--dark-gray-col);
-
-        &.reg-sign-up {
-            max-height: 1350px;
-        }
-        &.reg-sign-in {
-            max-height: 755px;
-        }
-    }
-
-    &-header {
-        display: flex;
-        justify-content: space-between;
-        font-size: 60px;
-        margin-bottom: 120px;
-    }
-
-    &-form {
-        display: grid;
-        margin: 0 auto;
-        row-gap: 145px;
-
-        input {
-            width: 640px;
-            padding: 21px 35px;
-            border-radius: 20px;
-            border: 1px solid var(--dark-gray-col);
-        }
-        p {
-            margin-bottom: 30px;
-        }
-    }
-}
-
-.sign-in,
-.sign-up {
+.form {
     cursor: pointer;
     color: var(--dark-gray-col);
-
-    &-form {
+    &-sign-up,
+    &-sign-in,
+    &-request {
         display: grid;
         row-gap: 45px;
+        p {
+            font-size: clamp(16px, 5vw, 35px);
+            color: var(--dark-col);
+            margin-top: clamp(15px, 7vw, 40px);
+            margin-bottom: 0 !important;
+        }
+        input {
+            font-size: clamp(6px, 2.5vw, 18px);
+        }
+    }
+    &-request {
+        .form-button {
+            margin-top: clamp(15px, 5vw, 40px);
+        }
+    }
+
+    &Page {
+        display: none;
+        align-self: center;
+        padding: 6vw 1.92vw;
+        min-height: 100vh;
+        background: linear-gradient(to bottom, var(--light-red-col), var(--light-col), var(--light-red-col));
+        
+        &-block {
+            height: fit-content;
+            display: grid;
+            margin: 0 auto;
+
+            padding: 86px 42px 30px;
+            background-color: var(--light-col);
+            border-radius: 30px;
+            color: var(--dark-gray-col);
+        }
+        &-header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-between;
+            font-size: clamp(25px, 7vw, 60px);
+            margin-bottom: 120px;
+        }
+        &-form {
+            display: grid;
+            margin: 0 auto;
+            input {
+                width: 640px;
+                padding: 21px 35px;
+                border-radius: 20px;
+                border: 1px solid var(--dark-gray-col);
+            }
+            p {
+                margin-bottom: 30px;
+            }
+        }
     }
 }
-
 .form-button {
-    font-size: 29px;
+    font-size: clamp(12px, 2vw, 29px);
     color: var(--light-col);
     background: linear-gradient(to bottom, var(--light-red-col), var(--dark-gray-col)) !important;
 }
 
-//
-//
+////////
+/// 
+/// 
 /* ALERT */
 .notifications-container {
     position: fixed;

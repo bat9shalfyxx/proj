@@ -17,6 +17,7 @@
         border-radius: 20px;
         border: 3px solid  var(--dark-gray-col);
         width: 300px;
+        max-width: 300px;
         p {
             font-size: 17px;
             color: var(--dark-gray-col);
@@ -36,7 +37,7 @@
     &-not-found {
         display: grid;
         text-align: center;
-        margin-top: 80px;
+        margin-top: clamp(30px, 12vw, 80px);
         
         p {
             font-size: 20px;

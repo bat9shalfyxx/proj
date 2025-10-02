@@ -2,7 +2,7 @@
 .header {
     display: flex;
     flex-wrap: wrap;
-    gap: 25px;
+    gap: clamp(8px, 2vw, 25px);
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid var(--dark-col);
@@ -15,17 +15,18 @@
         &-info {
             display: flex;
             align-items: center;
-            margin-left: 90px;
-            font-size: 19px;
+            margin-left:  clamp(20px, 5vw, 90px);
+            font-size: clamp(14px, 3vw, 19px);
+            
             a,
             p {
-                font-size: 25px;
+                font-size: clamp(13px, 3vw, 25px);
                 margin: 0 10px;
                 color: var(--dark-gray-col);
             }
         }
     }
-
+    
     &-right {
         display: flex;
         align-items: center;
@@ -33,17 +34,16 @@
         &-info {
             a {
                 color: var(--light-red-col);
+                padding: 14px 31px;
+                font-size: clamp(10px, 2vw, 15px) !important;
+                border: 2px solid var(--dark-col);
+                border-radius: 26px;
             }
-            font-size: 19px;
-            padding: 14px 31px;
-            border: 2px solid var(--dark-col);
-            border-radius: 26px;
         }
 
         &-links {
-            .arrow {
-                margin-top: 13px;
-            }
+            display: flex;
+            align-items: center;
             margin-left: 11px;
             padding: 5px 22px;
             border: 2px solid var(--light-red-col);
@@ -52,7 +52,7 @@
 
         &-profile {
             display: flex;
-            column-gap: 20px;
+            column-gap: clamp(10px, 3vw, 20px);
             margin-left: 140px;
             a {
                 color: var(--dark-gray-col);
@@ -91,11 +91,12 @@
         background: var(--light-gray-col);
         border-radius: 30px;
         p {
-            font-size: 31px;
+            font-size: clamp(18px, 3.4vw, 31px);
             margin-bottom: 30px;
         }
         h5 {
             font-size: 40px;
+            font-size: clamp(24px, 3.7vw, 40px);
             font-weight: 600;
             margin-bottom: 30px;
         }
@@ -121,11 +122,11 @@
                 margin-inline: 85px;
             }
             span {
-                font-size: 47px;
+                font-size: clamp(27px, 4vw, 47px);
                 font-weight: 600;
             }
             p {
-                font-size: 30px;
+                font-size: clamp(21px, 3.3vw, 30px);
                 line-height: 2;
             }
         }
@@ -150,11 +151,12 @@
 .main {
     position: relative;
     display: grid;
-    padding: 23px 70px 70px;
+    padding: 1.2vw 3.64vw 3.64vw;
     background: linear-gradient(to top, var(--light-col) 90%, #afb0b0);
 
     &-text {
-        font-size: 50px;
+        margin-top: 30px;
+        font-size: clamp(20px, 4vw, 50px);
         color: var(--dark-col);
 
         &::first-line {
@@ -168,25 +170,29 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
+
     }
 
     &-input {
-        input {
-            padding: 22px 40px;
-            width: 100%;
-        }
-        height: 70px;
-        font-size: 23px;
+        display: flex;
+        justify-content: space-between;
+        padding-right: 10px;
+        font-size: clamp(12px, 2vw, 23px);
         color: var(--dark-col);
         opacity: 0.5;
         border-radius: 35px;
         border: 2px solid var(--dark-col, 0.5);
         margin-bottom: 70px;
+        
+        input {
+            padding: 22px 40px;
+            width: 100%;
+        }
     }
 
     &-for-buisness {
         margin: 20px 0 50px 110px;
-        font-size: 40px;
+        font-size: clamp(14px, 3.7vw, 40px);
         max-width: 410px;
         padding: 7px 80px;
         border-radius: 35px;
@@ -203,33 +209,32 @@
             border-radius: 20px;
         }
     }
-
+    
     &-grid {
         position: relative;
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
+        font-size: clamp(11px, 2.5vw, 24px);
         gap: 55px;
-
+        
         &-less {
             display: grid;
             grid-template-columns: 1fr 1fr;
             flex-wrap: wrap;
             gap: 55px;
         }
-
+        
         &-greater {
             .main-grid-block {
+                p {
+                    margin-top: -40px;
+                }
                 position: relative;
                 height: 362px;
         
-                p {
-                    font-size: 30px;
-                    margin-bottom: 100px;
-                }
                 img {
-                    margin: auto;
                     margin-bottom: 40px;
                     margin-right: 80px;
                     transform: scale(1.8);
@@ -255,7 +260,6 @@
                 right: 20px;
                 bottom: -18px;
             }
-
             &:hover {
                 background: linear-gradient(90deg, var(--light-red-col) 25%, var(--dark-gray-col) 100%);
                 color: var(--light-col);

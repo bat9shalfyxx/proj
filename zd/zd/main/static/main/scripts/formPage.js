@@ -3,6 +3,8 @@ const mainContent = document.querySelector(".switch-content");
 const formPage = document.querySelector(".formPage");
 const header = document.querySelector(".header");
 
+const requestButton = document.querySelector(".req-btn");
+
 header.addEventListener("click", (e) => {
     if (e.target.classList.contains("header-left-logo") || e.target.classList.contains("header-right-profile-logo")) {
         if (formPage.classList.contains("active")) {
