@@ -66,3 +66,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+const toggleCalendar = (target) => {
+        if (target.classList.contains("date-btn")) {
+            const calendar = document.querySelector(".date-selector");
+            calendar.style.display =
+                calendar.style.display === "none" ? "inline-block" : "none";
+        }
+    };
+
+function showCalendar() {
+    const dateInput = document.querySelector(".date-selector");
+    dateInput.style.display = "block";
+    dateInput.focus(); // сразу открывает выбор даты
+}

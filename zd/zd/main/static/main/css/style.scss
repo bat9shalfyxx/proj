@@ -228,3 +228,30 @@ button,
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+.date-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.date-selector {
+  display: none;
+  margin-left: 8px;
+}

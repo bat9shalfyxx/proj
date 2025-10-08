@@ -73,8 +73,9 @@ const toggleCalendar = (target) => {
         }
     };
 
-    document.addEventListener("DOMContentLoaded", () => {
-        document.addEventListener("click", (e) => {
-            toggleCalendar(e.target);
-        });
-    });
+function showCalendar() {
+    const dateInput = document.querySelector(".date-selector");
+    dateInput.style.display = "block";
+    dateInput.focus(); // сразу открывает выбор даты
+}
+
