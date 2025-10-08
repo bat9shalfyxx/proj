@@ -1,0 +1,215 @@
+@media screen and (max-width: 1201px) {
+    .profile {
+        &-container {
+            padding: clamp(36px, 10vw, 70px) 0 0;
+        }
+        &-block {
+            padding: clamp(5px, 1vw, 10px) clamp(6px, 3vw, 60px);
+        }
+        &-menu-btn {
+            position: absolute;
+            top: 2vw;
+            right: 2vw;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5px;
+            height: fit-content;
+
+            opacity: 0.88;
+            padding: 7px;
+            border-radius: 5px;
+            border: 1px solid var(--dark-col);
+            background-color: var(--light-col);
+
+            img {
+                min-width: 100%;
+                width: clamp(10px, 2.5vw, 25px);
+            }
+        }
+    }
+    .sidebar {
+        display: none;
+    }
+    
+    ////////
+    //BLOCK1
+    .profile-header {
+        h2 {
+            font-size: clamp(20px, 6.5vw, 45px);
+        }
+        &-img {
+            padding: clamp(15px, 4vw, 40px);
+            margin-right: clamp(15px, 4vw, 50px);
+            height: clamp(80px, 15vw, 150px);
+        }
+        .pen {
+            height: clamp(12px, 4vw, 25px);
+        }
+    }
+    .add-organization {
+        padding: clamp(10px, 4vw, 22px) clamp(10px, 5vw, 35px);
+        p {
+            font-size: clamp(13px, 5vw, 21px);
+        }
+        span {
+            font-size: 30px;
+            font-size: clamp(15px, 6.5vw, 30px);
+        }
+        button {
+            font-size: clamp(13px, 5vw, 21px);
+            padding: 10px 30px;
+        }
+    }
+
+    ////////
+    //BLOCK2
+    .profile-block.block-2 {
+        h2 {
+            font-size: clamp(20px, 6.5vw, 45px);
+        }
+    }
+    .profile-second {
+        &-select {
+            padding: clamp(10px, 4vw, 20px);
+            border-radius: clamp(10px, 4vw, 20px);
+            width: 80vw;
+            p {
+                font-size: clamp(11px, 4.5vw, 17px);
+            }
+            &-list {
+                gap: clamp(17px, 6vw, 20px);
+            }
+        }
+    }
+
+    ////////
+    //BLOCK3
+    .profile-third {
+        &-1st-row {
+            gap: clamp(20px, 6vw, 45px);
+            margin-bottom: 20px;
+            h2 {
+                font-size: clamp(28px, 9vw, 50px);
+            }
+            div {
+                column-gap: clamp(13px, 5vw, 34px);
+                padding: clamp(6px, 2vw, 12px) clamp(13px, 2vw, 40px);
+                
+                font-size: clamp(10px, 3.5vw, 24px);
+                border-radius: 20px;
+            }
+        }
+        &-search {
+            padding: clamp(6px, 1.5vw, 14px) clamp(10px, 2vw, 25px);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            width: 80vw !important;
+        }
+        &-last {
+            &-row {
+                gap: 20px;
+                margin-bottom: 80px;
+                display: grid;
+            }
+            &-block {
+                border-radius: 20px;
+                padding: clamp(6px, 1.5vw, 14px) clamp(10px, 2vw, 18px);
+                width: clamp(200px, 80vw, 300px);
+                font-size: 15зч;
+            }
+        }
+        &-info {
+            gap: 25px;
+            &-block {
+                padding: 15px;
+                border-radius: 20px;
+                h2 {
+                    font-size: 30px;
+                    margin-bottom: 10px;
+                }
+                p {
+                    font-size: 20px;
+                    margin-bottom: 20px;
+                }
+                h3 {
+                    font-size: 25px;
+                }
+            }
+        }
+    }
+    
+    ////////
+    //BLOCK4-5
+    .block-4,
+    .block-5 {
+        gap: clamp(20px, 7vw, 40px);
+        h2 {
+            font-size: clamp(23px, 9vw, 53px);
+        }
+        &-first-line {
+            gap: clamp(12px, 3vw, 24px);
+            &-info {
+                font-size: 35px;
+                font-size: clamp(18px, 6vw, 30px);
+                border-radius: 20px;
+                padding: clamp(10px, 6vw, 35px);
+            }
+        }
+        &-second-line {
+            gap: 20px;
+            &-search {
+                input {
+                    width: 80vw;
+                    height: fit-content;
+                    margin: 15px;
+                }
+                border-radius: 20px;
+            }
+        }
+        &-main {
+            gap: clamp(30px, 10vw, 50px);
+            &-block {
+                padding: 23px;
+                padding: clamp(8px, 4vw, 20px);
+                border-radius: 20px;
+                p {
+                    font-size: clamp(14px, 5vw, 25px);
+                    margin-bottom: 40px;
+                }
+                button {
+                    font-size: 15px;
+                    font-size: clamp(10px, 3vw, 15px);
+                    max-width: 160px;
+                    padding: 6px 8px;
+                    border-radius: 10px;
+                }
+            }
+        }
+    }
+    
+    ////////
+    //BLOCK6
+    .block-6 {
+        font-size: clamp(23px, 9vw, 50px);
+        &-chat-bot {
+            padding: clamp(10px, 5vw, 30px);
+            margin-top: 18px;
+            font-size: clamp(20px, 8vw, 48px);
+            &-text {
+                margin-right: 20px;
+                font-size: clamp(16px, 6vw, 38px);
+                p {
+                    font-size: 19px;
+                    font-size: clamp(10px, 4vw, 18px);
+                }
+                &-tech {
+                    column-gap: 50px;
+                    margin-top: 20px;
+                    p {
+                        line-height: 2;
+                    }
+                }
+            }
+        }
+    }
+}
