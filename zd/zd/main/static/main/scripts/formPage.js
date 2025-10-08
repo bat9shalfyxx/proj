@@ -1,4 +1,6 @@
-const regButton = document.querySelector(".header-right-profile-button");
+console.log("formPage.js executed");
+
+const regBtn = document.querySelector(".header-right-profile-button");
 const mainContent = document.querySelector(".switch-content");
 const formPage = document.querySelector(".formPage");
 const header = document.querySelector(".header");
@@ -18,7 +20,7 @@ header.addEventListener("click", (e) => {
 header.addEventListener("click", (e) => {
     e.preventDefault();
 
-    if ((e.target === regButton || e.target === requestButton) && !formPage.classList.contains("active")) {
+    if ((e.target === regBtn || e.target === requestButton) && !formPage.classList.contains("active")) {
         formPage.classList.add("active");
         mainContent.style.display = "none";
         formPage.style.display = "grid";
@@ -50,7 +52,7 @@ header.addEventListener("click", (e) => {
     if (e.target === requestButton) {
         requestContent.style.display = "grid";
         regContent.style.display = "none";
-    } else if (e.target === regButton) {
+    } else if (e.target === regBtn) {
         requestContent.style.display = "none";
         regContent.style.display = "grid";
     }

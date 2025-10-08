@@ -1,3 +1,5 @@
+console.log("profile.js executed");
+
 //// HIDING MENU
 const menu = document.querySelectorAll(".menu-btn");
 const menuBlock = document.querySelectorAll(".profile-menu-btn");

@@ -30,6 +30,3 @@ profileIcon.addEventListener("click", (e) => {
         hubPage.style.display = "none";
     }
 });
-
-
-

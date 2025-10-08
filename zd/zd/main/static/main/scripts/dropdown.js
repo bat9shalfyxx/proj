@@ -1,3 +1,5 @@
+console.log("dropdown.js executed");
+
 const navList = document.querySelectorAll(".nav-link");
 
 const hideAllDropdowns = () => {
@@ -61,4 +63,3 @@ window.addEventListener("resize", () => {
         }
     }
 });
-
