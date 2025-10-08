@@ -1,0 +1,54 @@
+
+/* 1st */
+.profile-block.block-1 {
+    display: block;
+}
+
+.profile-header {
+    display: flex;
+    height: fit-content;
+    align-items: start;
+    justify-content: space-between;
+    h2 {
+        font-size: 53px;
+        color: var(--dark-col);
+    }
+    &-left {
+        display: flex;
+    }
+    &-img {
+        padding: 50px;
+        margin-bottom: 70px;
+        margin-right: 61px;
+        border-radius: 30px;
+        background-color: var(--dark-gray-col, 0.35);
+    }
+}
+
+.add-organization {
+    display: flex;
+    height: fit-content;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: space-between;
+    box-shadow: 5px 5px 15px gray;
+    border-radius: 30px;
+    padding: 26px 42px;
+
+    p {
+        font-size: 21px;
+        color: var(--dark-gray-col);
+    }
+    span {
+        font-size: 30px;
+        color: var(--dark-col);
+    }
+    button {
+        color: var(--light-col);
+        font-size: 21px;
+        padding: 10px 30px;
+        border-radius: 20px;
+        background: linear-gradient(to right, var(--light-red-col), var(--dark-red-col));
+    }
+}
