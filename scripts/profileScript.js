@@ -64,3 +64,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+const toggleCalendar = (target) => {
+        if (target.classList.contains("date-btn")) {
+            const calendar = document.querySelector(".date-selector");
+            calendar.style.display =
+                calendar.style.display === "none" ? "inline-block" : "none";
+        }
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("click", (e) => {
+            toggleCalendar(e.target);
+        });
+    });

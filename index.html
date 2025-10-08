@@ -185,6 +185,7 @@
                     <div class="formPage-header">
                         <p href="#!" class="sign-in active link" style="color: black;">Вход</p>
                         <p href="#!" class="sign-up link">Регистрация</p>
+                        <button class="close-btn">&times;</button>
                     </div>
                     
                     <form class="formPage-form" action="">
@@ -716,10 +717,8 @@
                                         </div>
                     
                                         <div class="profile-third-last-block">
-                                            <p>Дата</p>
-                                            <a href="#!">
-                                                <img src="./src/profile/calendar.svg" alt="calendar">
-                                            </a>
+                                            <button class="date-btn" onclick="showCalendar()">Дата</button>
+                                                <input type="date" class="date-selector" style="display:none;" />
                                         </div>
                                     </div>
                     
