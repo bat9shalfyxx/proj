@@ -9,6 +9,24 @@
 }
 
 .profile-second {
+    &-request {
+        &-list {
+            margin-top: 4vw;
+            display: grid;
+            gap: 3vw;
+        }
+        
+        &-el {
+            color: var(--dark-col);
+            h3 {
+                font-size: clamp(14px, 3.5vw, 26px);
+                margin-bottom: 0.5vw;
+            }
+            p {
+                font-size: clamp(10px, 3vw, 20px);
+            }
+        }
+    }
     &-select {
         display: flex;
         align-items: center;

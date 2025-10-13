@@ -6,6 +6,8 @@ const profilePage = document.querySelector(".profilePage");
 
 const hubIcon = document.querySelector(".header-left-logo");
 const profileIcon = document.querySelector(".header-right-profile-logo");
+const requestButton = document.querySelector(".req-btn");
+
 
 hubPage.style.display = "block";
 profilePage.style.display = "none";

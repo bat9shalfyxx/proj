@@ -1,14 +1,7 @@
-const hiddenNavBtn = document.querySelector(".nav-hidden-btn");
-const mobileNavList = document.querySelector(".nav-list")
+const hiddenNavBtn = document.querySelector(".hidden-nav-btn");
+console.log(header.offsetHeight);
 
 hiddenNavBtn.addEventListener("click", (e) => {
     e.preventDefault();
-
-    mobileNavList.classList.toggle("visible");
-
-    if (mobileNavList.classList.contains("visible")) {
-        mobileNavList.style.display = "grid"
-    } else {
-        mobileNavList.style.display = "none"
-    }
+    console.log(1);
 });

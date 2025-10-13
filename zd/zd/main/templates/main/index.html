@@ -13,6 +13,73 @@
     <script src="../../static/main/scripts/formPage.js" defer></script>
     <script src="../../static/main/scripts/switch.js" defer></script>
     <script src="../../static/main/scripts/dropdown.js" defer></script>
+    <script src="../../static/main/scripts/hiddenNav.js" defer></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const applicationForm = document.getElementById('application-form');
+    
+    if (applicationForm) {
+        applicationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitButton = document.getElementById('application-submit');
+            const originalText = submitButton.value;
+            
+            // Показываем индикатор загрузки
+            submitButton.value = 'Отправка...';
+            submitButton.disabled = true;
+            
+            // Убираем предыдущие ошибки
+            const errorElements = document.querySelectorAll('#application-form .error');
+            errorElements.forEach(el => el.remove());
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Успешная отправка
+                    showNotification(data.message, 'success');
+                    applicationForm.reset(); // Очищаем форму
+                } else {
+                    // Ошибки валидации
+                    if (data.errors) {
+                        // Обрабатываем ошибки полей
+                        Object.keys(data.errors).forEach(fieldName => {
+                            const field = applicationForm.querySelector(`[name="${fieldName}"]`);
+                            if (field) {
+                                const errorDiv = document.createElement('div');
+                                errorDiv.className = 'error';
+                                errorDiv.textContent = data.errors[fieldName][0].message;
+                                field.parentNode.insertBefore(errorDiv, field.nextSibling);
+                            }
+                        });
+                    }
+                    showNotification('Пожалуйста, исправьте ошибки в форме', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Произошла ошибка при отправке заявки', 'error');
+            })
+            .finally(() => {
+                submitButton.value = originalText;
+                submitButton.disabled = false;
+            });
+        });
+    }
+    
+    // Функция для показа уведомлений (должна быть у вас уже)
+    function showNotification(message, type = 'success') {
+        // Ваш существующий код для уведомлений
+    }
+});</script>
     
     
     <body>
@@ -22,9 +89,9 @@
                     <a class="link active" href="#!"><img class="header-left-logo" src="../../static/main/src/section1/цнп.svg" alt="Цифровая научная платформа" /></a>
 
                     <div class="header-left-info">
-                        <a class="link" href="#!">Организациям и ИП</a>
+                        <button id="org-btn" class="link" href="#!">Организациям и ИП</button>
                         <p> / </p>
-                        <a class="link" href="#!">Физическим лицам</a>
+                        <button id="pers-btn" class="link" href="#!">Физическим лицам</button>
                     </div>
                 </div>
     
@@ -48,14 +115,25 @@
 
             
             <nav class="nav">
-                <ul class="nav-list">
+                <div class="nav-mobile">
+                    <button class="nav-hidden-btn" style="display: grid;">
+                        <hr class="long-hr">
+                        <hr class="short-hr">
+                        <hr class="long-hr">
+                    </button>
+                    <div class="nav-hidden-block">
+                        
+                    </div>
+                </div>
+
+                <ul id="nav-org" class="nav-list">
                     <li class="nav-link">
-                        <a href="#!"><h1>Инвестиции</h1></a>
+                        <a href="#!"><h1>Организации</h1></a>
 
                         <div class="nav-dropdown">
                             <div class="nav-dropdown-left">
-                                <h5>Инвестиции</h5>
-                                <p>Венчурный центр для <br />стартапов и инвесторов</p>
+                                <h5>Организации</h5>
+                                <p>Нет информации</p>
 
                                 <button class="nav-dropdown-button">Перейти</button>
                                 <img src="../../static/main/src/section1/invest.svg" />
@@ -70,59 +148,160 @@
                     </li>
 
                     <li class="nav-link">
-                        <a href="#!"><h1>Спрос и кооперация</h1></a>
+                        <a href="#!"><h1>ОНОИО</h1></a>
 
                         <div class="nav-dropdown">
                             <div class="nav-dropdown-left">
-                                <h5>Спрос и кооперация</h5>
-                                <p>Развитие и передвижение <br />жизни</p>
+                                <h5>Образовательные и научно-исследовательские организации</h5>
+                                <p>Нет информации</p>
 
                                 <button class="nav-dropdown-button">Перейти</button>
                                 <img src="../../static/main/src/section1/hands.svg" />
                             </div>
 
                             <div class="nav-dropdown-right">
-                                <p><span>Спрос</span> <br />Нет информации</p>
+                                <p><span>Стартапам</span> <br />Нет информации</p>
                                 <hr />
-                                <p><span>Кооперации</span> <br />Нет информации</p>
+                                <p><span>Инвесторам</span> <br />Нет информации</p>
                             </div>
                         </div>
                     </li>
 
                     <li class="nav-link">
-                        <a href="#!"><h1>Гранты и кредиты</h1></a>
+                        <a href="#!"><h1>Проекты</h1></a>
 
                         <div class="nav-dropdown">
                             <div class="nav-dropdown-left">
-                                <h5>Гранты и кредиты</h5>
-                                <p>Финансовые меры <br />поддержки</p>
+                                <h5>Проекты</h5>
+                                <p>Нет информации</p>
 
                                 <button class="nav-dropdown-button">Перейти</button>
                                 <img src="../../static/main/src/section1/money.svg" />
                             </div>
 
                             <div class="nav-dropdown-right">
-                                <p><span>Гранты</span> <br />Нет информации</p>
+                                <p><span>Стартапам</span> <br />Нет информации</p>
                                 <hr />
-                                <p>Нет информации</p>
+                                <p><span>Инвесторам</span> <br />Нет информации</p>
                             </div>
                         </div>
                     </li>
 
                     <li class="nav-link">
-                        <a href="#!"><h1>Инфраструктура</h1></a>
+                        <a href="#!"><h1>Обучение и карьера</h1></a>
 
                         <div class="nav-dropdown">
                             <div class="nav-dropdown-left">
-                                <h5>Инфраструктура</h5>
-                                <p>Современное пространство <br />для бизнеса</p>
+                                <h5>Обучение и карьера</h5>
+                                <p>Нет информации</p>
 
                                 <button class="nav-dropdown-button">Перейти</button>
                                 <img src="../../static/main/src/section1/building.svg" />
                             </div>
 
                             <div class="nav-dropdown-right">
+                                <p><span>Стартапам</span> <br />Нет информации</p>
+                                <hr />
+                                <p><span>Инвесторам</span> <br />Нет информации</p>
+                            </div>
+                        </div>
+                    </li>
+                    
+                    <li class="nav-link">
+                        <a href="#!"><h1>Новости</h1></a>
+
+                        <div class="nav-dropdown">
+                            <div class="nav-dropdown-left">
+                                <h5>Новости</h5>
                                 <p>Нет информации</p>
+
+                                <button class="nav-dropdown-button">Перейти</button>
+                                <img src="../../static/main/src/section1/book.svg" />
+                            </div>
+
+                            <div class="nav-dropdown-right">
+                                <p><span>Стартапам</span> <br />Нет информации</p>
+                                <hr />
+                                <p><span>Инвесторам</span> <br />Нет информации</p>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#!"><h1>Форум</h1></a>
+
+                        <div class="nav-dropdown">
+                            <div class="nav-dropdown-left">
+                                <h5>Форум</h5>
+                                <p>Нет информации</p>
+
+                                <button class="nav-dropdown-button">Перейти</button>
+                                <img src="../../static/main/src/section1/book.svg" />
+                            </div>
+
+                            <div class="nav-dropdown-right">
+                                <p><span>Стартапам</span> <br />Нет информации</p>
+                                <hr />
+                                <p><span>Инвесторам</span> <br />Нет информации</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                
+                <ul id="nav-alt" class="nav-list" style="display: none;">
+                    <li class="nav-link">
+                        <a href="#!"><h1>Лидеры цифровой информации</h1></a>
+
+                        <div class="nav-dropdown">
+                            <div class="nav-dropdown-left">
+                                <h5>Лидеры цифровой информации</h5>
+                                
+                                <button class="nav-dropdown-button">Перейти</button>
+                                <img src="../../static/main/src/section1/invest.svg" />
+                            </div>
+
+                            <div class="nav-dropdown-right">
+                                <p><span>Стартапам</span> <br />Нет информации</p>
+                                <hr />
+                                <p><span>Инвесторам</span> <br />Нет информации</p>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#!"><h1>Академия иноваторов</h1></a>
+
+                        <div class="nav-dropdown">
+                            <div class="nav-dropdown-left">
+                                <h5>Академия иноваторов</h5>
+                               
+                                <button class="nav-dropdown-button">Перейти</button>
+                                <img src="../../static/main/src/section1/hands.svg" />
+                            </div>
+
+                            <div class="nav-dropdown-right">
+                                <p><span>Стартапам</span> <br />Нет информации</p>
+                                <hr />
+                                <p><span>Инвесторам</span> <br />Нет информации</p>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="nav-link">
+                        <a href="#!"><h1>Новаторы Москвы</h1></a>
+
+                        <div class="nav-dropdown">
+                            <div class="nav-dropdown-left">
+                                <h5>Новаторы Москвы</h5>
+
+                                <button class="nav-dropdown-button">Перейти</button>
+                                <img src="../../static/main/src/section1/money.svg" />
+                            </div>
+
+                            <div class="nav-dropdown-right">
+                                <p><span>Стартапам</span> <br />Нет информации</p>
+                                <hr />
+                                <p><span>Инвесторам</span> <br />Нет информации</p>
                             </div>
                         </div>
                     </li>
@@ -140,46 +319,98 @@
                             </div>
 
                             <div class="nav-dropdown-right">
-                                <p><span>Обучение</span> <br />Нет информации</p>
+                                <p><span>Стартапам</span> <br />Нет информации</p>
                                 <hr />
-                                <p><span>Карьера</span> <br />Нет информации</p>
+                                <p><span>Инвесторам</span> <br />Нет информации</p>
                             </div>
                         </div>
                     </li>
                 </ul>
+                    
             </nav>
-
 
             <div class="formPage">
                 <div class="formPage-block request-form">
-                    <!-- /// ЗАЯВКИ -->
-                    <div class="formPage-header">
-                        <p href="#!" class="link" style="color: black;">Заявка</p>
-                    </div>
+    <div class="formPage-header">
+        <p href="#!" class="link" style="color: black;">Заявка</p>
+    </div>
 
-                    <form class="formPage-form" action="">
-                        <div class="form-request">
-                            <p>Организация</p>
-                            <input type="input" placeholder="Наименование организации" required>
-                            <input type="input" placeholder="ИНН организации" required>
-                            <input type="input" placeholder="Сайт организации" required>
-                            
-                            <p>Предлагаемое решение</p>
-                            <input type="input" placeholder="Краткое наименование" required>
-                            <input type="input" placeholder="Описание предлагаемого решения" required>
-                            <input type="input" placeholder="Релевантный опыт применения подобного решения" required>
-                            
-                            <p>Контакты для обратной связи</p>
-                            <input type="input" placeholder="Имя " required>
-                            <input type="input" placeholder="Фамилия" required>
-                            <input type="input" placeholder="Отчество" required>
-                            <input type="input" placeholder="Телефон" required>
-                            <input type="input" placeholder="электронная почта" required>
-                            
-                            <input class="form-button" type="submit" value="Подать заявку">
-                        </div>
-                    </form>
+    <form class="formPage-form" method="post" action="{% url 'home' %}" id="application-form">
+        {% csrf_token %}
+        <input type="hidden" name="application_submit" value="1">
+        
+        <div class="form-request">
+            <p>Организация</p>
+            {{ application_form.organization_name }}
+            {% if application_form.organization_name.errors %}
+                <div class="error">{{ application_form.organization_name.errors }}</div>
+            {% endif %}
+            
+            {{ application_form.organization_inn }}
+            {% if application_form.organization_inn.errors %}
+                <div class="error">{{ application_form.organization_inn.errors }}</div>
+            {% endif %}
+            
+            {{ application_form.organization_website }}
+            {% if application_form.organization_website.errors %}
+                <div class="error">{{ application_form.organization_website.errors }}</div>
+            {% endif %}
+            
+            <p>Предлагаемое решение</p>
+            {{ application_form.solution_name }}
+            {% if application_form.solution_name.errors %}
+                <div class="error">{{ application_form.solution_name.errors }}</div>
+            {% endif %}
+            
+            {{ application_form.solution_description }}
+            {% if application_form.solution_description.errors %}
+                <div class="error">{{ application_form.solution_description.errors }}</div>
+            {% endif %}
+            
+            {{ application_form.solution_experience }}
+            {% if application_form.solution_experience.errors %}
+                <div class="error">{{ application_form.solution_experience.errors }}</div>
+            {% endif %}
+            
+            <p>Контакты для обратной связи</p>
+            {{ application_form.contact_first_name }}
+            {% if application_form.contact_first_name.errors %}
+                <div class="error">{{ application_form.contact_first_name.errors }}</div>
+            {% endif %}
+            
+            {{ application_form.contact_last_name }}
+            {% if application_form.contact_last_name.errors %}
+                <div class="error">{{ application_form.contact_last_name.errors }}</div>
+            {% endif %}
+            
+            {{ application_form.contact_middle_name }}
+            {% if application_form.contact_middle_name.errors %}
+                <div class="error">{{ application_form.contact_middle_name.errors }}</div>
+            {% endif %}
+            
+            {{ application_form.contact_phone }}
+            {% if application_form.contact_phone.errors %}
+                <div class="error">{{ application_form.contact_phone.errors }}</div>
+            {% endif %}
+            
+            {{ application_form.contact_email }}
+            {% if application_form.contact_email.errors %}
+                <div class="error">{{ application_form.contact_email.errors }}</div>
+            {% endif %}
+            
+            <!-- Общие ошибки формы -->
+            {% if application_form.non_field_errors %}
+                <div class="error">
+                    {% for error in application_form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
                 </div>
+            {% endif %}
+            
+            <input class="form-button" type="submit" value="Подать заявку" id="application-submit">
+        </div>
+    </form>
+</div>
 
                 <div class="formPage-block reg-form">
                     <!-- /// ВХОД-РЕГИСТРАЦИЯ -->
@@ -633,7 +864,7 @@
                     
                                 <div class="profile-block block-2" style="display: none;">
                                     <h2>Заявки</h2>
-                    
+
                                     <ul class="profile-second-select-list">
                                         <li class="profile-second-select">
                                             <p>Аккаунты</p>
@@ -660,20 +891,30 @@
                                         <a href="#!" class="profile-row-el">Черновики</a>
                                     </div>
                     
-                                    <div class="profile-requests-form">
-                                        
-                                    </div>
-                    
-                                    <div class="profile-second-not-found">
-                                        <div class="not-found-block">
-                                            <img src="../../static/main/src/profile/search.svg" alt="">
-                                            <h2>Ничего не найдено</h2>
+                                    {% block requests-display %}
+                                        {% if application %}   
+                                        <div class="profile-second-request-list">
+                                            {% for el in application%}
+                                                <div class="profile-second-request-el">
+                                                    <h3>Заявка № {{ el.id }}</h3>
+                                                    <p>{{ el.organization_name }}</p>
+                                                    <p>{{ el.solution_name }}</p>
+                                                </div>
+                                             {% endfor %}    
                                         </div>
-                                        <p>Попробуйте изменить условия поиска</p>
-                                        <a href="#!">
-                                            <button class="reset-filters">Сбросить фильтры</button>
-                                        </a>
-                                    </div>
+                                        {% else %}
+                                            <div class="profile-second-not-found">
+                                                <div class="not-found-block">
+                                                    <img src="../../static/main/src/profile/search.svg" alt="">
+                                                    <h2>Ничего не найдено</h2>
+                                                </div>
+                                                <p>Попробуйте изменить условия поиска</p>
+                                                <a href="#!">
+                                                    <button class="reset-filters">Сбросить фильтры</button>
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    {% endblock %}
                                 </div>
                     
                                 <div class="profile-block block-3" style="display: none;">

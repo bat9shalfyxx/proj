@@ -60,7 +60,7 @@
 .nav {
   border-bottom: 1px solid lightgrey;
 }
-.nav-list {
+.nav-org, .nav-alt {
   display: flex;
   flex-wrap: wrap;
   gap: 25px;
@@ -558,6 +558,21 @@
   margin-bottom: 25px;
 }
 
+.profile-second-request-list {
+  margin-top: 4vw;
+  display: grid;
+  gap: 3vw;
+}
+.profile-second-request-el {
+  color: var(--dark-col);
+}
+.profile-second-request-el h3 {
+  font-size: clamp(14px, 3.5vw, 26px);
+  margin-bottom: 0.5vw;
+}
+.profile-second-request-el p {
+  font-size: clamp(10px, 3vw, 20px);
+}
 .profile-second-select {
   display: flex;
   align-items: center;
@@ -900,7 +915,34 @@
 }
 @media screen and (max-width: 980px) {
   .nav {
+    position: relative;
+  }
+  .nav-alt {
     display: none;
+  }
+  .nav-list {
+    display: none;
+    padding: 4vw;
+    gap: 2.5vw;
+  }
+  .nav-link h1 {
+    font-size: clamp(14px, 4vw, 18px) !important;
+  }
+  .nav-hidden-btn {
+    display: grid;
+    justify-self: flex-end;
+    margin: 2vw;
+    justify-items: end;
+    gap: 1vw;
+  }
+  .nav-hidden-btn hr {
+    border: 3px solid var(--light-red-col);
+  }
+  .nav-hidden-btn .long-hr {
+    width: 6vw;
+  }
+  .nav-hidden-btn .short-hr {
+    width: 3vw;
   }
   .header {
     padding-inline: clamp(10px, 4vw, 50px);

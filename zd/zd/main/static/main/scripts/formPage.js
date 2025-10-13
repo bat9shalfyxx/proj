@@ -1,11 +1,8 @@
-console.log("dropdown.js executed");
-
-const regBtn = document.querySelector(".header-right-profile-button");
+const regButton = document.querySelector(".header-right-profile-button");
 const mainContent = document.querySelector(".switch-content");
 const formPage = document.querySelector(".formPage");
 const header = document.querySelector(".header");
 
-const requestButton = document.querySelector(".req-btn");
 
 header.addEventListener("click", (e) => {
     if (e.target.classList.contains("header-left-logo") || e.target.classList.contains("header-right-profile-logo")) {
@@ -20,7 +17,7 @@ header.addEventListener("click", (e) => {
 header.addEventListener("click", (e) => {
     e.preventDefault();
 
-    if ((e.target === regBtn || e.target === requestButton) && !formPage.classList.contains("active")) {
+    if ((e.target === regButton || e.target === requestButton) && !formPage.classList.contains("active")) {
         formPage.classList.add("active");
         mainContent.style.display = "none";
         formPage.style.display = "grid";
@@ -29,6 +26,7 @@ header.addEventListener("click", (e) => {
         formPage.style.display = "none";
         mainContent.style.display = "block";
     }
+
 });
 
 ///////////////////////////////
@@ -52,7 +50,7 @@ header.addEventListener("click", (e) => {
     if (e.target === requestButton) {
         requestContent.style.display = "grid";
         regContent.style.display = "none";
-    } else if (e.target === regBtn) {
+    } else if (e.target === regButton) {
         requestContent.style.display = "none";
         regContent.style.display = "grid";
     }
@@ -88,3 +86,30 @@ signUp.addEventListener("click", (e) => {
         requestContent.style.display = "none";
     }
 });
+
+const orgBtn = document.getElementById("org-btn");
+const persBtn = document.getElementById("pers-btn");
+const navOrg = document.getElementById("nav-org");
+const navAlt = document.getElementById("nav-alt");
+
+function showOrg() {
+    navOrg.style.display = "flex";
+    navAlt.style.display = "none";
+}
+
+function showAlt() {
+    navOrg.style.display = "none";
+    navAlt.style.display = "flex";
+}
+
+orgBtn.addEventListener("click", e => {
+    e.preventDefault()
+
+    showOrg()
+})
+persBtn.addEventListener("click", e => {
+    e.preventDefault()
+
+    showAlt()
+})
+
