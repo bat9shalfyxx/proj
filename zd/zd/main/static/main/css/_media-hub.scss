@@ -4,13 +4,17 @@
     }
 }
 
+@media screen and (min-width: 980px) {
+     .nav {
+        &-list {
+            display: flex !important;
+        }
+     }
+}
 @media screen and (max-width: 980px) {
     //HIDDEN-NAV
     .nav {
         position: relative;
-        &-alt {
-            display: none;
-        }
         &-list {
             display: none;
             padding: 4vw;

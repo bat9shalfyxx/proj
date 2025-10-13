@@ -86,30 +86,3 @@ signUp.addEventListener("click", (e) => {
         requestContent.style.display = "none";
     }
 });
-
-const orgBtn = document.getElementById("org-btn");
-const persBtn = document.getElementById("pers-btn");
-const navOrg = document.getElementById("nav-org");
-const navAlt = document.getElementById("nav-alt");
-
-function showOrg() {
-    navOrg.style.display = "flex";
-    navAlt.style.display = "none";
-}
-
-function showAlt() {
-    navOrg.style.display = "none";
-    navAlt.style.display = "flex";
-}
-
-orgBtn.addEventListener("click", e => {
-    e.preventDefault()
-
-    showOrg()
-})
-persBtn.addEventListener("click", e => {
-    e.preventDefault()
-
-    showAlt()
-})
-

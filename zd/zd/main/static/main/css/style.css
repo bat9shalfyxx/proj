@@ -60,7 +60,7 @@
 .nav {
   border-bottom: 1px solid lightgrey;
 }
-.nav-org, .nav-alt {
+.nav-list {
   display: flex;
   flex-wrap: wrap;
   gap: 25px;
@@ -913,12 +913,14 @@
     display: none;
   }
 }
+@media screen and (min-width: 980px) {
+  .nav-list {
+    display: flex !important;
+  }
+}
 @media screen and (max-width: 980px) {
   .nav {
     position: relative;
-  }
-  .nav-alt {
-    display: none;
   }
   .nav-list {
     display: none;

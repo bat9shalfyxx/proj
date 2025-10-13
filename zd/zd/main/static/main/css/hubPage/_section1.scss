@@ -66,8 +66,7 @@
 .nav {
     border-bottom: 1px solid lightgrey;
 
-    &-org,
-    &-alt {
+    &-list {
         display: flex;
         flex-wrap: wrap;
         gap: 25px;

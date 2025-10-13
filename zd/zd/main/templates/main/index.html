@@ -121,12 +121,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         <hr class="short-hr">
                         <hr class="long-hr">
                     </button>
-                    <div class="nav-hidden-block">
-                        
-                    </div>
                 </div>
 
-                <ul id="nav-org" class="nav-list">
+                <ul class="nav-list">
                     <li class="nav-link">
                         <a href="#!"><h1>Организации</h1></a>
 
@@ -247,170 +244,90 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     </li>
                 </ul>
-                
-                <ul id="nav-alt" class="nav-list" style="display: none;">
-                    <li class="nav-link">
-                        <a href="#!"><h1>Лидеры цифровой информации</h1></a>
-
-                        <div class="nav-dropdown">
-                            <div class="nav-dropdown-left">
-                                <h5>Лидеры цифровой информации</h5>
-                                
-                                <button class="nav-dropdown-button">Перейти</button>
-                                <img src="../../static/main/src/section1/invest.svg" />
-                            </div>
-
-                            <div class="nav-dropdown-right">
-                                <p><span>Стартапам</span> <br />Нет информации</p>
-                                <hr />
-                                <p><span>Инвесторам</span> <br />Нет информации</p>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#!"><h1>Академия иноваторов</h1></a>
-
-                        <div class="nav-dropdown">
-                            <div class="nav-dropdown-left">
-                                <h5>Академия иноваторов</h5>
-                               
-                                <button class="nav-dropdown-button">Перейти</button>
-                                <img src="../../static/main/src/section1/hands.svg" />
-                            </div>
-
-                            <div class="nav-dropdown-right">
-                                <p><span>Стартапам</span> <br />Нет информации</p>
-                                <hr />
-                                <p><span>Инвесторам</span> <br />Нет информации</p>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="nav-link">
-                        <a href="#!"><h1>Новаторы Москвы</h1></a>
-
-                        <div class="nav-dropdown">
-                            <div class="nav-dropdown-left">
-                                <h5>Новаторы Москвы</h5>
-
-                                <button class="nav-dropdown-button">Перейти</button>
-                                <img src="../../static/main/src/section1/money.svg" />
-                            </div>
-
-                            <div class="nav-dropdown-right">
-                                <p><span>Стартапам</span> <br />Нет информации</p>
-                                <hr />
-                                <p><span>Инвесторам</span> <br />Нет информации</p>
-                            </div>
-                        </div>
-                    </li>
-                    
-                    <li class="nav-link">
-                        <a href="#!"><h1>Обучение и карьера</h1></a>
-
-                        <div class="nav-dropdown">
-                            <div class="nav-dropdown-left">
-                                <h5>Обучение и карьера</h5>
-                                <p>Онлайн-курсы и <br />трудоустройства</p>
-
-                                <button class="nav-dropdown-button">Перейти</button>
-                                <img src="../../static/main/src/section1/book.svg" />
-                            </div>
-
-                            <div class="nav-dropdown-right">
-                                <p><span>Стартапам</span> <br />Нет информации</p>
-                                <hr />
-                                <p><span>Инвесторам</span> <br />Нет информации</p>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-                    
             </nav>
 
             <div class="formPage">
                 <div class="formPage-block request-form">
-    <div class="formPage-header">
-        <p href="#!" class="link" style="color: black;">Заявка</p>
-    </div>
+                    <div class="formPage-header">
+                        <p href="#!" class="link" style="color: black;">Заявка</p>
+                    </div>
 
-    <form class="formPage-form" method="post" action="{% url 'home' %}" id="application-form">
-        {% csrf_token %}
-        <input type="hidden" name="application_submit" value="1">
-        
-        <div class="form-request">
-            <p>Организация</p>
-            {{ application_form.organization_name }}
-            {% if application_form.organization_name.errors %}
-                <div class="error">{{ application_form.organization_name.errors }}</div>
-            {% endif %}
-            
-            {{ application_form.organization_inn }}
-            {% if application_form.organization_inn.errors %}
-                <div class="error">{{ application_form.organization_inn.errors }}</div>
-            {% endif %}
-            
-            {{ application_form.organization_website }}
-            {% if application_form.organization_website.errors %}
-                <div class="error">{{ application_form.organization_website.errors }}</div>
-            {% endif %}
-            
-            <p>Предлагаемое решение</p>
-            {{ application_form.solution_name }}
-            {% if application_form.solution_name.errors %}
-                <div class="error">{{ application_form.solution_name.errors }}</div>
-            {% endif %}
-            
-            {{ application_form.solution_description }}
-            {% if application_form.solution_description.errors %}
-                <div class="error">{{ application_form.solution_description.errors }}</div>
-            {% endif %}
-            
-            {{ application_form.solution_experience }}
-            {% if application_form.solution_experience.errors %}
-                <div class="error">{{ application_form.solution_experience.errors }}</div>
-            {% endif %}
-            
-            <p>Контакты для обратной связи</p>
-            {{ application_form.contact_first_name }}
-            {% if application_form.contact_first_name.errors %}
-                <div class="error">{{ application_form.contact_first_name.errors }}</div>
-            {% endif %}
-            
-            {{ application_form.contact_last_name }}
-            {% if application_form.contact_last_name.errors %}
-                <div class="error">{{ application_form.contact_last_name.errors }}</div>
-            {% endif %}
-            
-            {{ application_form.contact_middle_name }}
-            {% if application_form.contact_middle_name.errors %}
-                <div class="error">{{ application_form.contact_middle_name.errors }}</div>
-            {% endif %}
-            
-            {{ application_form.contact_phone }}
-            {% if application_form.contact_phone.errors %}
-                <div class="error">{{ application_form.contact_phone.errors }}</div>
-            {% endif %}
-            
-            {{ application_form.contact_email }}
-            {% if application_form.contact_email.errors %}
-                <div class="error">{{ application_form.contact_email.errors }}</div>
-            {% endif %}
-            
-            <!-- Общие ошибки формы -->
-            {% if application_form.non_field_errors %}
-                <div class="error">
-                    {% for error in application_form.non_field_errors %}
-                        {{ error }}
-                    {% endfor %}
-                </div>
-            {% endif %}
-            
-            <input class="form-button" type="submit" value="Подать заявку" id="application-submit">
-        </div>
-    </form>
-</div>
+                    <form class="formPage-form" method="post" action="{% url 'home' %}" id="application-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="application_submit" value="1">
+                        
+                        <div class="form-request">
+                            <p>Организация</p>
+                            {{ application_form.organization_name }}
+                            {% if application_form.organization_name.errors %}
+                                <div class="error">{{ application_form.organization_name.errors }}</div>
+                            {% endif %}
+                            
+                            {{ application_form.organization_inn }}
+                            {% if application_form.organization_inn.errors %}
+                                <div class="error">{{ application_form.organization_inn.errors }}</div>
+                            {% endif %}
+                            
+                            {{ application_form.organization_website }}
+                            {% if application_form.organization_website.errors %}
+                                <div class="error">{{ application_form.organization_website.errors }}</div>
+                            {% endif %}
+                            
+                            <p>Предлагаемое решение</p>
+                            {{ application_form.solution_name }}
+                            {% if application_form.solution_name.errors %}
+                                <div class="error">{{ application_form.solution_name.errors }}</div>
+                            {% endif %}
+                            
+                            {{ application_form.solution_description }}
+                            {% if application_form.solution_description.errors %}
+                                <div class="error">{{ application_form.solution_description.errors }}</div>
+                            {% endif %}
+                            
+                            {{ application_form.solution_experience }}
+                            {% if application_form.solution_experience.errors %}
+                                <div class="error">{{ application_form.solution_experience.errors }}</div>
+                            {% endif %}
+                            
+                            <p>Контакты для обратной связи</p>
+                            {{ application_form.contact_first_name }}
+                            {% if application_form.contact_first_name.errors %}
+                                <div class="error">{{ application_form.contact_first_name.errors }}</div>
+                            {% endif %}
+                            
+                            {{ application_form.contact_last_name }}
+                            {% if application_form.contact_last_name.errors %}
+                                <div class="error">{{ application_form.contact_last_name.errors }}</div>
+                            {% endif %}
+                            
+                            {{ application_form.contact_middle_name }}
+                            {% if application_form.contact_middle_name.errors %}
+                                <div class="error">{{ application_form.contact_middle_name.errors }}</div>
+                            {% endif %}
+                            
+                            {{ application_form.contact_phone }}
+                            {% if application_form.contact_phone.errors %}
+                                <div class="error">{{ application_form.contact_phone.errors }}</div>
+                            {% endif %}
+                            
+                            {{ application_form.contact_email }}
+                            {% if application_form.contact_email.errors %}
+                                <div class="error">{{ application_form.contact_email.errors }}</div>
+                            {% endif %}
+                            
+                            <!-- Общие ошибки формы -->
+                            {% if application_form.non_field_errors %}
+                                <div class="error">
+                                    {% for error in application_form.non_field_errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <input class="form-button" type="submit" value="Подать заявку" id="application-submit">
+                        </div>
+                    </form>
+                </div>          
 
                 <div class="formPage-block reg-form">
                     <!-- /// ВХОД-РЕГИСТРАЦИЯ -->
@@ -442,134 +359,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     </form>
                 </div>
             </div>
-
-            
-            <!-- <div class="registration">
-                <div class="registration-block reg-sign-in">
-                    <div class="registration-header">
-                        <a href="#!" class="sign-in active" style="color: black;">Вход</a>
-                        <a href="#!" class="sign-up">Регистрация</a>
-                    </div>
-                    
-                     <form class="registration-form" method="post" action="{% url 'home' %}" id="login-form">
-                        {% csrf_token %}
-                        <input type="hidden" name="login_submit" value="1">
-                        <div class="sign-in-form">
-                            <input type="text" 
-                                   name="username" 
-                                   placeholder="Телефон, электронная почта" 
-                                   value="{{ login_form.username.value|default:'' }}"
-                                   required
-                                   class="form-input">
-                            {% if login_form.username.errors %}
-                                <div class="error">{{ login_form.username.errors }}</div>
-                            {% endif %}
-                            
-                            <input type="password" 
-                                   name="password" 
-                                   placeholder="Введите пароль" 
-                                   autocomplete="on" 
-                                   required
-                                   class="form-input">
-                            {% if login_form.password.errors %}
-                                <div class="error">{{ login_form.password.errors }}</div>
-                            {% endif %}
-                            
-                            {% if login_form.non_field_errors %}
-                                <div class="error login-error">
-                                    {% for error in login_form.non_field_errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            
-                            <input class="form-button" type="submit" value="Войти" id="login-submit">
-                        </div>
-                    </form>
-
-                    <form class="registration-form" method="post" action="{% url 'home' %}" id="registration-form" style="display: none;">
-                        {% csrf_token %}
-                        <input type="hidden" name="registration_submit" value="1">
-                        <div class="sign-up-form">
-                            <input type="text" 
-                                   name="last_name" 
-                                   placeholder="Фамилия" 
-                                   value="{{ registration_form.last_name.value|default:'' }}">
-                            {% if registration_form.last_name.errors %}
-                                <div class="error">{{ registration_form.last_name.errors }}</div>
-                            {% endif %}
-                            
-                            <input type="text" 
-                                   name="first_name" 
-                                   placeholder="Имя" 
-                                   value="{{ registration_form.first_name.value|default:'' }}">
-                            {% if registration_form.first_name.errors %}
-                                <div class="error">{{ registration_form.first_name.errors }}</div>
-                            {% endif %}
-                            
-                            <input type="text" 
-                                   name="middle_name" 
-                                   placeholder="Отчество" 
-                                   value="{{ registration_form.middle_name.value|default:'' }}">
-                            {% if registration_form.middle_name.errors %}
-                                <div class="error">{{ registration_form.middle_name.errors }}</div>
-                            {% endif %}
-                            
-                            <input type="email" 
-                                   name="email" 
-                                   id="email-input"
-                                   placeholder="Электронная почта*" 
-                                   required
-                                   value="{{ registration_form.email.value|default:'' }}">
-                            <div id="email-error" class="error"></div>
-                            {% if registration_form.email.errors %}
-                                <div class="error">{{ registration_form.email.errors }}</div>
-                            {% endif %}
-                            
-                            <input type="tel" 
-                                   name="phone_number" 
-                                   id="phone-input"
-                                   placeholder="Номер мобильного телефона*" 
-                                   required
-                                   value="{{ registration_form.phone_number.value|default:'' }}">
-                            <div id="phone-error" class="error"></div>
-                            {% if registration_form.phone_number.errors %}
-                                <div class="error">{{ registration_form.phone_number.errors }}</div>
-                            {% endif %}
-                            
-                            <input type="password" 
-                                   name="password1" 
-                                   placeholder="Придумайте пароль" 
-                                   autocomplete="on" 
-                                   required>
-                            {% if registration_form.password1.errors %}
-                                <div class="error">{{ registration_form.password1.errors }}</div>
-                            {% endif %}
-                            <p>Минимум 8 символов</p>
-                            
-                            <input type="password" 
-                                   name="password2" 
-                                   placeholder="Подтвердите пароль" 
-                                   autocomplete="on" 
-                                   required>
-                            {% if registration_form.password2.errors %}
-                                <div class="error">{{ registration_form.password2.errors }}</div>
-                            {% endif %}
-                            
-                            {% if registration_form.non_field_errors %}
-                                <div class="error">
-                                    {% for error in registration_form.non_field_errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                            
-                            <input class="form-button" type="submit" value="Зарегистрироваться">
-                        </div>
-                    </form>
-                </div>
-            </div> -->
-
 
             <div class="switch-content">
                 <div class="hubPage">

@@ -63,9 +63,9 @@
 .nav-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 25px;
+  gap: 25px !important;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-between !important;
   padding: 10px 70px;
 }
 .nav-link {
