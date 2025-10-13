@@ -25,6 +25,15 @@ header.addEventListener("click", (e) => {
         formPage.style.display = "none";
         mainContent.style.display = "block";
     }
+
+const closeBtn = document.querySelector(".close-btn");
+
+        closeBtn.addEventListener("click", (e) => {
+         e.preventDefault();
+         regContent.classList.remove("active");
+        regContent.style.display = "none";
+        mainContent.style.display = "block";
+    });
 });
 
 ///////////////////////////////
