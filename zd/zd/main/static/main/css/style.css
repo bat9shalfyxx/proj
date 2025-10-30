@@ -501,6 +501,46 @@
   display: block;
 }
 
+.skill-list {
+  color: var(--dark-col);
+}
+.skill-list h2 {
+  margin-top: 50px;
+  font-size: clamp(15px, 4vw, 30px);
+}
+.skill-list .add-skill {
+  font-size: clamp(12px, 2vw, 24px);
+  margin-top: 15px;
+  color: var(--light-col);
+  padding: 10px 30px;
+  border-radius: 20px;
+  background: linear-gradient(to right, var(--light-red-col), var(--dark-red-col));
+}
+.skill-list-block {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2vw;
+  padding: 15px 25px;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin-top: 30px;
+  border-radius: 20px;
+  border: 2px solid var(--dark-gray-col);
+}
+.skill-list .skill-el {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  border-radius: 24px;
+  background-color: rgb(202, 201, 201);
+  color: var(--dark-col);
+  font-size: clamp(10px, 2.8vw, 18px);
+}
+.skill-list .delete-skill {
+  margin-left: 14px;
+  font-size: 32px;
+}
+
 .profile-header {
   display: flex;
   height: -moz-fit-content;
@@ -558,16 +598,37 @@
   margin-bottom: 25px;
 }
 
-.profile-second-request-list {
-  margin-top: 4vw;
+.filter-controls {
+  color: var(--dark-col);
+  margin-top: 60px;
   display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+.filter-controls input {
+  color: var(--dark-gray-col);
+}
+
+.profile-second-request-list {
+  overflow: scroll;
+  max-height: 50vh;
+  margin-top: 30px;
+  display: grid;
+  padding: 4vw;
   gap: 3vw;
+  border-radius: 30px;
+  border: 3px solid var(--dark-gray-col);
+  background-color: var(--light-gray-col);
 }
 .profile-second-request-el {
   color: var(--dark-col);
+  padding: 15px;
+  border-radius: 20px;
+  border: 3px solid var(--dark-gray-col);
+  background-color: var(--light-col);
 }
 .profile-second-request-el h3 {
-  font-size: clamp(14px, 3.5vw, 26px);
+  font-size: clamp(14px, 13.5vw, 26px);
   margin-bottom: 0.5vw;
 }
 .profile-second-request-el p {

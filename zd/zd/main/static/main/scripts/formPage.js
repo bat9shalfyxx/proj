@@ -39,7 +39,6 @@ const signUpForm = document.querySelector(".form-sign-up");
 
 const requestContent = document.querySelector(".request-form");
 const regContent = document.querySelector(".reg-form");
-// const regBlock = document.querySelector(".formPage-block");
 
 signUpForm.style.display = "none";
 requestContent.style.display = "none";

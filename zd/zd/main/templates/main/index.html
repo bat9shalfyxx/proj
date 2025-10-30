@@ -10,78 +10,170 @@
     <link rel="icon" href="../../static/main/src/section1/stonks.svg" type="image/x-icon">
 
     <script src="../../static/main/scripts/profileScript.js" defer></script>
+    <script src="../../static/main/scripts/skills.js" defer></script>
+    <script src="../../static/main/scripts/skillsFiltration.js" defer></script>
     <script src="../../static/main/scripts/formPage.js" defer></script>
     <script src="../../static/main/scripts/switch.js" defer></script>
     <script src="../../static/main/scripts/dropdown.js" defer></script>
     <script src="../../static/main/scripts/hiddenNav.js" defer></script>
-    <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const applicationForm = document.getElementById('application-form');
-    
-    if (applicationForm) {
-        applicationForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+    <script defer>
+        document.addEventListener('DOMContentLoaded', function() {
+            const applicationForm = document.getElementById('application-form');
             
-            const formData = new FormData(this);
-            const submitButton = document.getElementById('application-submit');
-            const originalText = submitButton.value;
-            
-            // Показываем индикатор загрузки
-            submitButton.value = 'Отправка...';
-            submitButton.disabled = true;
-            
-            // Убираем предыдущие ошибки
-            const errorElements = document.querySelectorAll('#application-form .error');
-            errorElements.forEach(el => el.remove());
-            
-            fetch(this.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Успешная отправка
-                    showNotification(data.message, 'success');
-                    applicationForm.reset(); // Очищаем форму
-                } else {
-                    // Ошибки валидации
-                    if (data.errors) {
-                        // Обрабатываем ошибки полей
-                        Object.keys(data.errors).forEach(fieldName => {
-                            const field = applicationForm.querySelector(`[name="${fieldName}"]`);
-                            if (field) {
-                                const errorDiv = document.createElement('div');
-                                errorDiv.className = 'error';
-                                errorDiv.textContent = data.errors[fieldName][0].message;
-                                field.parentNode.insertBefore(errorDiv, field.nextSibling);
+            if (applicationForm) {
+                applicationForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(this);
+                    const submitButton = document.getElementById('application-submit');
+                    const originalText = submitButton.value;
+                    
+                    // Показываем индикатор загрузки
+                    submitButton.value = 'Отправка...';
+                    submitButton.disabled = true;
+                    
+                    // Убираем предыдущие ошибки
+                    const errorElements = document.querySelectorAll('#application-form .error');
+                    errorElements.forEach(el => el.remove());
+                    
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Успешная отправка
+                            showNotification(data.message, 'success');
+                            applicationForm.reset(); // Очищаем форму
+                        } else {
+                            // Ошибки валидации
+                            if (data.errors) {
+                                // Обрабатываем ошибки полей
+                                Object.keys(data.errors).forEach(fieldName => {
+                                    const field = applicationForm.querySelector(`[name="${fieldName}"]`);
+                                    if (field) {
+                                        const errorDiv = document.createElement('div');
+                                        errorDiv.className = 'error';
+                                        errorDiv.textContent = data.errors[fieldName][0].message;
+                                        field.parentNode.insertBefore(errorDiv, field.nextSibling);
+                                    }
+                                });
                             }
-                        });
-                    }
-                    showNotification('Пожалуйста, исправьте ошибки в форме', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Произошла ошибка при отправке заявки', 'error');
-            })
-            .finally(() => {
-                submitButton.value = originalText;
-                submitButton.disabled = false;
-            });
+                            showNotification('Пожалуйста, исправьте ошибки в форме', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('Произошла ошибка при отправке заявки', 'error');
+                    })
+                    .finally(() => {
+                        submitButton.value = originalText;
+                        submitButton.disabled = false;
+                    });
+                });
+            }
         });
-    }
-    
-    // Функция для показа уведомлений (должна быть у вас уже)
-    function showNotification(message, type = 'success') {
-        // Ваш существующий код для уведомлений
-    }
-});</script>
-    
-    
+    </script>
+
+    <!-- <script>
+        const allApplicationsData = JSON.parse('{{ application_json|safe }}');
+        let currentApplications = [...allApplicationsData]; 
+
+        // 2. Получение DOM-элементов
+        const filterInput = document.getElementById('filter-skills');
+        const applicationsListContainer = document.querySelector('.profile-second-request-list');
+        const resetFilterBtn = document.getElementById('reset-filter-btn');
+
+        // 3. Функция для отображения заявок
+        function renderApplications(applicationsToRender) {
+            if (!applicationsListContainer) {
+                console.error('Контейнер ".profile-second-request-list" не найден!');
+                return;
+            }
+            applicationsListContainer.innerHTML = ''; // Очищаем текущий список
+
+            if (applicationsToRender.length === 0) {
+                applicationsListContainer.innerHTML = '<p>Нет заявок, соответствующих вашим критериям.</p>';
+                return;
+            }
+
+            applicationsToRender.forEach(app => {
+                const appElement = document.createElement('div');
+                appElement.classList.add('profile-second-request-el');
+                
+                // Форматируем skill_list (если он является списком) в строку
+                const skillsString = Array.isArray(app.skill_list) ? app.skill_list.join(', ') : String(app.skill_list);
+
+                appElement.innerHTML = `
+                    <h3>Заявка № ${app.id}</h3>
+                    <p>${app.organization_name || ''}</p> {# Используем || '' для безопасного вывода #}
+                    <p>${app.solution_name || ''}</p>
+                    <p class="skillList">${skillsString}</p>
+                `;
+                applicationsListContainer.appendChild(appElement);
+            });
+        }
+
+        // 4. Функция для применения фильтра
+        function applyFilter() {
+            const filterText = filterInput.value.trim().toLowerCase();
+            
+            if (!filterText) {
+                // Если поле ввода пустое, показываем все заявки
+                currentApplications = [...allApplicationsData];
+            } else {
+                // Парсим введенные навыки
+                const requiredSkills = filterText.split(',')
+                                                .map(s => s.trim().toLowerCase())
+                                                .filter(s => s); // Убираем пустые строки
+
+                currentApplications = allApplicationsData.filter(app => {
+                    // Проверяем, что skill_list существует и является строкой (как у вас в описании)
+                    if (!app.skill_list || typeof app.skill_list !== 'string') {
+                        return false; // Заявки без навыков или с некорректным форматом skill_list не проходят
+                    }
+
+                    // Приводим строку навыков заявки к нижнему регистру для сравнения
+                    const appSkillsStringLower = app.skill_list.toLowerCase();
+
+                    // Логика: "содержит хотя бы один навык"
+                    // Проверяем, есть ли хотя бы один из требуемых навыков в строке заявки
+                    return requiredSkills.some(reqSkill => appSkillsStringLower.includes(reqSkill));
+                    
+                    // Если вам нужна логика "содержит ВСЕ навыки":
+                    // return requiredSkills.every(reqSkill => appSkillsStringLower.includes(reqSkill));
+                });
+            }
+            renderApplications(currentApplications); // Обновляем отображение
+        }
+
+        // 5. Обработчики событий
+        filterInput.addEventListener('input', applyFilter); // Фильтрация при каждом вводе
+        
+        if (resetFilterBtn) {
+            resetFilterBtn.addEventListener('click', () => {
+                filterInput.value = ''; // Очищаем поле ввода
+                applyFilter(); // Применяем пустой фильтр, чтобы показать все заявки
+            });
+        }
+
+        // 6. Первоначальное отображение всех заявок при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            // Убедимся, что данные загружены
+            if (allApplicationsData && Array.isArray(allApplicationsData)) {
+                currentApplications = [...allApplicationsData]; // Инициализируем рабочий массив
+                renderApplications(currentApplications);
+            } else {
+                console.error("Данные заявок не были загружены или некорректны.");
+                applicationsListContainer.innerHTML = '<p>Ошибка загрузки данных.</p>';
+            }
+        });
+    </script> -->
+
     <body>
         <div class="container">
             <header class="header">
@@ -257,6 +349,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         <input type="hidden" name="application_submit" value="1">
                         
                         <div class="form-request">
+                            <p>Навыки</p>
+                            {{ application_form.skill_list }}
+                            {% if application_form.skill_list.errors %}
+                                <div class="error">{{ application_form.skill_list.errors }}</div>
+                            {% endif %}
+
                             <p>Организация</p>
                             {{ application_form.organization_name }}
                             {% if application_form.organization_name.errors %}
@@ -649,6 +747,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                             <button>Добавить</button>
                                         </a>
                                     </div>
+
+                                    <div class="skill-list">
+                                        <h2>Ваши навыки:</h2>
+                                        <div class="skill-list-block">
+                                        </div>
+                                        <button class="add-skill">Добавить</button>
+                                    </div>
                                 </div>
                     
                                 <div class="profile-block block-2" style="display: none;">
@@ -680,6 +785,14 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <a href="#!" class="profile-row-el">Черновики</a>
                                     </div>
                     
+                                    <div class="filter-controls">
+                                        <label for="filter-skills-js">Фильтровать по навыкам (через запятую):</label>
+                                        <input type="text" id="filter-skills-js" placeholder="Например: Python, JS">
+                                        
+                                        <button id="apply-filter-js">Применить фильтр</button>
+                                        <button id="reset-filter-js">Сбросить фильтр</button>
+                                    </div>
+
                                     {% block requests-display %}
                                         {% if application %}   
                                         <div class="profile-second-request-list">
@@ -688,6 +801,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                     <h3>Заявка № {{ el.id }}</h3>
                                                     <p>{{ el.organization_name }}</p>
                                                     <p>{{ el.solution_name }}</p>
+                                                    <p class="skillList">{{ el.skill_list }}</pс>
                                                 </div>
                                              {% endfor %}    
                                         </div>

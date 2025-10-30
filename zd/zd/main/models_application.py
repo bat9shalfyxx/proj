@@ -1,4 +1,3 @@
-
 # main/models_application.py
 from django.db import models
 from django.conf import settings
@@ -14,6 +13,9 @@ class Application(models.Model):
     def get_absolute_url(self):
         return f'/news/{self.id}'
     
+    #Навыки
+    skill_list = models.TextField('Ваши навыки')
+
     # Организация
     organization_name = models.CharField('Наименование организации', max_length=255)
     organization_inn = models.CharField('ИНН организации', max_length=12)

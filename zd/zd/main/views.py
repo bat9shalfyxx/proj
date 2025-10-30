@@ -23,6 +23,11 @@ def index(request):
     registration_form = CustomUserCreationForm()
     application_form = ApplicationForm()
     application = Application.objects.all()
+    # application_list = list(application.values())
+    # context = {
+    #     'application_json': application_list
+    # }
+
     if request.method == 'POST':
         # Обработка формы заявки
         if 'application_submit' in request.POST:

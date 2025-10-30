@@ -11,7 +11,7 @@ class ApplicationForm(forms.ModelForm):
             'organization_name', 'organization_inn', 'organization_website',
             'solution_name', 'solution_description', 'solution_experience',
             'contact_first_name', 'contact_last_name', 'contact_middle_name',
-            'contact_phone', 'contact_email'
+            'contact_phone', 'contact_email', 'skill_list'
         ]
         widgets = {
             'organization_name': forms.TextInput(attrs={
@@ -60,6 +60,10 @@ class ApplicationForm(forms.ModelForm):
                 'placeholder': 'Электронная почта',
                 'class': 'form-input'
             }),
+            'skill_list': forms.TextInput(attrs={
+                'placeholder': 'Навыки (писать через пробел изапятую)',
+                'class': 'form-input'
+            })
         }
     
     def __init__(self, *args, **kwargs):
