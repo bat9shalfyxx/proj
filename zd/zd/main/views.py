@@ -11,6 +11,29 @@ import re
 import logging
 import json
 
+def form_page(request):
+    if request.method == 'POST' and request.POST.get('application_submit'):
+        form = ApplicationForm(request.POST)
+        if form.is_valid():
+            application = form.save(commit=False)
+            
+            # Если пользователь авторизован, связываем заявку с ним
+            if request.user.is_authenticated:
+                application.user = request.user
+            
+            application.save()
+            
+            messages.success(request, 'Заявка успешно отправлена!')
+            return redirect('profile')
+        else:
+            messages.error(request, 'Пожалуйста, исправьте ошибки в форме')
+    else:
+        form = ApplicationForm()
+    
+    return render(request, 'formPage.html', {
+        'application_form': form
+    })
+
 logger = logging.getLogger(__name__)
 
 def index(request):

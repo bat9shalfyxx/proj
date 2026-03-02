@@ -13,6 +13,9 @@ const regContent = document.querySelector(".reg-form");
 const requestButton = document.querySelector('.req-btn')
 const regButton = document.querySelector(".header-right-profile-button");
 
+signIn.style.color = "#cbcbcb";
+signUp.style.color = "#5c5c5c";
+
 signUpForm.style.display = "none";
 requestContent.style.display = "none";
 
@@ -42,8 +45,8 @@ signIn.addEventListener("click", (e) => {
         signIn.classList.add("active");
         signUp.classList.remove("active");
 
-        signIn.style.color = "black";
-        signUp.style.color = "var(--dark-gray-col)";
+        signIn.style.color = "#cbcbcb";
+        signUp.style.color = "#5c5c5c";
 
         signInForm.style.display = "grid";
         signUpForm.style.display = "none";
@@ -59,8 +62,8 @@ signUp.addEventListener("click", (e) => {
         signUp.classList.add("active");
         signIn.classList.remove("active");
 
-        signUp.style.color = "black";
-        signIn.style.color = "var(--dark-gray-col)";
+        signUp.style.color = "#cbcbcb";
+        signIn.style.color = "#5c5c5c";
 
         signInForm.style.display = "none";
         signUpForm.style.display = "grid";

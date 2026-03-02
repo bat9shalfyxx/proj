@@ -1,7 +1,45 @@
 {% extends "index.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/_formPage.scss' %}">
+{% endblock %}
+
 {% block content %}
+<!-- Модальное окно для добавления навыка -->
+<div class="skill-modal-overlay" id="skillModalOverlay" style="display: none;">
+    <div class="skill-modal">
+        <div class="skill-modal-header">
+            <h3>Добавить навык</h3>
+            <button type="button" class="skill-modal-close" id="closeSkillModal">×</button>
+        </div>
+        <div class="skill-modal-content">
+            <div class="skill-modal-field">
+                <label for="skillName">Название навыка *</label>
+                <input type="text" id="skillName" class="skill-input" placeholder="Например: JavaScript, Python, React...">
+            </div>
+            <div class="skill-modal-field">
+                <label for="skillLevel">Уровень владения</label>
+                <select id="skillLevel" class="skill-select">
+                    <option value="unspecified">Уровень не указан</option>
+                    <option value="expert">Эксперт</option>
+                    <option value="senior">Senior</option>
+                    <option value="middle">Middle</option>
+                    <option value="junior">Junior</option>
+                    <option value="beginner">Начинающий</option>
+                </select>
+            </div>
+        </div>
+        <div class="skill-modal-footer">
+            <button type="button" class="skill-modal-btn cancel" id="cancelSkillModal">Отмена</button>
+            <button type="button" class="skill-modal-btn add" id="addSkillBtn">Добавить</button>
+        </div>
+    </div>
+</div>
+
     <div class="formPage">
         <div class="formPage-block request-form">
+            
             <div class="formPage-header">
                 <p href="#!" class="link" style="color: black;">Заявка</p>
             </div>
@@ -11,11 +49,90 @@
                 <input type="hidden" name="application_submit" value="1">
                 
                 <div class="form-request">
-                    <p>Навыки</p>
-                    {{ application_form.skill_list }}
-                    {% if application_form.skill_list.errors %}
-                        <div class="error">{{ application_form.skill_list.errors }}</div>
-                    {% endif %}
+                    <p>Ваши навыки</p>
+                    <div class="skills-section">
+                        {{ application_form.skill_list }}
+                        {% if application_form.skill_list.errors %}
+                            <div class="error">{{ application_form.skill_list }}</div>
+                        {% endif %}
+                        
+                        <!-- Блок навыков в форме -->
+                        <div class="skills-section">
+                            <div class="skills-header">
+                                <h3>Навыки</h3>
+                                <button type="button" class="add-skill-btn" id="showSkillModalBtn">
+                                    + Добавить навык
+                                </button>
+                            </div>
+                            
+                            <!-- Контейнер для навыков -->
+                            <div class="skills-container" id="skillsContainer">
+                                <!-- Навыки будут добавляться сюда динамически -->
+                            </div>
+                            
+                            <!-- Скрытое поле для хранения данных навыков -->
+                            <input type="hidden" name="skills_data" id="skillsDataInput" value="[]">
+                        </div>
+
+                        <!-- Замените старый блок навыков в форме -->
+                        <!-- Удалите или закомментируйте старый блок:
+                        <p>Навыки</p>
+                        {{ application_form.skill_list }}
+                        -->
+
+                        <!-- Шаблон для навыка -->
+                        <template id="skillItemTemplate">
+                            <div class="skill-item" data-skill-name="" data-skill-level="">
+                                <div class="skill-item-content">
+                                    <span class="skill-name"></span>
+                                    <span class="skill-level-badge"></span>
+                                </div>
+                                <button type="button" class="skill-remove" title="Удалить навык">×</button>
+                            </div>
+                        </template>
+
+                        <!-- Группировка навыков по уровням -->
+                        <template id="skillGroupTemplate">
+                            <div class="skill-group">
+                                <div class="skill-group-header">
+                                    <h4 class="skill-group-title"></h4>
+                                </div>
+                                <div class="skill-group-items"></div>
+                            </div>
+                        </template>
+                        
+                        
+                        <!-- Контейнер для навыков -->
+                        <div class="skills-container" id="skillsContainer">
+                            <!-- Навыки будут добавляться сюда динамически -->
+                        </div>
+                        
+                        <!-- Скрытое поле для хранения данных навыков -->
+                        <input type="hidden" name="skills_data" id="skillsDataInput" value="[]">
+                    </div>
+
+                    <div class="role-section">
+                        <div class="role-header">
+                            <h3>Роль в команде</h3>
+                            <span class="role-hint">(необязательно)</span>
+                        </div>
+                        
+                        <div class="role-select-wrapper">
+                            {{ application_form.team_role }}
+                            {% if application_form.team_role.errors %}
+                                <div class="error">{{ application_form.team_role.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="other-role-field" id="otherRoleField" style="display: none;">
+                            <label for="otherRole">Укажите вашу роль:</label>
+                            <input type="text" 
+                                id="otherRole" 
+                                name="other_role" 
+                                class="form-input" 
+                                placeholder="Например: Scrum-мастер">
+                        </div>
+                    </div>
 
                     <p>Организация</p>
                     {{ application_form.organization_name }}
@@ -202,4 +319,215 @@
             </form>
         </div>
     </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Элементы
+    const modalOverlay = document.getElementById('skillModalOverlay');
+    const showModalBtn = document.getElementById('showSkillModalBtn');
+    const closeModalBtn = document.getElementById('closeSkillModal');
+    const cancelModalBtn = document.getElementById('cancelSkillModal');
+    const addSkillBtn = document.getElementById('addSkillBtn');
+    const skillsContainer = document.getElementById('skillsContainer');
+    const skillsDataInput = document.getElementById('skillsDataInput');
+    
+    // Поля модального окна
+    const skillNameInput = document.getElementById('skillName');
+    const skillLevelSelect = document.getElementById('skillLevel');
+    
+    // Шаблоны
+    const skillTemplate = document.getElementById('skillItemTemplate');
+    const groupTemplate = document.getElementById('skillGroupTemplate');
+    
+    // Перевод уровней
+    const levelNames = {
+        'expert': 'Эксперт',
+        'senior': 'Senior',
+        'middle': 'Middle',
+        'junior': 'Junior',
+        'beginner': 'Начинающий',
+        'unspecified': 'Уровень не указан'
+    };
+    
+    // Порядок групп
+    const levelOrder = ['expert', 'senior', 'middle', 'junior', 'beginner', 'unspecified'];
+    
+    // Текущие навыки
+    let skills = [];
+    
+    // Загрузка существующих навыков
+    try {
+        const savedSkills = skillsDataInput.value;
+        if (savedSkills && savedSkills !== '[]') {
+            skills = JSON.parse(savedSkills);
+        }
+    } catch (e) {
+        console.error('Ошибка парсинга навыков:', e);
+    }
+    
+    // Функция для рендеринга навыков по группам
+    function renderSkills() {
+        if (!skillsContainer) return;
+        
+        // Группируем навыки по уровням
+        const groupedSkills = {};
+        levelOrder.forEach(level => {
+            groupedSkills[level] = [];
+        });
+        
+        skills.forEach(skill => {
+            const level = skill.level || 'unspecified';
+            if (groupedSkills[level]) {
+                groupedSkills[level].push(skill);
+            } else {
+                groupedSkills['unspecified'].push(skill);
+            }
+        });
+        
+        // Очищаем контейнер
+        skillsContainer.innerHTML = '';
+        
+        // Рендерим каждую группу
+        let hasSkills = false;
+        
+        levelOrder.forEach(level => {
+            const levelSkills = groupedSkills[level] || [];
+            if (levelSkills.length === 0) return;
+            
+            hasSkills = true;
+            
+            // Создаем группу
+            const groupClone = groupTemplate.content.cloneNode(true);
+            const groupElement = groupClone.querySelector('.skill-group');
+            const groupTitle = groupClone.querySelector('.skill-group-title');
+            const groupItems = groupClone.querySelector('.skill-group-items');
+            
+            groupTitle.textContent = levelNames[level] || 'Уровень не указан';
+            
+            // Добавляем навыки в группу
+            levelSkills.forEach(skill => {
+                const skillClone = skillTemplate.content.cloneNode(true);
+                const skillElement = skillClone.querySelector('.skill-item');
+                const skillName = skillClone.querySelector('.skill-name');
+                const skillLevel = skillClone.querySelector('.skill-level-badge');
+                const removeBtn = skillClone.querySelector('.skill-remove');
+                
+                skillName.textContent = skill.name;
+                skillLevel.textContent = levelNames[skill.level] || '';
+                skillElement.dataset.skillName = skill.name;
+                skillElement.dataset.skillLevel = skill.level || 'unspecified';
+                
+                // Обработчик удаления
+                removeBtn.addEventListener('click', function() {
+                    removeSkill(skill.name);
+                });
+                
+                groupItems.appendChild(skillElement);
+            });
+            
+            skillsContainer.appendChild(groupElement);
+        });
+        
+        // Если нет навыков, показываем сообщение
+        if (!hasSkills) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'empty-skills';
+            emptyMessage.innerHTML = '<p>Навыки не добавлены. Нажмите "+ Добавить навык"</p>';
+            skillsContainer.appendChild(emptyMessage);
+        }
+        
+        // Обновляем скрытое поле
+        skillsDataInput.value = JSON.stringify(skills);
+    }
+    
+    // Функция добавления навыка
+    function addSkill() {
+        const name = skillNameInput.value.trim();
+        if (!name) {
+            alert('Введите название навыка');
+            return;
+        }
+        
+        // Проверка на дубликат
+        if (skills.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+            alert('Такой навык уже добавлен');
+            return;
+        }
+        
+        const level = skillLevelSelect.value;
+        
+        skills.push({
+            name: name,
+            level: level
+        });
+        
+        // Очищаем поля
+        skillNameInput.value = '';
+        skillLevelSelect.value = 'unspecified';
+        
+        // Закрываем модальное окно
+        closeModal();
+        
+        // Рендерим обновленный список
+        renderSkills();
+    }
+    
+    // Функция удаления навыка
+    function removeSkill(skillName) {
+        skills = skills.filter(s => s.name !== skillName);
+        renderSkills();
+    }
+    
+    // Функции открытия/закрытия модального окна
+    function openModal() {
+        modalOverlay.style.display = 'flex';
+        skillNameInput.focus();
+    }
+    
+    function closeModal() {
+        modalOverlay.style.display = 'none';
+        skillNameInput.value = '';
+        skillLevelSelect.value = 'unspecified';
+    }
+    
+    // Обработчики событий
+    if (showModalBtn) {
+        showModalBtn.addEventListener('click', openModal);
+    }
+    
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeModal);
+    }
+    
+    if (cancelModalBtn) {
+        cancelModalBtn.addEventListener('click', closeModal);
+    }
+    
+    if (addSkillBtn) {
+        addSkillBtn.addEventListener('click', addSkill);
+    }
+    
+    // Закрытие по клику на оверлей
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+    }
+    
+    // Добавление по Enter
+    if (skillNameInput) {
+        skillNameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addSkill();
+            }
+        });
+    }
+    
+    // Инициализация
+    renderSkills();
+});
+</script>
 {%endblock%}
+

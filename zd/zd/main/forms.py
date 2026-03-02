@@ -6,15 +6,22 @@ import re
 import json
 
 class ApplicationForm(forms.ModelForm):
+    skills_data = forms.CharField(widget=forms.HiddenInput(), required=False)
+
     class Meta:
         model = Application
         fields = [
             'organization_name', 'organization_inn', 'organization_website',
             'solution_name', 'solution_description', 'solution_experience',
             'contact_first_name', 'contact_last_name', 'contact_middle_name',
-            'contact_phone', 'contact_email', 'skill_list', 'requirement_name', 'requirement_price'
+            'contact_phone', 'contact_email', 'skill_list', 'requirement_name', 'requirement_price',
+            'team_role',  # Добавляем новое поле
         ]
         widgets = {
+            'team_role': forms.Select(attrs={
+                'class': 'form-input role-select',
+                'placeholder': 'Выберите роль в команде'
+            }),
             'organization_name': forms.TextInput(attrs={
                 'placeholder': 'Наименование организации',
                 'class': 'form-input'
@@ -72,7 +79,8 @@ class ApplicationForm(forms.ModelForm):
             'requirement_price': forms.NumberInput(attrs={
                 'placeholder': 'Цена ресурса',
                 'class': 'requirement-price'
-            })
+            }),
+            'skills_json': forms.HiddenInput(), 
         }
     
     def __init__(self, *args, **kwargs):
@@ -80,6 +88,61 @@ class ApplicationForm(forms.ModelForm):
         self.fields['solution_name'].required = False
         for field_name in self.fields:
             self.fields[field_name].label = ''
+        
+        self.fields['team_role'].label = 'Роль в команде'
+        self.fields['team_role'].required = False
+        self.fields['team_role'].empty_label = 'Выберите роль (необязательно)'
+    
+                # Если есть существующие навыки, преобразуем их для отображения
+        if self.instance and self.instance.pk and self.instance.skills_json:
+            self.initial['skills_data'] = json.dumps(self.instance.skills_json)
+        elif self.instance and self.instance.skill_list:
+            # Конвертируем старый формат в новый
+            skills = [s.strip() for s in self.instance.skill_list.split(',') if s.strip()]
+            skills_json = [{'name': skill, 'level': 'unspecified'} for skill in skills]
+            self.initial['skills_data'] = json.dumps(skills_json)
+    
+    def clean_skills_data(self):
+        skills_data = self.cleaned_data.get('skills_data')
+        if skills_data:
+            try:
+                skills = json.loads(skills_data)
+                if not isinstance(skills, list):
+                    raise forms.ValidationError("Неверный формат данных навыков")
+                
+                # Валидация каждого навыка
+                for skill in skills:
+                    if not isinstance(skill, dict):
+                        raise forms.ValidationError("Каждый навык должен быть объектом")
+                    if 'name' not in skill or not skill['name'].strip():
+                        raise forms.ValidationError("Название навыка обязательно")
+                    
+                    # Проверка уровня
+                    valid_levels = ['expert', 'senior', 'middle', 'junior', 'beginner', 'unspecified']
+                    if 'level' in skill and skill['level'] not in valid_levels:
+                        skill['level'] = 'unspecified'
+                
+                return skills
+            except json.JSONDecodeError:
+                raise forms.ValidationError("Ошибка парсинга JSON")
+        return []
+    
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        
+        # Сохраняем структурированные навыки
+        skills_data = self.cleaned_data.get('skills_data')
+        if skills_data:
+            instance.skills_json = skills_data
+            
+            # Обновляем текстовое поле для обратной совместимости
+            skills_text = ', '.join([skill['name'] for skill in skills_data])
+            instance.skill_list = skills_text
+        
+        if commit:
+            instance.save()
+        
+        return instance
     
     #
     #
