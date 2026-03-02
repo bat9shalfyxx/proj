@@ -11,17 +11,24 @@ class ApplicationForm(forms.ModelForm):
     class Meta:
         model = Application
         fields = [
+            # Организация
             'organization_name', 'organization_inn', 'organization_website',
-            'solution_name', 'solution_description', 'solution_experience',
+            
+            # О себе и возраст
+            'age', 'about_me',
+            
+            # Роль и навыки
+            'team_role', 'skill_list', 'skills_json',
+            
+            # Ресурсы
+            'requirement_name', 'requirement_price',
+            
+            # Контакты
             'contact_first_name', 'contact_last_name', 'contact_middle_name',
-            'contact_phone', 'contact_email', 'skill_list', 'requirement_name', 'requirement_price',
-            'team_role',  # Добавляем новое поле
+            'contact_phone', 'contact_email',
         ]
         widgets = {
-            'team_role': forms.Select(attrs={
-                'class': 'form-input role-select',
-                'placeholder': 'Выберите роль в команде'
-            }),
+            # Организация
             'organization_name': forms.TextInput(attrs={
                 'placeholder': 'Наименование организации',
                 'class': 'form-input'
@@ -34,20 +41,28 @@ class ApplicationForm(forms.ModelForm):
                 'placeholder': 'Сайт организации',
                 'class': 'form-input'
             }),
-            'solution_name': forms.TextInput(attrs={
-                'placeholder': 'Краткое наименование',
-                'class': 'form-input'
+            
+            # Возраст
+            'age': forms.NumberInput(attrs={
+                'placeholder': 'Ваш возраст',
+                'class': 'form-input age-input',
+                'min': 14,
+                'max': 100
             }),
-            'solution_description': forms.Textarea(attrs={
-                'placeholder': 'Описание предлагаемого решения',
-                'class': 'form-input',
-                'rows': 4
+            
+            # О себе
+            'about_me': forms.Textarea(attrs={
+                'placeholder': 'Расскажите о себе: опыт, образование, цели, интересы...',
+                'class': 'form-input about-textarea',
+                'rows': 5
             }),
-            'solution_experience': forms.Textarea(attrs={
-                'placeholder': 'Релевантный опыт применения подобного решения',
-                'class': 'form-input',
-                'rows': 4
+            
+            # Роль
+            'team_role': forms.Select(attrs={
+                'class': 'form-input role-select',
             }),
+            
+            # Контакты
             'contact_first_name': forms.TextInput(attrs={
                 'placeholder': 'Имя',
                 'class': 'form-input'
@@ -68,10 +83,8 @@ class ApplicationForm(forms.ModelForm):
                 'placeholder': 'Электронная почта',
                 'class': 'form-input'
             }),
-            'skill_list': forms.TextInput(attrs={
-                'placeholder': 'Навыки (писать через пробел и запятую)',
-                'class': 'form-input'
-            }),
+            
+            # Ресурсы
             'requirement_name': forms.TextInput(attrs={
                 'placeholder': 'Название ресурса',
                 'class': 'requirement-name'
@@ -79,28 +92,35 @@ class ApplicationForm(forms.ModelForm):
             'requirement_price': forms.NumberInput(attrs={
                 'placeholder': 'Цена ресурса',
                 'class': 'requirement-price'
-            }),
-            'skills_json': forms.HiddenInput(), 
+            })
         }
+
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['solution_name'].required = False
+        
+        # Убираем метки
         for field_name in self.fields:
             self.fields[field_name].label = ''
         
-        self.fields['team_role'].label = 'Роль в команде'
-        self.fields['team_role'].required = False
+        # Настройка полей
         self.fields['team_role'].empty_label = 'Выберите роль (необязательно)'
-    
-                # Если есть существующие навыки, преобразуем их для отображения
+        self.fields['age'].required = False
+        self.fields['about_me'].required = False
+        
+        # Загрузка существующих навыков
         if self.instance and self.instance.pk and self.instance.skills_json:
             self.initial['skills_data'] = json.dumps(self.instance.skills_json)
         elif self.instance and self.instance.skill_list:
-            # Конвертируем старый формат в новый
             skills = [s.strip() for s in self.instance.skill_list.split(',') if s.strip()]
             skills_json = [{'name': skill, 'level': 'unspecified'} for skill in skills]
             self.initial['skills_data'] = json.dumps(skills_json)
+
+    def clean_age(self):
+        age = self.cleaned_data.get('age')
+        if age and (age < 14 or age > 100):
+            raise ValidationError('Возраст должен быть от 14 до 100 лет')
+        return age
     
     def clean_skills_data(self):
         skills_data = self.cleaned_data.get('skills_data')
@@ -126,24 +146,22 @@ class ApplicationForm(forms.ModelForm):
             except json.JSONDecodeError:
                 raise forms.ValidationError("Ошибка парсинга JSON")
         return []
-    
+     
     def save(self, commit=True):
         instance = super().save(commit=False)
         
-        # Сохраняем структурированные навыки
+        # Сохраняем навыки
         skills_data = self.cleaned_data.get('skills_data')
         if skills_data:
-            instance.skills_json = skills_data
-            
-            # Обновляем текстовое поле для обратной совместимости
-            skills_text = ', '.join([skill['name'] for skill in skills_data])
-            instance.skill_list = skills_text
+            try:
+                instance.skills_json = json.loads(skills_data)
+            except:
+                pass
         
         if commit:
             instance.save()
         
         return instance
-    
     #
     #
     def clean_requirements(self):

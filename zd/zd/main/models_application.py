@@ -13,9 +13,6 @@ class Application(models.Model):
         ('rejected', 'Отклонена'),
     ]
     
-    def get_absolute_url(self):
-        return f'/news/{self.id}'
-    
     TEAM_ROLE_CHOICES = [
         ('developer', 'Разработчик'),
         ('frontend', 'Frontend-разработчик'),
@@ -38,6 +35,14 @@ class Application(models.Model):
         ('other', 'Другое'),
     ]
     
+    def get_absolute_url(self):
+        return f'/news/{self.id}'
+    
+    # Навыки
+    skill_list = models.TextField('Ваши навыки', default='JS, REACT, TypeScript', blank=True)
+    skills_json = models.JSONField('Навыки (структурированные)', default=list, blank=True)
+
+    # Роль в команде
     team_role = models.CharField(
         'Роль в команде', 
         max_length=50, 
@@ -46,21 +51,16 @@ class Application(models.Model):
         blank=True
     )
     
-    # Навыки - текстовое поле для обратной совместимости
-    skill_list = models.TextField('Ваши навыки', default='JS, REACT, TypeScript', blank=True)
+    # Возраст
+    age = models.PositiveIntegerField('Возраст', null=True, blank=True)
     
-    # Новое поле для хранения навыков в структурированном виде
-    skills_json = models.JSONField('Навыки (структурированные)', default=list, blank=True)
-
+    # О себе
+    about_me = models.TextField('О себе', blank=True, default='')
+    
     # Организация
     organization_name = models.CharField('Наименование организации', max_length=255, default='NewOrg')
     organization_inn = models.CharField('ИНН организации', max_length=12, default='1000000000')
     organization_website = models.URLField('Сайт организации', blank=True, default='http://NewOrg.com')
-    
-    # Предлагаемое решение
-    solution_name = models.CharField('Краткое наименование решения', max_length=255, default='-')
-    solution_description = models.TextField('Описание предлагаемого решения', default='-')
-    solution_experience = models.TextField('Релевантный опыт применения', default='-')
 
     # Контакты
     contact_first_name = models.CharField('Имя', max_length=100, default='Тимур')
@@ -74,7 +74,7 @@ class Application(models.Model):
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата обновления', auto_now=True)
 
-    # РЕСУРС-ЦЕНА
+    # Ресурсы
     requirement_name = models.TextField('Название ресурса', max_length=255, default='Ноут')
     requirement_price = models.CharField('Цена ресурса', default=10000, max_length=255)
     
@@ -96,24 +96,19 @@ class Application(models.Model):
         return f"Заявка от {self.organization_name} ({self.created_at.strftime('%d.%m.%Y')})"
     
     def save(self, *args, **kwargs):
-        # Синхронизируем skill_list с skills_json для обратной совместимости
         if self.skills_json and not self.skill_list:
             skills_text = ', '.join([skill.get('name', '') for skill in self.skills_json if skill.get('name')])
             self.skill_list = skills_text
         elif self.skill_list and not self.skills_json:
-            # Конвертируем старый формат в новый при необходимости
             try:
-                # Проверяем, не является ли skill_list уже JSON строкой
                 if self.skill_list.startswith('[') and self.skill_list.endswith(']'):
                     self.skills_json = json.loads(self.skill_list)
                 else:
-                    # Разделяем по запятой и создаем структуру
                     skills = [s.strip() for s in self.skill_list.split(',') if s.strip()]
                     self.skills_json = [{'name': skill, 'level': 'unspecified'} for skill in skills]
             except:
-                # Если ошибка парсинга, оставляем как есть
                 pass
-                
+    
         super().save(*args, **kwargs)
     
     def get_skills_by_level(self):

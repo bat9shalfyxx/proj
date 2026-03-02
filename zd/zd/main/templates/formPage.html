@@ -49,72 +49,35 @@
                 <input type="hidden" name="application_submit" value="1">
                 
                 <div class="form-request">
-                    <p>Ваши навыки</p>
-                    <div class="skills-section">
-                        {{ application_form.skill_list }}
-                        {% if application_form.skill_list.errors %}
-                            <div class="error">{{ application_form.skill_list }}</div>
-                        {% endif %}
-                        
-                        <!-- Блок навыков в форме -->
-                        <div class="skills-section">
-                            <div class="skills-header">
-                                <h3>Навыки</h3>
-                                <button type="button" class="add-skill-btn" id="showSkillModalBtn">
-                                    + Добавить навык
-                                </button>
-                            </div>
-                            
-                            <!-- Контейнер для навыков -->
-                            <div class="skills-container" id="skillsContainer">
-                                <!-- Навыки будут добавляться сюда динамически -->
-                            </div>
-                            
-                            <!-- Скрытое поле для хранения данных навыков -->
-                            <input type="hidden" name="skills_data" id="skillsDataInput" value="[]">
-                        </div>
-
-                        <!-- Замените старый блок навыков в форме -->
-                        <!-- Удалите или закомментируйте старый блок:
-                        <p>Навыки</p>
-                        {{ application_form.skill_list }}
-                        -->
-
-                        <!-- Шаблон для навыка -->
-                        <template id="skillItemTemplate">
-                            <div class="skill-item" data-skill-name="" data-skill-level="">
-                                <div class="skill-item-content">
-                                    <span class="skill-name"></span>
-                                    <span class="skill-level-badge"></span>
-                                </div>
-                                <button type="button" class="skill-remove" title="Удалить навык">×</button>
-                            </div>
-                        </template>
-
-                        <!-- Группировка навыков по уровням -->
-                        <template id="skillGroupTemplate">
-                            <div class="skill-group">
-                                <div class="skill-group-header">
-                                    <h4 class="skill-group-title"></h4>
-                                </div>
-                                <div class="skill-group-items"></div>
-                            </div>
-                        </template>
-                        
-                        
-                        <!-- Контейнер для навыков -->
-                        <div class="skills-container" id="skillsContainer">
-                            <!-- Навыки будут добавляться сюда динамически -->
+                    <!-- О себе и возраст -->
+                    <div class="personal-section">
+                        <div class="section-header">
+                            <h3>О себе</h3>
                         </div>
                         
-                        <!-- Скрытое поле для хранения данных навыков -->
-                        <input type="hidden" name="skills_data" id="skillsDataInput" value="[]">
+                        <div class="age-field">
+                            <label for="{{ application_form.age.id_for_label }}">Возраст</label>
+                            {{ application_form.age }}
+                            {% if application_form.age.errors %}
+                                <div class="error">{{ application_form.age.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="about-field">
+                            <label for="{{ application_form.about_me.id_for_label }}">Расскажите о себе</label>
+                            {{ application_form.about_me }}
+                            {% if application_form.about_me.errors %}
+                                <div class="error">{{ application_form.about_me.errors }}</div>
+                            {% endif %}
+                            <span class="field-hint">Опыт работы, образование, цели, интересы, достижения</span>
+                        </div>
                     </div>
 
+                    <!-- Роль в команде -->
                     <div class="role-section">
-                        <div class="role-header">
+                        <div class="section-header">
                             <h3>Роль в команде</h3>
-                            <span class="role-hint">(необязательно)</span>
+                            <span class="optional-badge">необязательно</span>
                         </div>
                         
                         <div class="role-select-wrapper">
@@ -125,92 +88,102 @@
                         </div>
                         
                         <div class="other-role-field" id="otherRoleField" style="display: none;">
-                            <label for="otherRole">Укажите вашу роль:</label>
                             <input type="text" 
                                 id="otherRole" 
                                 name="other_role" 
                                 class="form-input" 
-                                placeholder="Например: Scrum-мастер">
+                                placeholder="Укажите вашу роль">
                         </div>
                     </div>
 
-                    <p>Организация</p>
-                    {{ application_form.organization_name }}
-                    {% if application_form.organization_name.errors %}
-                        <div class="error">{{ application_form.organization_name.errors }}</div>
-                    {% endif %}
-                    
-                    {{ application_form.organization_inn }}
-                    {% if application_form.organization_inn.errors %}
-                        <div class="error">{{ application_form.organization_inn.errors }}</div>
-                    {% endif %}
-                    
-                    {{ application_form.organization_website }}
-                    {% if application_form.organization_website.errors %}
-                        <div class="error">{{ application_form.organization_website.errors }}</div>
-                    {% endif %}
-                    
-                    <p>Предлагаемое решение</p>
-                    {{ application.solution_name }}
-                    {% if application_form.solution_name.errors %}
-                        <div class="error">{{ application_form.solution_name.errors }}</div>
-                    {% endif %}
-                    
-                    {{ application_form.solution_description }}
-                    {% if application_form.solution_description.errors %}
-                        <div class="error">{{ application_form.solution_description.errors }}</div>
-                    {% endif %}
-                    
-                    {{ application_form.solution_experience }}
-                    {% if application_form.solution_experience.errors %}
-                        <div class="error">{{ application_form.solution_experience.errors }}</div>
-                    {% endif %}
-                    
-                    <p>Бюджет</p>
-                    <h2>Требования к ресурсам<br>(например: зарплата, оборудование, материалы и т.п.):</h2>
-                    <div class="requirements-list">
-                        <div class="requirements-el">
-                            <label>
-                                Название ресурса:<br>
-                                {{ application_form.requirement_name }}
-                            </label>
-
-                            <label>
-                                Цена ресурса:<br>
-                                {{ application_form.requirement_price }}
-                            </label>
+                    <!-- Навыки (существующий блок) -->
+                    <div class="skills-section">
+                        <div class="skills-header">
+                            <h3>Навыки</h3>
+                            <button type="button" class="add-skill-btn" id="showSkillModalBtn">
+                                + Добавить навык
+                            </button>
                         </div>
+                        
+                        <div class="skills-container" id="skillsContainer"></div>
+                        <input type="hidden" name="skills_data" id="skillsDataInput" value="[]">
                     </div>
 
-                    <button type="button" class="add-requirement-btn">
-                        + Добавить ресурс/цену
-                    </button>
+                    <!-- Организация -->
+                    <div class="organization-section">
+                        <div class="section-header">
+                            <h3>Организация</h3>
+                        </div>
+                        
+                        {{ application_form.organization_name }}
+                        {% if application_form.organization_name.errors %}
+                            <div class="error">{{ application_form.organization_name.errors }}</div>
+                        {% endif %}
+                        
+                        {{ application_form.organization_inn }}
+                        {% if application_form.organization_inn.errors %}
+                            <div class="error">{{ application_form.organization_inn.errors }}</div>
+                        {% endif %}
+                        
+                        {{ application_form.organization_website }}
+                        {% if application_form.organization_website.errors %}
+                            <div class="error">{{ application_form.organization_website.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Бюджет и ресурсы -->
+                    <div class="budget-section">
+                        <div class="section-header">
+                            <h3>Бюджет и ресурсы</h3>
+                        </div>
+                        
+                        <h4>Требования к ресурсам (зарплата, оборудование, материалы и т.п.):</h4>
+                        
+                        <div class="requirements-list">
+                            <div class="requirements-el">
+                                <label>
+                                    Название ресурса:
+                                    {{ application_form.requirement_name }}
+                                </label>
 
-                    <p>Контакты для обратной связи</p>
-                    {{ application_form.contact_first_name }}
-                    {% if application_form.contact_first_name.errors %}
-                        <div class="error">{{ application_form.contact_first_name.errors }}</div>
-                    {% endif %}
-                    
-                    {{ application_form.contact_last_name }}
-                    {% if application_form.contact_last_name.errors %}
-                        <div class="error">{{ application_form.contact_last_name.errors }}</div>
-                    {% endif %}
-                    
-                    {{ application_form.contact_middle_name }}
-                    {% if application_form.contact_middle_name.errors %}
-                        <div class="error">{{ application_form.contact_middle_name.errors }}</div>
-                    {% endif %}
-                    
-                    {{ application_form.contact_phone }}
-                    {% if application_form.contact_phone.errors %}
-                        <div class="error">{{ application_form.contact_phone.errors }}</div>
-                    {% endif %}
-                    
-                    {{ application_form.contact_email }}
-                    {% if application_form.contact_email.errors %}
-                        <div class="error">{{ application_form.contact_email.errors }}</div>
-                    {% endif %}
+                                <label>
+                                    Цена ресурса (₽):
+                                    {{ application_form.requirement_price }}
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="button" class="add-requirement-btn">
+                            + Добавить ресурс
+                        </button>
+                    </div>
+
+                    <!-- Контакты -->
+                    <div class="contacts-section">
+                        <div class="section-header">
+                            <h3>Контакты для обратной связи</h3>
+                        </div>
+                        
+                        <div class="name-fields">
+                            {{ application_form.contact_last_name }}
+                            {{ application_form.contact_first_name }}
+                            {{ application_form.contact_middle_name }}
+                        </div>
+                        
+                        {% if application_form.contact_last_name.errors %}
+                            <div class="error">{{ application_form.contact_last_name.errors }}</div>
+                        {% endif %}
+                        
+                        {{ application_form.contact_phone }}
+                        {% if application_form.contact_phone.errors %}
+                            <div class="error">{{ application_form.contact_phone.errors }}</div>
+                        {% endif %}
+                        
+                        {{ application_form.contact_email }}
+                        {% if application_form.contact_email.errors %}
+                            <div class="error">{{ application_form.contact_email.errors }}</div>
+                        {% endif %}
+                    </div>
                     
                     <!-- Общие ошибки формы -->
                     {% if application_form.non_field_errors %}
@@ -221,7 +194,9 @@
                         </div>
                     {% endif %}
                     
-                    <input class="form-button" type="submit" value="Подать заявку" id="application-submit">
+                    <button class="form-button" type="submit" id="application-submit">
+                        Подать заявку
+                    </button>
                 </div>
             </form>
         </div>          

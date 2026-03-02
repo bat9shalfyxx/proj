@@ -1,5 +1,148 @@
 /* _formPage.scss - Темная тема как в createTeam */
 /* Стили для секции навыков */
+/* Добавьте в SCSS */
+
+.personal-section,
+.role-section,
+.organization-section,
+.budget-section,
+.contacts-section {
+    background: #2d2d2d;
+    border-radius: 15px;
+    padding: 25px;
+    margin: 20px 0;
+    border: 2px solid #404040;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    
+    h3 {
+        color: #e0e0e0;
+        font-size: 18px;
+        margin: 0;
+    }
+    
+    .optional-badge {
+        color: #888;
+        font-size: 12px;
+        font-style: italic;
+        background: #363636;
+        padding: 4px 10px;
+        border-radius: 15px;
+    }
+}
+
+.age-field,
+.about-field {
+    margin-bottom: 20px;
+    
+    label {
+        display: block;
+        color: #b0b0b0;
+        font-size: 14px;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+}
+
+.age-input {
+    max-width: 150px;
+}
+
+.about-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.name-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.field-hint {
+    display: block;
+    color: #888;
+    font-size: 12px;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.role-select-wrapper {
+    select.role-select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #404040;
+        border-radius: 10px;
+        font-size: 14px;
+        background: #363636;
+        color: #e0e0e0;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 15px;
+        cursor: pointer;
+        
+        &:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        
+        option {
+            background: #2d2d2d;
+            color: #e0e0e0;
+        }
+    }
+}
+
+.other-role-field {
+    margin-top: 15px;
+    animation: slideDown 0.3s ease-out;
+    
+    input {
+        width: 100%;
+        padding: 10px 15px;
+        border: 2px solid #404040;
+        border-radius: 8px;
+        background: #363636;
+        color: #e0e0e0;
+        
+        &:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .name-fields {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .age-input {
+        max-width: 100%;
+    }
+}
 .skills-section {
     background: #2d2d2d;
     border-radius: 15px;

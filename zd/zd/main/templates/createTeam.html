@@ -106,6 +106,22 @@
 
                             <h2 class="choose-request-el-orgname">Название организации:</h2>
                             <h2 class="org-name">{{ app.organization_name }}</h2>
+
+                            <div class="personal-info">
+                                {% if app.age %}
+                                <div class="info-item">
+                                    <span class="info-label">Возраст:</span>
+                                    <span class="info-value">{{ app.age }} лет</span>
+                                </div>
+                                {% endif %}
+                                
+                                {% if app.about_me %}
+                                <div class="info-item about">
+                                    <span class="info-label">О себе:</span>
+                                    <p class="about-text">{{ app.about_me|truncatechars:200 }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
                             
                             <!-- Добавляем теги навыков -->
                             <div class="skill-tags">
