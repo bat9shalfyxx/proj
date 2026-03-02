@@ -98,12 +98,48 @@
 
                     <!-- Навыки (существующий блок) -->
                     <div class="skills-section">
-                        <div class="skills-header">
-                            <h3>Навыки</h3>
-                            <button type="button" class="add-skill-btn" id="showSkillModalBtn">
-                                + Добавить навык
-                            </button>
+                        <div class="skills-section">
+                            <div class="skills-header">
+                                <h3>Навыки</h3>
+                                <button type="button" class="add-skill-btn" id="showSkillModalBtn">
+                                    + Добавить навык
+                                </button>
+                            </div>
+                            
+                            <!-- Контейнер для навыков -->
+                            <div class="skills-container" id="skillsContainer">
+                                <!-- Навыки будут добавляться сюда динамически -->
+                            </div>
+                            
+                            <!-- Скрытое поле для хранения данных навыков -->
+                            <input type="hidden" name="skills_data" id="skillsDataInput" value="[]">
                         </div>
+
+                        <!-- Замените старый блок навыков в форме -->
+                        <!-- Удалите или закомментируйте старый блок:
+                        <p>Навыки</p>
+                        -->
+
+                        <!-- Шаблон для навыка -->
+                        <template id="skillItemTemplate">
+                            <div class="skill-item" data-skill-name="" data-skill-level="">
+                                <div class="skill-item-content">
+                                    <span class="skill-name"></span>
+                                    <span class="skill-level-badge"></span>
+                                </div>
+                                <button type="button" class="skill-remove" title="Удалить навык">×</button>
+                            </div>
+                        </template>
+
+                        <!-- Группировка навыков по уровням -->
+                        <template id="skillGroupTemplate">
+                            <div class="skill-group">
+                                <div class="skill-group-header">
+                                    <h4 class="skill-group-title"></h4>
+                                </div>
+                                <div class="skill-group-items"></div>
+                            </div>
+                        </template>
                         
                         <div class="skills-container" id="skillsContainer"></div>
                         <input type="hidden" name="skills_data" id="skillsDataInput" value="[]">
