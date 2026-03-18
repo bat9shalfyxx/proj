@@ -6,6 +6,18 @@ from main.models_application import Application
 
 User = settings.AUTH_USER_MODEL
 
+BELBIN_ROLE_CHOICES = [
+    ('implementer', 'Исполнитель'),
+    ('coordinator', 'Координатор'),
+    ('shaper', 'Формирователь'),
+    ('plant', 'Генератор идей'),
+    ('resource_investigator', 'Разведчик'),
+    ('teamworker', 'Душа команды'),
+    ('monitor_evaluator', 'Аналитик'),
+    ('completer_finisher', 'Педантичность'),
+    ('specialist', 'Специалист'),
+]
+
 # Модель проекта
 class Project(models.Model):
     STATUS_CHOICES = [
@@ -33,6 +45,12 @@ class Project(models.Model):
     status = models.CharField('Статус', max_length=20, 
                              choices=STATUS_CHOICES, default='draft')
     
+    keywords = models.CharField(
+        'Ключевые слова',
+        max_length=500,
+        blank=True,
+        help_text='Введите ключевые слова через запятую'
+    )
 
     creator = models.ForeignKey(
         User, 
@@ -79,6 +97,14 @@ class ProjectRequirement(models.Model):
         ('expert', 'Эксперт'),
     ]
     
+    belbin_role = models.CharField(
+        'Требуемая роль по Белбину',
+        max_length=30,
+        choices=BELBIN_ROLE_CHOICES,
+        blank=True,
+        help_text='Необязательное поле. Выберите роль, которая требуется для данного навыка'
+    )
+
     project = models.ForeignKey(
         Project, 
         on_delete=models.CASCADE, 

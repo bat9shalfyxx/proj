@@ -88,9 +88,8 @@
                         {% for app in applications %}
                         <div class="choose-request-el" 
                              data-application-id="{{ app.id }}"
-                             data-organization="{{ app.organization_name|lower }}"
                              data-author="{{ app.contact_first_name|lower }} {{ app.contact_last_name|lower }}"
-                             data-budget="{{ app.requirement_price|default:'0' }}"
+                             data-budget="{{ app.expected_salary|default:'0' }}"
                              data-skills="{{ app.skill_list|lower }}"
                              data-solution="{{ app.solution_description|lower }}">
                             
@@ -103,9 +102,6 @@
 
                             <p class="request-number">Заявка №{{ forloop.counter }}:</p>
                             <p class="request-author">Автор: {{ app.contact_first_name }} {{ app.contact_last_name }}</p>
-
-                            <h2 class="choose-request-el-orgname">Название организации:</h2>
-                            <h2 class="org-name">{{ app.organization_name }}</h2>
 
                             <div class="personal-info">
                                 {% if app.age %}
@@ -143,14 +139,14 @@
                                     <h4>{{ app.solution_experience|default:"Не указано" }}</h4>
                                     
                                     <h3>Требуемые ресурсы:</h3>
-                                    <h4>{{ app.requirement_name|default:"Не указано" }} - {{ app.requirement_price|default:"0" }}₽</h4>
+                                    <h4>{{ app.requirement_name|default:"Не указано" }} - {{ app.expected_salary|default:"0" }}₽</h4>
                                     
                                     <h3>Навыки:</h3>
                                     <div class="skill-list-detailed">
                                         {{ app.skill_list|default:"Не указано" }}
                                     </div>
                                     
-                                    <h3>Общая сумма бюджета: <span class="budget-sum">{{ app.requirement_price|default:"0" }}</span>₽</h3>
+                                    <h3>Общая сумма бюджета: <span class="budget-sum">{{ app.expected_salary|default:"0" }}</span>₽</h3>
                                     
                                     <div class="contact-info">
                                         <h3>Контакты:</h3>

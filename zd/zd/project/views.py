@@ -45,9 +45,12 @@ def project_list(request):
 @login_required
 def project_create(request):
     #Создание нового проекта
+
     if request.method == 'POST':
         try:
             with transaction.atomic():
+                keywords = request.POST.get('keywords', '')
+                
                 project = Project.objects.create(
                     name=request.POST.get('name'),
                     description=request.POST.get('description'),
@@ -57,7 +60,8 @@ def project_create(request):
                     end_date=request.POST.get('end_date') or None,
                     budget=request.POST.get('budget') or None,
                     status='draft',
-                    creator=request.user
+                    creator=request.user,
+                    keywords=keywords
                 )
                 
                 # Обработка требований к участникам
@@ -67,6 +71,7 @@ def project_create(request):
                 requirement_mandatory = request.POST.getlist('requirement_mandatory[]')
                 requirement_prices = request.POST.getlist('requirement_price[]')
                 requirement_conditions = request.POST.getlist('requirement_condition[]')
+                belbin_roles = request.POST.getlist('belbin_role[]')
                 
                 for i in range(len(requirement_names)):
                     if requirement_names[i].strip():
@@ -77,7 +82,8 @@ def project_create(request):
                             people_count=int(requirement_counts[i]) if i < len(requirement_counts) else 1,
                             is_mandatory=(requirement_mandatory[i] == 'on') if i < len(requirement_mandatory) else False,
                             price=requirement_prices[i] if i < len(requirement_prices) and requirement_prices[i] else None,
-                            work_condition=requirement_conditions[i] if i < len(requirement_conditions) else ''
+                            work_condition=requirement_conditions[i] if i < len(requirement_conditions) else '',
+                            belbin_role=belbin_roles[i] if i < len(belbin_roles) and belbin_roles[i] else ''
                         )
                 
                 messages.success(request, f'Проект "{project.name}" успешно создан!')
@@ -192,6 +198,7 @@ def project_edit(request, project_id):
                 project.start_date = request.POST.get('start_date') or None
                 project.end_date = request.POST.get('end_date') or None
                 project.budget = request.POST.get('budget') or None
+                project.keywords = request.POST.get('keywords', '') 
                 project.save()
                 
                 # Удаляем старые требования
@@ -204,6 +211,7 @@ def project_edit(request, project_id):
                 requirement_mandatory = request.POST.getlist('requirement_mandatory[]')
                 requirement_prices = request.POST.getlist('requirement_price[]')
                 requirement_conditions = request.POST.getlist('requirement_condition[]')
+                belbin_roles = request.POST.getlist('belbin_role[]')
                 
                 for i in range(len(requirement_names)):
                     if requirement_names[i].strip():
@@ -214,7 +222,8 @@ def project_edit(request, project_id):
                             people_count=int(requirement_counts[i]) if i < len(requirement_counts) else 1,
                             is_mandatory=(requirement_mandatory[i] == 'on') if i < len(requirement_mandatory) else False,
                             price=requirement_prices[i] if i < len(requirement_prices) and requirement_prices[i] else None,
-                            work_condition=requirement_conditions[i] if i < len(requirement_conditions) else ''
+                            work_condition=requirement_conditions[i] if i < len(requirement_conditions) else '',
+                            belbin_role=belbin_roles[i] if i < len(belbin_roles) and belbin_roles[i] else ''
                         )
                 
                 messages.success(request, 'Проект успешно обновлен!')

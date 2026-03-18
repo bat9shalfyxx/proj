@@ -6,11 +6,51 @@ import json
 from decimal import Decimal
 
 class Application(models.Model):
+    BELBIN_ROLE_CHOICES = [
+        ('implementer', 'Исполнитель'),
+        ('coordinator', 'Координатор'),
+        ('shaper', 'Формирователь'),
+        ('plant', 'Генератор идей'),
+        ('resource_investigator', 'Разведчик'),
+        ('teamworker', 'Душа команды'),
+        ('monitor_evaluator', 'Аналитик'),
+        ('completer_finisher', 'Педантичность'),
+        ('specialist', 'Специалист'),
+    ]
+
     STATUS_CHOICES = [
         ('new', 'Новая'),
         ('in_progress', 'В обработке'),
         ('approved', 'Одобрена'),
         ('rejected', 'Отклонена'),
+    ]
+    
+    ACTIVITY_AREA_CHOICES = [
+        ('it', 'Информационные технологии'),
+        ('energy', 'Энергетика'),
+        ('automation', 'Автоматика'),
+        ('math', 'Математика'),
+        ('economics', 'Экономика'),
+        ('management', 'Менеджмент'),
+        ('business_analysis', 'Бизнес-анализ'),
+        ('other', 'Другое'),
+    ]
+    
+    IT_SKILLS_CHOICES = [
+        ('information_systems', 'Информационные системы'),
+        ('design', 'Проектирование'),
+        ('ui_development', 'Разработка пользовательского интерфейса'),
+        ('server_development', 'Разработка серверной части'),
+        ('client_development', 'Клиентская часть'),
+        ('other', 'Другое'),
+    ]
+    
+    TECHNOLOGY_CHOICES = [
+        ('programming_language', 'Язык программирования'),
+        ('database', 'СУБД'),
+        ('framework', 'Фреймворк'),
+        ('library', 'Библиотека'),
+        ('other', 'Другое'),
     ]
     
     TEAM_ROLE_CHOICES = [
@@ -35,50 +75,158 @@ class Application(models.Model):
         ('other', 'Другое'),
     ]
     
+    WORK_SCHEDULE_CHOICES = [
+        ('full_time', 'Полная занятость'),
+        ('part_time', 'Частичная занятость'),
+        ('flexible', 'Гибкий график'),
+        ('remote', 'Удаленная работа'),
+        ('project_work', 'Проектная работа'),
+        ('other', 'Другое'),
+    ]
+    
     def get_absolute_url(self):
         return f'/news/{self.id}'
     
-    # Навыки
-    skill_list = models.TextField('Ваши навыки', default='JS, REACT, TypeScript', blank=True)
-    skills_json = models.JSONField('Навыки (структурированные)', default=list, blank=True)
+    activity_area = models.CharField(
+        'Область деятельности',
+        max_length=50,
+        choices=ACTIVITY_AREA_CHOICES,
+        default='it',
+        blank=True
+    )
+    activity_area_other = models.CharField(
+        'Другая область деятельности',
+        max_length=255,
+        blank=True,
+        default=''
+    )
+    
+    it_skill = models.CharField(
+        'Ключевые навыки в IT',
+        max_length=50,
+        choices=IT_SKILLS_CHOICES,
+        default='information_systems',
+        blank=True
+    )
+    it_skill_other = models.CharField(
+        'Другие ключевые навыки',
+        max_length=255,
+        blank=True,
+        default=''
+    )
 
-    # Роль в команде
+    
+    technologies_json = models.JSONField('Технологии (структурированные)', default=list, blank=True)
+    technologies_text = models.TextField('Технологии (текст)', blank=True, default='')
+    technology = models.CharField(
+        'Знание технологий',
+        max_length=50,
+        choices=TECHNOLOGY_CHOICES,
+        default='programming_language',
+        blank=True
+    )
+    technology_other = models.CharField(
+        'Другие технологии',
+        max_length=255,
+        blank=True,
+        default=''
+    )
+    technology_details = models.TextField(
+        'Детальное описание технологий',
+        blank=True,
+        default='',
+        help_text='Перечислите конкретные технологии, языки, СУБД, фреймворки и т.д.'
+    )
+    
     team_role = models.CharField(
-        'Роль в команде', 
-        max_length=50, 
-        choices=TEAM_ROLE_CHOICES, 
+        'Ваша специальность',  # меняем здесь
+        max_length=50,
+        choices=TEAM_ROLE_CHOICES,
         default='developer',
         blank=True
     )
+    belbin_role = models.CharField(
+        'Роль в команде (по Белбину)',
+        max_length=30,
+        choices=BELBIN_ROLE_CHOICES,
+        blank=True,
+        default=''
+    )
+    team_role_other = models.CharField(
+        'Другая роль',
+        max_length=255,
+        blank=True,
+        default=''
+    )
     
-    # Возраст
-    age = models.PositiveIntegerField('Возраст', null=True, blank=True)
+    leaderid_link = models.URLField('Ссылка на LeaderID', blank=True, default='')
+    elibrary_link = models.URLField('Ссылка на Elibrary', blank=True, default='')
+    github_link = models.URLField('Ссылка на GitHub', blank=True, default='')
+    project_examples = models.TextField(
+        'Примеры проектов',
+        blank=True,
+        default='',
+        help_text='Опишите ваши проекты, можно добавить ссылки'
+    )
+    work_experience = models.TextField(
+        'Опыт работы',
+        blank=True,
+        default='',
+        help_text='Опишите ваш опыт работы'
+    )
+    driver_license = models.BooleanField('Наличие водительских прав', default=False)
     
-    # О себе
-    about_me = models.TextField('О себе', blank=True, default='')
+    expected_salary = models.DecimalField(
+        'Ожидаемое вознаграждение (₽)',
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True
+    )
+    work_schedule = models.CharField(
+        'График работы',
+        max_length=20,
+        choices=WORK_SCHEDULE_CHOICES,
+        default='full_time',
+        blank=True
+    )
+    work_schedule_other = models.CharField(
+        'Другой график',
+        max_length=255,
+        blank=True,
+        default=''
+    )
+    required_equipment = models.TextField(
+        'Требуемое оборудование',
+        blank=True,
+        default='',
+        help_text='Какое оборудование необходимо для работы'
+    )
     
-    # Организация
-    organization_name = models.CharField('Наименование организации', max_length=255, default='NewOrg')
-    organization_inn = models.CharField('ИНН организации', max_length=12, default='1000000000')
-    organization_website = models.URLField('Сайт организации', blank=True, default='http://NewOrg.com')
+    collaboration_expectations = models.TextField(
+        'Ожидание от сотрудничества',
+        blank=True,
+        default='',
+        help_text='Что вы ожидаете от сотрудничества?'
+    )
+    
+    skill_list = models.TextField('Ваши навыки', default='JS, REACT, TypeScript', blank=True)
+    skills_json = models.JSONField('Навыки (структурированные)', default=list, blank=True)
+    
+    # organization_name = models.CharField('Наименование организации', max_length=255, default='NewOrg')
+    # organization_inn = models.CharField('ИНН организации', max_length=12, default='1000000000')
+    # organization_website = models.URLField('Сайт организации', blank=True, default='http://NewOrg.com')
 
-    # Контакты
     contact_first_name = models.CharField('Имя', max_length=100, default='Тимур')
     contact_last_name = models.CharField('Фамилия', max_length=100, default='Шокиров')
     contact_middle_name = models.CharField('Отчество', max_length=100, blank=True)
     contact_phone = models.CharField('Телефон', max_length=20, default='+79879879292')
     contact_email = models.EmailField('Электронная почта', default='ya@gmail.com')
     
-    # Системные поля
     status = models.CharField('Статус', max_length=20, choices=STATUS_CHOICES, default='new')
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата обновления', auto_now=True)
 
-    # Ресурсы
-    requirement_name = models.TextField('Название ресурса', max_length=255, default='Ноут')
-    requirement_price = models.CharField('Цена ресурса', default=10000, max_length=255)
-    
-    # Связь с пользователем
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL, 
@@ -96,24 +244,24 @@ class Application(models.Model):
         return f"Заявка от {self.organization_name} ({self.created_at.strftime('%d.%m.%Y')})"
     
     def save(self, *args, **kwargs):
-        if self.skills_json and not self.skill_list:
-            skills_text = ', '.join([skill.get('name', '') for skill in self.skills_json if skill.get('name')])
-            self.skill_list = skills_text
-        elif self.skill_list and not self.skills_json:
+        if self.technologies_json and not self.technologies_text:
+            techs_text = ', '.join([tech.get('name', '') for tech in self.technologies_json if tech.get('name')])
+            self.technologies_text = techs_text
+        elif self.technologies_text and not self.technologies_json:
             try:
-                if self.skill_list.startswith('[') and self.skill_list.endswith(']'):
-                    self.skills_json = json.loads(self.skill_list)
+                if self.technologies_text.startswith('[') and self.technologies_text.endswith(']'):
+                    self.technologies_json = json.loads(self.technologies_text)
                 else:
-                    skills = [s.strip() for s in self.skill_list.split(',') if s.strip()]
-                    self.skills_json = [{'name': skill, 'level': 'unspecified'} for skill in skills]
+                    techs = [t.strip() for t in self.technologies_text.split(',') if t.strip()]
+                    self.technologies_json = [{'name': tech, 'level': 'unspecified'} for tech in techs]
             except:
                 pass
-    
+        
         super().save(*args, **kwargs)
-    
-    def get_skills_by_level(self):
-        """Возвращает навыки, сгруппированные по уровням"""
-        skills_by_level = {
+
+    def get_technologies_by_level(self):
+        """Возвращает технологии, сгруппированные по уровням"""
+        techs_by_level = {
             'expert': [],
             'senior': [],
             'middle': [],
@@ -122,24 +270,36 @@ class Application(models.Model):
             'unspecified': []
         }
         
-        if self.skills_json:
-            for skill in self.skills_json:
-                level = skill.get('level', 'unspecified')
-                if level in skills_by_level:
-                    skills_by_level[level].append(skill)
+        if self.technologies_json:
+            for tech in self.technologies_json:
+                level = tech.get('level', 'unspecified')
+                if level in techs_by_level:
+                    techs_by_level[level].append(tech)
                 else:
-                    skills_by_level['unspecified'].append(skill)
+                    techs_by_level['unspecified'].append(tech)
         
-        return skills_by_level
+        return techs_by_level
     
-    def get_skill_level_display(self, level):
-        """Возвращает отображаемое название уровня"""
-        level_names = {
-            'expert': 'Эксперт',
-            'senior': 'Senior',
-            'middle': 'Middle',
-            'junior': 'Junior',
-            'beginner': 'Начинающий',
-            'unspecified': 'Уровень не указан'
-        }
-        return level_names.get(level, 'Уровень не указан')
+    def get_activity_area_display_full(self):
+        """Полное отображение области деятельности"""
+        if self.activity_area == 'other' and self.activity_area_other:
+            return self.activity_area_other
+        return dict(self.ACTIVITY_AREA_CHOICES).get(self.activity_area, '')
+    
+    def get_it_skill_display_full(self):
+        """Полное отображение IT навыка"""
+        if self.it_skill == 'other' and self.it_skill_other:
+            return self.it_skill_other
+        return dict(self.IT_SKILLS_CHOICES).get(self.it_skill, '')
+    
+    def get_technology_display_full(self):
+        """Полное отображение технологии"""
+        if self.technology == 'other' and self.technology_other:
+            return self.technology_other
+        return dict(self.TECHNOLOGY_CHOICES).get(self.technology, '')
+    
+    def get_team_role_display_full(self):
+        """Полное отображение роли"""
+        if self.team_role == 'other' and self.team_role_other:
+            return self.team_role_other
+        return dict(self.TEAM_ROLE_CHOICES).get(self.team_role, '')

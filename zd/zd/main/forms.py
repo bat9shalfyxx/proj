@@ -7,150 +7,189 @@ import json
 
 class ApplicationForm(forms.ModelForm):
     skills_data = forms.CharField(widget=forms.HiddenInput(), required=False)
+    technologies_data = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     class Meta:
         model = Application
-        fields = [
-            # Организация
-            'organization_name', 'organization_inn', 'organization_website',
-            
-            # О себе и возраст
-            'age', 'about_me',
-            
-            # Роль и навыки
-            'team_role', 'skill_list', 'skills_json',
-            
-            # Ресурсы
-            'requirement_name', 'requirement_price',
-            
-            # Контакты
-            'contact_first_name', 'contact_last_name', 'contact_middle_name',
-            'contact_phone', 'contact_email',
-        ]
+        fields = '__all__'
+        exclude = ['user', 'status', 'created_at', 'updated_at', 'skill_list', 'skills_json', 'technologies_text']
+        
         widgets = {
-            # Организация
-            'organization_name': forms.TextInput(attrs={
-                'placeholder': 'Наименование организации',
-                'class': 'form-input'
-            }),
-            'organization_inn': forms.TextInput(attrs={
-                'placeholder': 'ИНН организации',
-                'class': 'form-input'
-            }),
-            'organization_website': forms.URLInput(attrs={
-                'placeholder': 'Сайт организации',
-                'class': 'form-input'
+            'belbin_role': forms.Select(attrs={'class': 'form-input'}),
+            'technologies_json': forms.HiddenInput(),
+            'activity_area': forms.Select(attrs={'class': 'form-input'}),
+            'activity_area_other': forms.TextInput(attrs={
+                'class': 'form-input other-field',
+                'placeholder': 'Укажите вашу область деятельности',
+                'style': 'display: none;'
             }),
             
-            # Возраст
-            'age': forms.NumberInput(attrs={
-                'placeholder': 'Ваш возраст',
-                'class': 'form-input age-input',
-                'min': 14,
-                'max': 100
+            'it_skill': forms.Select(attrs={'class': 'form-input'}),
+            'it_skill_other': forms.TextInput(attrs={
+                'class': 'form-input other-field',
+                'placeholder': 'Укажите ваши ключевые навыки',
+                'style': 'display: none;'
             }),
             
-            # О себе
-            'about_me': forms.Textarea(attrs={
-                'placeholder': 'Расскажите о себе: опыт, образование, цели, интересы...',
-                'class': 'form-input about-textarea',
-                'rows': 5
+            'technology': forms.Select(attrs={'class': 'form-input'}),
+            'technology_other': forms.TextInput(attrs={
+                'class': 'form-input other-field',
+                'placeholder': 'Укажите другие технологии',
+                'style': 'display: none;'
+            }),
+            'technology_details': forms.Textarea(attrs={
+                'class': 'form-input',
+                'rows': 3,
+                'placeholder': 'Например: Python, Django, React, PostgreSQL, Docker...'
             }),
             
-            # Роль
-            'team_role': forms.Select(attrs={
-                'class': 'form-input role-select',
+            'team_role': forms.Select(attrs={'class': 'form-input'}),
+            'team_role_other': forms.TextInput(attrs={
+                'class': 'form-input other-field',
+                'placeholder': 'Укажите вашу роль',
+                'style': 'display: none;'
             }),
             
-            # Контакты
+            'leaderid_link': forms.URLInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'https://leaderid.ru/...'
+            }),
+            'elibrary_link': forms.URLInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'https://elibrary.ru/...'
+            }),
+            'github_link': forms.URLInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'https://github.com/...'
+            }),
+            'project_examples': forms.Textarea(attrs={
+                'class': 'form-input',
+                'rows': 4,
+                'placeholder': 'Опишите ваши проекты, добавьте ссылки на портфолио...'
+            }),
+            'work_experience': forms.Textarea(attrs={
+                'class': 'form-input',
+                'rows': 4,
+                'placeholder': 'Опишите ваш опыт работы...'
+            }),
+            'driver_license': forms.CheckboxInput(attrs={
+                'class': 'form-checkbox'
+            }),
+            
+            'expected_salary': forms.NumberInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Например: 150000',
+                'min': 0
+            }),
+            'work_schedule': forms.Select(attrs={'class': 'form-input'}),
+            'work_schedule_other': forms.TextInput(attrs={
+                'class': 'form-input other-field',
+                'placeholder': 'Укажите другой график',
+                'style': 'display: none;'
+            }),
+            'required_equipment': forms.Textarea(attrs={
+                'class': 'form-input',
+                'rows': 3,
+                'placeholder': 'Например: ноутбук, монитор, доступ к серверам...'
+            }),
+            
+            'collaboration_expectations': forms.Textarea(attrs={
+                'class': 'form-input',
+                'rows': 4,
+                'placeholder': 'Что вы ожидаете от сотрудничества? Например: интересные задачи, профессиональный рост, гибкий график...'
+            }),
+            
+            # 'organization_name': forms.TextInput(attrs={
+            #     'class': 'form-input',
+            #     'placeholder': 'Название организации'
+            # }),
+            # 'organization_inn': forms.TextInput(attrs={
+            #     'class': 'form-input',
+            #     'placeholder': 'ИНН'
+            # }),
+            # 'organization_website': forms.URLInput(attrs={
+            #     'class': 'form-input',
+            #     'placeholder': 'https://...'
+            # }),
+            
             'contact_first_name': forms.TextInput(attrs={
-                'placeholder': 'Имя',
-                'class': 'form-input'
+                'class': 'form-input',
+                'placeholder': 'Имя'
             }),
             'contact_last_name': forms.TextInput(attrs={
-                'placeholder': 'Фамилия',
-                'class': 'form-input'
+                'class': 'form-input',
+                'placeholder': 'Фамилия'
             }),
             'contact_middle_name': forms.TextInput(attrs={
-                'placeholder': 'Отчество',
-                'class': 'form-input'
+                'class': 'form-input',
+                'placeholder': 'Отчество'
             }),
             'contact_phone': forms.TextInput(attrs={
-                'placeholder': 'Телефон',
-                'class': 'form-input'
+                'class': 'form-input',
+                'placeholder': '+7 (999) 999-99-99'
             }),
             'contact_email': forms.EmailInput(attrs={
-                'placeholder': 'Электронная почта',
-                'class': 'form-input'
+                'class': 'form-input',
+                'placeholder': 'email@example.com'
             }),
-            
-            # Ресурсы
-            'requirement_name': forms.TextInput(attrs={
-                'placeholder': 'Название ресурса',
-                'class': 'requirement-name'
-            }),
-            'requirement_price': forms.NumberInput(attrs={
-                'placeholder': 'Цена ресурса',
-                'class': 'requirement-price'
-            })
         }
-
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # Убираем метки
+        if self.instance and self.instance.pk and self.instance.technologies_json:
+            self.initial['technologies_data'] = json.dumps(self.instance.technologies_json)
+        elif self.instance and self.instance.technologies_text:
+            techs = [t.strip() for t in self.instance.technologies_text.split(',') if t.strip()]
+            techs_json = [{'name': tech, 'level': 'unspecified'} for tech in techs]
+            self.initial['technologies_data'] = json.dumps(techs_json)
+
         for field_name in self.fields:
             self.fields[field_name].label = ''
         
-        # Настройка полей
-        self.fields['team_role'].empty_label = 'Выберите роль (необязательно)'
-        self.fields['age'].required = False
-        self.fields['about_me'].required = False
+        optional_fields = [
+            'activity_area_other', 'it_skill_other', 'technology_other',
+            'team_role_other', 'leaderid_link', 'elibrary_link', 'github_link',
+            'project_examples', 'work_experience', 'work_schedule_other',
+            'required_equipment', 'collaboration_expectations',
+            'organization_website', 'contact_middle_name'
+        ]
+        for field in optional_fields:
+            if field in self.fields:
+                self.fields[field].required = False
         
-        # Загрузка существующих навыков
-        if self.instance and self.instance.pk and self.instance.skills_json:
-            self.initial['skills_data'] = json.dumps(self.instance.skills_json)
-        elif self.instance and self.instance.skill_list:
-            skills = [s.strip() for s in self.instance.skill_list.split(',') if s.strip()]
-            skills_json = [{'name': skill, 'level': 'unspecified'} for skill in skills]
-            self.initial['skills_data'] = json.dumps(skills_json)
+        self.fields['activity_area'].empty_label = 'Выберите область деятельности'
+        self.fields['it_skill'].empty_label = 'Выберите ключевой навык'
+        self.fields['technology'].empty_label = 'Выберите категорию технологий'
+        self.fields['team_role'].label = 'Ваша специальность'
+        self.fields['work_schedule'].empty_label = 'Выберите график работы'
 
-    def clean_age(self):
-        age = self.cleaned_data.get('age')
-        if age and (age < 14 or age > 100):
-            raise ValidationError('Возраст должен быть от 14 до 100 лет')
-        return age
-    
-    def clean_skills_data(self):
-        skills_data = self.cleaned_data.get('skills_data')
-        if skills_data:
+    def clean_technologies_data(self):
+        techs_data = self.cleaned_data.get('technologies_data')
+        if techs_data:
             try:
-                skills = json.loads(skills_data)
-                if not isinstance(skills, list):
-                    raise forms.ValidationError("Неверный формат данных навыков")
+                techs = json.loads(techs_data)
+                if not isinstance(techs, list):
+                    raise forms.ValidationError("Неверный формат данных технологий")
                 
-                # Валидация каждого навыка
-                for skill in skills:
-                    if not isinstance(skill, dict):
-                        raise forms.ValidationError("Каждый навык должен быть объектом")
-                    if 'name' not in skill or not skill['name'].strip():
-                        raise forms.ValidationError("Название навыка обязательно")
+                for tech in techs:
+                    if not isinstance(tech, dict):
+                        raise forms.ValidationError("Каждая технология должна быть объектом")
+                    if 'name' not in tech or not tech['name'].strip():
+                        raise forms.ValidationError("Название технологии обязательно")
                     
-                    # Проверка уровня
                     valid_levels = ['expert', 'senior', 'middle', 'junior', 'beginner', 'unspecified']
-                    if 'level' in skill and skill['level'] not in valid_levels:
-                        skill['level'] = 'unspecified'
+                    if 'level' in tech and tech['level'] not in valid_levels:
+                        tech['level'] = 'unspecified'
                 
-                return skills
+                return techs
             except json.JSONDecodeError:
                 raise forms.ValidationError("Ошибка парсинга JSON")
         return []
-     
+    
     def save(self, commit=True):
         instance = super().save(commit=False)
         
-        # Сохраняем навыки
         skills_data = self.cleaned_data.get('skills_data')
         if skills_data:
             try:
@@ -158,74 +197,18 @@ class ApplicationForm(forms.ModelForm):
             except:
                 pass
         
+        technologies_data = self.cleaned_data.get('technologies_data')
+        if technologies_data:
+            try:
+                instance.technologies_json = json.loads(technologies_data)
+            except:
+                pass
+        
         if commit:
             instance.save()
         
         return instance
-    #
-    #
-    def clean_requirements(self):
-        requirements_data = self.cleaned_data.get('requirements')
-        
-        if not requirements_data:
-            return []
-        try:
-            requirements_list_data = json.loads(requirements_data)
-            requirements_list = json.dumps(requirements_list_data)
-
-            if not isinstance(requirements_list, list):
-                raise forms.ValidationError("Некорректный формат данных для требований. Ожидается список.")
-                
-            for item in requirements_list:
-                if not isinstance(item, dict):
-                    raise forms.ValidationError("Некорректный формат записи в требованиях. Ожидается объект.")
-                
-                if 'resource_name' not in item or 'price' not in item:
-                    raise forms.ValidationError("Каждое требование должно содержать 'resource_name' и 'price'.")
-                
-                if not isinstance(item['resource_name'], str) or not item['resource_name']:
-                    raise forms.ValidationError("Поле 'resource_name' должно быть непустой строкой.")
-                
-                try:
-                    item['price'] = forms.DecimalField().clean(str(item['price']))
-                except forms.ValidationError:
-                    raise forms.ValidationError(f"Некорректная цена для ресурса '{item.get('resource_name', 'неизвестно')}'.")
-            
-            return requirements_list
-
-        except json.JSONDecodeError:
-            raise forms.ValidationError("Некорректный формат JSON. Пожалуйста, проверьте правильность ввода.")
-        except Exception as e:
-            raise forms.ValidationError(f"Ошибка при обработке требований: {e}")
-    #
-    #
-
-    def clean_organization_inn(self):
-        inn = self.cleaned_data.get('organization_inn')
-        if inn:
-            # Проверка формата ИНН (10 или 12 цифр)
-            if not re.match(r'^\d{10}$', inn) and not re.match(r'^\d{12}$', inn):
-                raise ValidationError('ИНН должен содержать 10 или 12 цифр.')
-        return inn
     
-    def clean_contact_phone(self):
-        phone = self.cleaned_data.get('contact_phone')
-        if phone:
-            # Нормализация номера телефона
-            phone = re.sub(r'[^\d+]', '', phone)
-            if not phone.startswith('+7'):
-                if phone.startswith('8'):
-                    phone = '+7' + phone[1:]
-                elif phone.startswith('7'):
-                    phone = '+' + phone
-                else:
-                    phone = '+7' + phone
-            
-            # Проверка длины
-            if len(phone) != 12:
-                raise ValidationError('Номер телефона должен содержать 11 цифр после +7.')
-        
-        return phone
 
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.CharField(

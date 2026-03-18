@@ -22,79 +22,151 @@ from .models_application import Application
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
     list_display = [
-        'id', 
-        'organization_name', 
-        'contact_first_name', 
+        'id',
+        'contact_first_name',
         'contact_last_name',
-        'team_role',  # Вместо solution_name
-        'age',        # Новое поле
-        'status', 
+        'team_role',
+        'belbin_role',
+        'expected_salary',
+        'status',
         'created_at'
     ]
-    
-    list_filter = ['status', 'team_role', 'created_at']
-    search_fields = [
-        'organization_name', 
-        'contact_first_name', 
-        'contact_last_name', 
-        'contact_email',
-        'about_me'  # Новое поле для поиска
+
+    list_filter = [
+        'status',
+        'team_role',
+        'belbin_role',
+        'activity_area',
+        'it_skill',
+        'work_schedule',
+        'created_at'
     ]
-    
+
+    search_fields = [
+        'contact_first_name',
+        'contact_last_name',
+        'contact_email',
+        'technologies_text',      # или technologies_json, если нужно
+        'project_examples',
+        'work_experience',
+        'collaboration_expectations'
+    ]
+
     readonly_fields = ['created_at', 'updated_at']
-    
+
     fieldsets = [
-        ('Основная информация', {
+        ('Статус', {
+            'fields': ['user', 'status']
+        }),
+        ('Область деятельности', {
+            'fields': ['activity_area', 'activity_area_other']
+        }),
+        ('Ключевые навыки в IT', {
+            'fields': ['it_skill', 'it_skill_other']
+        }),
+        ('Знание технологий', {
+            'fields': ['technologies_json', 'technologies_text']  # подставьте свои поля
+        }),
+        ('Роль в команде (по Белбину)', {
+            'fields': ['belbin_role']
+        }),
+        ('Ваша специальность', {
+            'fields': ['team_role', 'team_role_other']
+        }),
+        ('Дополнительные сведения', {
             'fields': [
-                'user', 
-                'status', 
-                'team_role',  # Вместо solution_name
-                'age',        # Новое поле
-                'about_me'     # Новое поле
+                'leaderid_link',
+                'elibrary_link',
+                'github_link',
+                'project_examples',
+                'work_experience',
+                'driver_license'
             ]
         }),
-        ('Навыки', {
-            'fields': ['skill_list', 'skills_json']
-        }),
-        ('Организация', {
+        ('Ожидаемое вознаграждение и требования', {
             'fields': [
-                'organization_name', 
-                'organization_inn', 
-                'organization_website'
+                'expected_salary',
+                'work_schedule',
+                'work_schedule_other',
+                'required_equipment'
             ]
+        }),
+        ('Ожидание от сотрудничества', {
+            'fields': ['collaboration_expectations']
         }),
         ('Контакты', {
             'fields': [
-                'contact_first_name', 
-                'contact_last_name', 
+                'contact_first_name',
+                'contact_last_name',
                 'contact_middle_name',
-                'contact_phone', 
+                'contact_phone',
                 'contact_email'
             ]
-        }),
-        ('Ресурсы', {
-            'fields': ['requirement_name', 'requirement_price']
         }),
         ('Системная информация', {
             'fields': ['created_at', 'updated_at'],
             'classes': ['collapse']
         }),
     ]
-    
+
     actions = ['approve_applications', 'reject_applications']
-    
+
     def approve_applications(self, request, queryset):
         queryset.update(status='approved')
         self.message_user(request, f"{queryset.count()} заявок одобрено")
     approve_applications.short_description = "Одобрить выбранные заявки"
-    
+
     def reject_applications(self, request, queryset):
         queryset.update(status='rejected')
         self.message_user(request, f"{queryset.count()} заявок отклонено")
     reject_applications.short_description = "Отклонить выбранные заявки"
 
-
 class CustomUserAdmin(admin.ModelAdmin):
+    list_display = [
+        'username', 
+        'email', 
+        'phone_number', 
+        'first_name', 
+        'last_name', 
+        'is_active',
+        'is_staff'
+    ]
+    
+    list_filter = ['is_active', 'is_staff', 'is_superuser']
+    
+    search_fields = [
+        'username', 
+        'email', 
+        'phone_number', 
+        'first_name', 
+        'last_name'
+    ]
+    
+    fieldsets = [
+        ('Основная информация', {
+            'fields': [
+                'username', 
+                'email', 
+                'phone_number',
+                'first_name', 
+                'last_name', 
+                'middle_name'
+            ]
+        }),
+        ('Права доступа', {
+            'fields': [
+                'is_active', 
+                'is_staff', 
+                'is_superuser',
+                'groups', 
+                'user_permissions'
+            ]
+        }),
+        ('Важные даты', {
+            'fields': ['last_login', 'date_joined'],
+            'classes': ['collapse']
+        }),
+    ]
     list_display = [
         'username', 
         'email', 

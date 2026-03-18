@@ -1,3 +1,5 @@
+# main/views.py - исправленная версия
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
@@ -21,17 +23,55 @@ def form_page(request):
             if request.user.is_authenticated:
                 application.user = request.user
             
+            # Обработка технологий (если есть)
+            technologies_data = request.POST.get('technologies_data')
+            if technologies_data:
+                try:
+                    application.technologies_json = json.loads(technologies_data)
+                except:
+                    pass
+            
             application.save()
             
             messages.success(request, 'Заявка успешно отправлена!')
             return redirect('profile')
         else:
             messages.error(request, 'Пожалуйста, исправьте ошибки в форме')
-    else:
-        form = ApplicationForm()
+    
+    # ВАЖНО: создаем формы для входа и регистрации
+    login_form = CustomAuthenticationForm()
+    registration_form = CustomUserCreationForm()
+    
+    # Если это POST запрос с формой входа
+    if request.method == 'POST' and request.POST.get('login_submit'):
+        login_form = CustomAuthenticationForm(request, data=request.POST)
+        if login_form.is_valid():
+            user = login_form.get_user()
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            login(request, user)
+            messages.success(request, 'Вход выполнен успешно!')
+            return redirect('profile')
+    
+    # Если это POST запрос с формой регистрации
+    if request.method == 'POST' and request.POST.get('registration_submit'):
+        registration_form = CustomUserCreationForm(request.POST, request.FILES)
+        if registration_form.is_valid():
+            user = registration_form.save()
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            login(request, user)
+            messages.success(request, 'Регистрация прошла успешно!')
+            return redirect('profile')
+    
+    # Создаем форму заявки для GET запроса
+    application_form = ApplicationForm()
     
     return render(request, 'formPage.html', {
-        'application_form': form
+        'title': 'Форма',
+        'application_form': application_form,
+        'login_form': login_form,
+        'registration_form': registration_form,
+        'user_authenticated': request.user.is_authenticated,
+        'messages': messages.get_messages(request)
     })
 
 logger = logging.getLogger(__name__)
@@ -194,20 +234,20 @@ def profile(request):
     print(f"Пользователь: {request.user.email} (ID: {request.user.id})")
     print(f"Найдено заявок: {applications.count()}")
     for app in applications:
-        print(f"  - Заявка #{app.id}: {app.organization_name}, статус: {app.status}")
+        print(f"  - Заявка #{app.id}: статус: {app.status}")
 
     for app in applications:
-        if app.requirement_price:
-            try:
-                if isinstance(app.requirement_price, str) and ',' in app.requirement_price:
-                    prices = app.requirement_price.split(',')
-                    app.total_price = sum(float(p.strip()) for p in prices if p.strip())
-                else:
-                    app.total_price = float(app.requirement_price)
-            except (ValueError, TypeError):
-                app.total_price = app.requirement_price
+        app.display_salary = app.expected_salary if app.expected_salary else 0
+        
+        app.total_price = app.expected_salary if app.expected_salary else 0
+        
+        if app.technologies_json:
+            app.technologies_count = len(app.technologies_json)
+            app.main_technologies = [t.get('name', '') for t in app.technologies_json[:3]]
         else:
-            app.total_price = 0
+            app.technologies_count = 0
+            app.main_technologies = []
+    
     return render(request, 'profile.html', {
         'title': 'Профиль',
         'user': request.user,
@@ -218,145 +258,20 @@ def profile(request):
 def create_team(request):
     applications = Application.objects.all().order_by('-created_at')
     
+    for app in applications:
+        app.display_salary = app.expected_salary if app.expected_salary else 0
+        
+        if app.technologies_json:
+            app.technologies_by_level = app.get_technologies_by_level()
+        else:
+            app.technologies_by_level = {}
+    
     return render(request, 'createTeam.html', {
         'title': 'Создание команды',
         'user': request.user,
         'applications': applications,
     })
 
-def form_page(request):
-    print(f"МЕТОД ЗАПРОСА: {request.method}")
-    print(f"POST данные: {request.POST}")
-    print(f"Headers: {request.headers.get('X-Requested-With')}")
-    
-    login_form = CustomAuthenticationForm()
-    registration_form = CustomUserCreationForm()
-    application_form = ApplicationForm()
-
-    if request.method == 'POST':
-        
-        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-        
-        if 'login_submit' in request.POST:
-            login_form = CustomAuthenticationForm(request, data=request.POST)
-            
-            if login_form.is_valid():
-                user = login_form.get_user()
-                user.backend = 'django.contrib.auth.backends.ModelBackend'
-                login(request, user)
-                messages.success(request, 'Вход выполнен успешно!')
-                
-                if is_ajax:
-                    return JsonResponse({
-                        'success': True,
-                        'redirect': '/profile/'
-                    })
-                return redirect('profile')
-            else:
-                if is_ajax:
-                    return JsonResponse({
-                        'success': False,
-                        'errors': login_form.errors.get_json_data()
-                    })
-                messages.error(request, 'Неверный email/телефон или пароль.')
-        
-        elif 'registration_submit' in request.POST:
-            registration_form = CustomUserCreationForm(request.POST)
-            
-            if registration_form.is_valid():
-                user = registration_form.save()
-                user.backend = 'django.contrib.auth.backends.ModelBackend'
-                login(request, user)
-                messages.success(request, 'Регистрация прошла успешно!')
-                
-                if is_ajax:
-                    return JsonResponse({
-                        'success': True,
-                        'redirect': '/profile/'
-                    })
-                return redirect('profile')
-            else:
-                if is_ajax:
-                    return JsonResponse({
-                        'success': False,
-                        'errors': registration_form.errors.get_json_data()
-                    })
-                messages.error(request, 'Пожалуйста, исправьте ошибки в форме регистрации.')
-        
-        elif 'application_submit' in request.POST:
-            print("="*50)
-            print("ОБРАБОТКА ЗАЯВКИ")
-            print("="*50)
-            
-            application_form = ApplicationForm(request.POST)
-            
-            if application_form.is_valid():
-                print("✅ Форма валидна")
-                
-        
-                application = application_form.save(commit=False)
-                
-            
-                if request.user.is_authenticated:
-                    application.user = request.user
-                
-           
-                requirement_names = request.POST.getlist('requirement_name')
-                requirement_prices = request.POST.getlist('requirement_price')
-                
-                print(f"Ресурсы: {requirement_names} - {requirement_prices}")
-                
-   
-                valid_names = [name for name in requirement_names if name and name.strip()]
-                valid_prices = [price for price in requirement_prices if price and price.strip()]
-                
-                if valid_names:
-                    application.requirement_name = ', '.join(valid_names)
-                if valid_prices:
-                    application.requirement_price = ', '.join(valid_prices)
-   
-                application.save()
-                print(f"✅ Заявка #{application.id} сохранена")
-                print(f"requirement_name: {application.requirement_name}")
-                print(f"requirement_price: {application.requirement_price}")
-                
-                messages.success(request, 'Заявка успешно отправлена!')
-                
-
-                if is_ajax:
-                    return JsonResponse({
-                        'success': True,
-                        'message': 'Заявка успешно отправлена!',
-                        'redirect': '/profile/'
-                    })
-                
-                return redirect('profile')
-                
-            else:
-                print("❌ Форма не валидна")
-                print(f"Ошибки: {application_form.errors}")
-                
-   
-                if is_ajax:
-                    return JsonResponse({
-                        'success': False,
-                        'errors': application_form.errors.get_json_data()
-                    })
-                
-                messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
-
-        elif is_ajax and 'action' in request.POST:
-     
-            return handle_ajax_request(request)
-    
-    # GET запрос
-    return render(request, 'formPage.html', {
-        'title': 'Форма',
-        'login_form': login_form,
-        'registration_form': registration_form,
-        'application_form': application_form,
-        'messages': messages.get_messages(request)
-    })
 
 def logout_view(request):
     """Выход из системы"""

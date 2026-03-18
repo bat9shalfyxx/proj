@@ -44,6 +44,18 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="{{ form.keywords.id_for_label }}">Ключевые слова (через запятую)</label>
+                    <input 
+                        type="text" 
+                        name="keywords" 
+                        id="keywords" 
+                        class="form-control" 
+                        placeholder="Например: Python, веб-разработка, искусственный интеллект"
+                        required>
+                    <span class="field-hint">Например: менеджмент, веб-разработка, искусственный интеллект</span>
+                </div>
+
+                <div class="form-group">
                     <label for="team_activities">Чем планирует заниматься команда</label>
                     <textarea name="team_activities" 
                               id="team_activities" 
@@ -137,7 +149,7 @@
                 <input type="text" 
                        name="requirement_name[]" 
                        class="form-control" 
-                       placeholder="например: Python,项目管理, дизайн"
+                       placeholder="например: Python, аналитика, дизайн"
                        required>
             </div>
             <div class="form-group half">
@@ -153,6 +165,25 @@
             </div>
         </div>
 
+        <div class="form-row">
+            <div class="form-group half">
+                <label>Роль по Белбину (необязательно)</label>
+                <select name="belbin_role[]" class="form-control">
+                    <option value="">— Не выбрана —</option>
+                    <option value="implementer">Исполнитель</option>
+                    <option value="coordinator">Координатор</option>
+                    <option value="shaper">Формирователь</option>
+                    <option value="plant">Генератор идей</option>
+                    <option value="resource_investigator">Разведчик</option>
+                    <option value="teamworker">Душа команды</option>
+                    <option value="monitor_evaluator">Аналитик</option>
+                    <option value="completer_finisher">Педантичность</option>
+                    <option value="specialist">Специалист</option>
+                </select>
+            </div>
+            <div class="form-group half"></div>
+        </div>
+        
         <div class="form-row">
             <div class="form-group half">
                 <label>Количество человек</label>

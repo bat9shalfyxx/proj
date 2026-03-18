@@ -2,25 +2,288 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/_formPage.scss' %}">
+<link rel="stylesheet" href="{% static 'css/formPage.css' %}">
 {% endblock %}
 
 {% block content %}
-<!-- Модальное окно для добавления навыка -->
-<div class="skill-modal-overlay" id="skillModalOverlay" style="display: none;">
+<div class="formPage">
+    <!-- Блок с заявкой -->
+    <div class="formPage-block request-form" id="requestBlock">
+        <div class="formPage-header">
+            <p class="link" style="color: black;">Заявка</p>
+        </div>
+
+        <form class="formPage-form" method="post" action="{% url 'form_page' %}" id="application-form">
+            {% csrf_token %}
+            <input type="hidden" name="application_submit" value="1">
+            
+            <div class="form-request">
+                <!-- Область деятельности -->
+                <div class="form-section">
+                    <h3>Область деятельности:</h3>
+                    <div class="field-group">
+                        {{ application_form.activity_area }}
+                        <div class="other-field-container" id="activityAreaOther">
+                            {{ application_form.activity_area_other }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ключевые навыки в IT -->
+                <div class="form-section">
+                    <h3>Ключевые навыки в IT:</h3>
+                    <div class="field-group">
+                        {{ application_form.it_skill }}
+                        <div class="other-field-container" id="itSkillOther">
+                            {{ application_form.it_skill_other }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Знание технологий -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <h3>Знание технологий:</h3>
+                        <button type="button" class="add-skill-btn" id="showTechModalBtn">
+                            + Добавить технологию
+                        </button>
+                    </div>
+                    
+                    <div class="skills-container" id="technologiesContainer"></div>
+                    <input type="hidden" name="technologies_data" id="technologiesDataInput" value="[]">
+                </div>
+
+                <!-- Роль в команде (по Белбину) -->
+                <div class="form-section">
+                    <h3>Роль в команде (по Белбину):</h3>
+                    <div class="field-group">
+                        {{ application_form.belbin_role }}
+                        <!-- Ссылка на тест -->
+                        <p class="field-hint">
+                            Не знаете свою роль? 
+                            <a href="https://balshem-ivant-dou17.edumsko.ru/blog/post/1744379" target="_blank">Пройдите тест</a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Ваша специальность -->
+                <div class="form-section">
+                    <h3>Ваша специальность:</h3>
+                    <div class="field-group">
+                        {{ application_form.team_role }}
+                        <div class="other-field-container" id="teamRoleOther">
+                            {{ application_form.team_role_other }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Дополнительные сведения -->
+                <div class="form-section">
+                    <h3>Дополнительные сведения</h3>
+                    
+                    <div class="field-group">
+                        <label>Ссылка на LeaderID:</label>
+                        {{ application_form.leaderid_link }}
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>Ссылка на Elibrary:</label>
+                        {{ application_form.elibrary_link }}
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>Ссылка на GitHub:</label>
+                        {{ application_form.github_link }}
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>Примеры проектов:</label>
+                        {{ application_form.project_examples }}
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>Опыт работы:</label>
+                        {{ application_form.work_experience }}
+                    </div>
+                    
+                    <div class="field-group checkbox-group">
+                        <label class="checkbox-label">
+                            {{ application_form.driver_license }}
+                            <span>Наличие водительских прав</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Ожидаемое вознаграждение -->
+                <div class="form-section">
+                    <div class="field-group">
+                        <label>Ожидаемое вознаграждение (₽/мес):</label>
+                        {{ application_form.expected_salary }}
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>График работы:</label>
+                        {{ application_form.work_schedule }}
+                        <div class="other-field-container" id="workScheduleOther">
+                            {{ application_form.work_schedule_other }}
+                        </div>
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>Требуемое оборудование:</label>
+                        {{ application_form.required_equipment }}
+                    </div>
+                </div>
+
+                <!-- Ожидание от сотрудничества -->
+                <div class="form-section">
+                    <h3>Ожидание от сотрудничества:</h3>
+                    <div class="field-group">
+                        {{ application_form.collaboration_expectations }}
+                    </div>
+                </div>
+
+                <!-- Контактные данные -->
+                <div class="form-section">
+                    <h3>Контактные данные:</h3>
+                    
+                    <div class="name-fields">
+                        {{ application_form.contact_last_name }}
+                        {{ application_form.contact_first_name }}
+                        {{ application_form.contact_middle_name }}
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>Телефон:</label>
+                        {{ application_form.contact_phone }}
+                    </div>
+                    
+                    <div class="field-group">
+                        <label>Email:</label>
+                        {{ application_form.contact_email }}
+                    </div>
+                </div>
+
+                <!-- Ошибки формы -->
+                {% if application_form.non_field_errors %}
+                    <div class="error">
+                        {% for error in application_form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <button class="form-button" type="submit" id="application-submit">
+                    Отправить заявку
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Блок с входом/регистрацией -->
+    <div class="formPage-block reg-form" id="authBlock">
+        <div class="formPage-header">
+            <p class="sign-in active link" style="color: black;">Вход</p>
+            <p class="sign-up link">Регистрация</p>
+        </div>
+        
+        <!-- Форма входа -->
+        <form class="formPage-form" method="post" action="{% url 'form_page' %}" id="login-form">
+            {% csrf_token %}
+            <input type="hidden" name="login_submit" value="1">
+            <div class="form-sign-in">
+                {{ login_form.username }}
+                {% if login_form.username.errors %}
+                    <div class="error">{{ login_form.username.errors }}</div>
+                {% endif %}
+                
+                {{ login_form.password }}
+                {% if login_form.password.errors %}
+                    <div class="error">{{ login_form.password.errors }}</div>
+                {% endif %}
+                
+                {% if login_form.non_field_errors %}
+                    <div class="error">
+                        {% for error in login_form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <input class="form-button" type="submit" value="войти" id="login-submit">
+            </div>
+        </form>
+
+        <!-- Форма регистрации -->
+        <form class="formPage-form" method="post" action="{% url 'form_page' %}" id="registration-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="registration_submit" value="1">
+            <div class="form-sign-up">
+                {{ registration_form.last_name }}
+                {% if registration_form.last_name.errors %}
+                    <div class="error">{{ registration_form.last_name.errors }}</div>
+                {% endif %}
+                
+                {{ registration_form.first_name }}
+                {% if registration_form.first_name.errors %}
+                    <div class="error">{{ registration_form.first_name.errors }}</div>
+                {% endif %}
+                
+                {{ registration_form.middle_name }}
+                {% if registration_form.middle_name.errors %}
+                    <div class="error">{{ registration_form.middle_name.errors }}</div>
+                {% endif %}
+
+                {{ registration_form.email }}
+                {% if registration_form.email.errors %}
+                    <div class="error">{{ registration_form.email.errors }}</div>
+                {% endif %}
+                
+                {{ registration_form.phone_number }}
+                {% if registration_form.phone_number.errors %}
+                    <div class="error">{{ registration_form.phone_number.errors }}</div>
+                {% endif %}
+                
+                {{ registration_form.password1 }}
+                {% if registration_form.password1.errors %}
+                    <div class="error">{{ registration_form.password1.errors }}</div>
+                {% endif %}
+                <p>Минимум 8 символов</p>
+                
+                {{ registration_form.password2 }}
+                {% if registration_form.password2.errors %}
+                    <div class="error">{{ registration_form.password2.errors }}</div>
+                {% endif %}
+                
+                {% if registration_form.non_field_errors %}
+                    <div class="error">
+                        {% for error in registration_form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <input class="form-button" type="submit" value="Зарегистрироваться" id="registration-submit">
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Модальное окно для добавления технологии -->
+<div class="skill-modal-overlay" id="techModalOverlay" style="display: none;">
     <div class="skill-modal">
         <div class="skill-modal-header">
-            <h3>Добавить навык</h3>
-            <button type="button" class="skill-modal-close" id="closeSkillModal">×</button>
+            <h3>Добавить технологию</h3>
+            <button type="button" class="skill-modal-close" id="closeTechModal">×</button>
         </div>
         <div class="skill-modal-content">
             <div class="skill-modal-field">
-                <label for="skillName">Название навыка *</label>
-                <input type="text" id="skillName" class="skill-input" placeholder="Например: JavaScript, Python, React...">
+                <label for="techName">Название технологии *</label>
+                <input type="text" id="techName" class="skill-input" placeholder="Например: Python, Django, PostgreSQL, Docker...">
             </div>
             <div class="skill-modal-field">
-                <label for="skillLevel">Уровень владения</label>
-                <select id="skillLevel" class="skill-select">
+                <label for="techLevel">Уровень владения</label>
+                <select id="techLevel" class="skill-select">
                     <option value="unspecified">Уровень не указан</option>
                     <option value="expert">Эксперт</option>
                     <option value="senior">Senior</option>
@@ -31,514 +294,280 @@
             </div>
         </div>
         <div class="skill-modal-footer">
-            <button type="button" class="skill-modal-btn cancel" id="cancelSkillModal">Отмена</button>
-            <button type="button" class="skill-modal-btn add" id="addSkillBtn">Добавить</button>
+            <button type="button" class="skill-modal-btn cancel" id="cancelTechModal">Отмена</button>
+            <button type="button" class="skill-modal-btn add" id="addTechBtn">Добавить</button>
         </div>
     </div>
 </div>
 
-    <div class="formPage">
-        <div class="formPage-block request-form">
-            
-            <div class="formPage-header">
-                <p href="#!" class="link" style="color: black;">Заявка</p>
-            </div>
-
-            <form class="formPage-form" method="post" action="{% url 'form_page' %}" id="application-form">
-                {% csrf_token %}
-                <input type="hidden" name="application_submit" value="1">
-                
-                <div class="form-request">
-                    <!-- О себе и возраст -->
-                    <div class="personal-section">
-                        <div class="section-header">
-                            <h3>О себе</h3>
-                        </div>
-                        
-                        <div class="age-field">
-                            <label for="{{ application_form.age.id_for_label }}">Возраст</label>
-                            {{ application_form.age }}
-                            {% if application_form.age.errors %}
-                                <div class="error">{{ application_form.age.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="about-field">
-                            <label for="{{ application_form.about_me.id_for_label }}">Расскажите о себе</label>
-                            {{ application_form.about_me }}
-                            {% if application_form.about_me.errors %}
-                                <div class="error">{{ application_form.about_me.errors }}</div>
-                            {% endif %}
-                            <span class="field-hint">Опыт работы, образование, цели, интересы, достижения</span>
-                        </div>
-                    </div>
-
-                    <!-- Роль в команде -->
-                    <div class="role-section">
-                        <div class="section-header">
-                            <h3>Роль в команде</h3>
-                            <span class="optional-badge">необязательно</span>
-                        </div>
-                        
-                        <div class="role-select-wrapper">
-                            {{ application_form.team_role }}
-                            {% if application_form.team_role.errors %}
-                                <div class="error">{{ application_form.team_role.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="other-role-field" id="otherRoleField" style="display: none;">
-                            <input type="text" 
-                                id="otherRole" 
-                                name="other_role" 
-                                class="form-input" 
-                                placeholder="Укажите вашу роль">
-                        </div>
-                    </div>
-
-                    <!-- Навыки (существующий блок) -->
-                    <div class="skills-section">
-                        <div class="skills-section">
-                            <div class="skills-header">
-                                <h3>Навыки</h3>
-                                <button type="button" class="add-skill-btn" id="showSkillModalBtn">
-                                    + Добавить навык
-                                </button>
-                            </div>
-                            
-                            <!-- Контейнер для навыков -->
-                            <div class="skills-container" id="skillsContainer">
-                                <!-- Навыки будут добавляться сюда динамически -->
-                            </div>
-                            
-                            <!-- Скрытое поле для хранения данных навыков -->
-                            <input type="hidden" name="skills_data" id="skillsDataInput" value="[]">
-                        </div>
-
-                        <!-- Замените старый блок навыков в форме -->
-                        <!-- Удалите или закомментируйте старый блок:
-                        <p>Навыки</p>
-                        -->
-
-                        <!-- Шаблон для навыка -->
-                        <template id="skillItemTemplate">
-                            <div class="skill-item" data-skill-name="" data-skill-level="">
-                                <div class="skill-item-content">
-                                    <span class="skill-name"></span>
-                                    <span class="skill-level-badge"></span>
-                                </div>
-                                <button type="button" class="skill-remove" title="Удалить навык">×</button>
-                            </div>
-                        </template>
-
-                        <!-- Группировка навыков по уровням -->
-                        <template id="skillGroupTemplate">
-                            <div class="skill-group">
-                                <div class="skill-group-header">
-                                    <h4 class="skill-group-title"></h4>
-                                </div>
-                                <div class="skill-group-items"></div>
-                            </div>
-                        </template>
-                        
-                        <div class="skills-container" id="skillsContainer"></div>
-                        <input type="hidden" name="skills_data" id="skillsDataInput" value="[]">
-                    </div>
-
-                    <!-- Организация -->
-                    <div class="organization-section">
-                        <div class="section-header">
-                            <h3>Организация</h3>
-                        </div>
-                        
-                        {{ application_form.organization_name }}
-                        {% if application_form.organization_name.errors %}
-                            <div class="error">{{ application_form.organization_name.errors }}</div>
-                        {% endif %}
-                        
-                        {{ application_form.organization_inn }}
-                        {% if application_form.organization_inn.errors %}
-                            <div class="error">{{ application_form.organization_inn.errors }}</div>
-                        {% endif %}
-                        
-                        {{ application_form.organization_website }}
-                        {% if application_form.organization_website.errors %}
-                            <div class="error">{{ application_form.organization_website.errors }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <!-- Бюджет и ресурсы -->
-                    <div class="budget-section">
-                        <div class="section-header">
-                            <h3>Бюджет и ресурсы</h3>
-                        </div>
-                        
-                        <h4>Требования к ресурсам (зарплата, оборудование, материалы и т.п.):</h4>
-                        
-                        <div class="requirements-list">
-                            <div class="requirements-el">
-                                <label>
-                                    Название ресурса:
-                                    {{ application_form.requirement_name }}
-                                </label>
-
-                                <label>
-                                    Цена ресурса (₽):
-                                    {{ application_form.requirement_price }}
-                                </label>
-                            </div>
-                        </div>
-
-                        <button type="button" class="add-requirement-btn">
-                            + Добавить ресурс
-                        </button>
-                    </div>
-
-                    <!-- Контакты -->
-                    <div class="contacts-section">
-                        <div class="section-header">
-                            <h3>Контакты для обратной связи</h3>
-                        </div>
-                        
-                        <div class="name-fields">
-                            {{ application_form.contact_last_name }}
-                            {{ application_form.contact_first_name }}
-                            {{ application_form.contact_middle_name }}
-                        </div>
-                        
-                        {% if application_form.contact_last_name.errors %}
-                            <div class="error">{{ application_form.contact_last_name.errors }}</div>
-                        {% endif %}
-                        
-                        {{ application_form.contact_phone }}
-                        {% if application_form.contact_phone.errors %}
-                            <div class="error">{{ application_form.contact_phone.errors }}</div>
-                        {% endif %}
-                        
-                        {{ application_form.contact_email }}
-                        {% if application_form.contact_email.errors %}
-                            <div class="error">{{ application_form.contact_email.errors }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <!-- Общие ошибки формы -->
-                    {% if application_form.non_field_errors %}
-                        <div class="error">
-                            {% for error in application_form.non_field_errors %}
-                                {{ error }}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    
-                    <button class="form-button" type="submit" id="application-submit">
-                        Подать заявку
-                    </button>
-                </div>
-            </form>
-        </div>          
-        
-        <div class="formPage-block reg-form">
-            <!-- /// ВХОД-РЕГИСТРАЦИЯ -->
-            <div class="formPage-header">
-                <p href="#!" class="sign-in active link" style="color: black;">Вход</p>
-                <p href="#!" class="sign-up link">Регистрация</p>
-            </div>
-            
-            <!-- ФОРМА ВХОДА -->
-            <form class="formPage-form" method="post" action="{% url 'form_page' %}" id="login-form">
-                {% csrf_token %}
-                <input type="hidden" name="login_submit" value="1">
-                <div class="form-sign-in">
-                    {{ login_form.username }}
-                    {% if login_form.username.errors %}
-                        <div class="error">{{ login_form.username.errors }}</div>
-                    {% endif %}
-                    
-                    {{ login_form.password }}
-                    {% if login_form.password.errors %}
-                        <div class="error">{{ login_form.password.errors }}</div>
-                    {% endif %}
-                    
-                    {% if login_form.non_field_errors %}
-                        <div class="error">
-                            {% for error in login_form.non_field_errors %}
-                                {{ error }}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    
-                    <input class="form-button" type="submit" value="войти" id="login-submit">
-                </div>
-            </form>
-
-            <!-- ФОРМА РЕГИСТРАЦИИ -->
-            <form class="formPage-form" method="post" action="{% url 'form_page' %}" id="registration-form" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="hidden" name="registration_submit" value="1">
-                <div class="form-sign-up" style="display: grid;">
-                    {{ registration_form.last_name }}
-                    {% if registration_form.last_name.errors %}
-                        <div class="error">{{ registration_form.last_name.errors }}</div>
-                    {% endif %}
-                    
-                    {{ registration_form.first_name }}
-                    {% if registration_form.first_name.errors %}
-                        <div class="error">{{ registration_form.first_name.errors }}</div>
-                    {% endif %}
-                    
-                    {{ registration_form.middle_name }}
-                    {% if registration_form.middle_name.errors %}
-                        <div class="error">{{ registration_form.middle_name.errors }}</div>
-                    {% endif %}
-
-                    {{ registration_form.profile_image }}
-                    {% if registration_form.profile_image.errors %}
-                        <div class="error">{{ registration_form.profile_image.errors }}</div>
-                    {% endif %}
-                    
-                    {{ registration_form.email }}
-                    {% if registration_form.email.errors %}
-                        <div class="error">{{ registration_form.email.errors }}</div>
-                    {% endif %}
-                    
-                    {{ registration_form.phone_number }}
-                    {% if registration_form.phone_number.errors %}
-                        <div class="error">{{ registration_form.phone_number.errors }}</div>
-                    {% endif %}
-                    
-                    {{ registration_form.password1 }}
-                    {% if registration_form.password1.errors %}
-                        <div class="error">{{ registration_form.password1.errors }}</div>
-                    {% endif %}
-                    <p>Минимум 8 символов</p>
-                    
-                    {{ registration_form.password2 }}
-                    {% if registration_form.password2.errors %}
-                        <div class="error">{{ registration_form.password2.errors }}</div>
-                    {% endif %}
-                    
-                    {% if registration_form.non_field_errors %}
-                        <div class="error">
-                            {% for error in registration_form.non_field_errors %}
-                                {{ error }}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    
-                    <input class="form-button" type="submit" value="Зарегистрироваться" id="registration-submit">
-                </div>
-            </form>
-        </div>
-    </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Элементы
-    const modalOverlay = document.getElementById('skillModalOverlay');
-    const showModalBtn = document.getElementById('showSkillModalBtn');
-    const closeModalBtn = document.getElementById('closeSkillModal');
-    const cancelModalBtn = document.getElementById('cancelSkillModal');
-    const addSkillBtn = document.getElementById('addSkillBtn');
-    const skillsContainer = document.getElementById('skillsContainer');
-    const skillsDataInput = document.getElementById('skillsDataInput');
-    
-    // Поля модального окна
-    const skillNameInput = document.getElementById('skillName');
-    const skillLevelSelect = document.getElementById('skillLevel');
-    
-    // Шаблоны
-    const skillTemplate = document.getElementById('skillItemTemplate');
-    const groupTemplate = document.getElementById('skillGroupTemplate');
-    
-    // Перевод уровней
-    const levelNames = {
-        'expert': 'Эксперт',
-        'senior': 'Senior',
-        'middle': 'Middle',
-        'junior': 'Junior',
-        'beginner': 'Начинающий',
-        'unspecified': 'Уровень не указан'
-    };
-    
-    // Порядок групп
-    const levelOrder = ['expert', 'senior', 'middle', 'junior', 'beginner', 'unspecified'];
-    
-    // Текущие навыки
-    let skills = [];
-    
-    // Загрузка существующих навыков
-    try {
-        const savedSkills = skillsDataInput.value;
-        if (savedSkills && savedSkills !== '[]') {
-            skills = JSON.parse(savedSkills);
-        }
-    } catch (e) {
-        console.error('Ошибка парсинга навыков:', e);
+    console.log('DOM загружен');
+
+    // Используем встроенную переменную user из Django
+    var userAuthenticated = {{ user.is_authenticated|yesno:"true,false" }};
+
+    // Элементы для переключения форм
+    const signIn = document.querySelector(".sign-in");
+    const signUp = document.querySelector(".sign-up");
+    const signInForm = document.querySelector(".form-sign-in");
+    const signUpForm = document.querySelector(".form-sign-up");
+    const requestContent = document.querySelector(".request-form");
+    const regContent = document.querySelector(".reg-form");
+
+    console.log('Найдены элементы:', {signIn, signUp, signInForm, signUpForm, requestContent, regContent});
+
+    // Функция сброса видимости всех блоков
+    function resetAllForms() {
+        if (signInForm) signInForm.style.display = "none";
+        if (signUpForm) signUpForm.style.display = "none";
+        if (requestContent) requestContent.style.display = "none";
+        if (regContent) regContent.style.display = "none";
     }
-    
-    // Функция для рендеринга навыков по группам
-    function renderSkills() {
-        if (!skillsContainer) return;
-        
-        // Группируем навыки по уровням
-        const groupedSkills = {};
-        levelOrder.forEach(level => {
-            groupedSkills[level] = [];
+
+    // Показать форму входа
+    function showSignInForm() {
+        resetAllForms();
+        if (signInForm) signInForm.style.display = "grid";
+        if (regContent) regContent.style.display = "grid"; // показываем блок с формами
+        // обновляем классы и цвета
+        if (signIn) {
+            signIn.classList.add("active");
+            signIn.style.color = "#cbcbcb";
+        }
+        if (signUp) {
+            signUp.classList.remove("active");
+            signUp.style.color = "#5c5c5c";
+        }
+    }
+
+    // Показать форму регистрации
+    function showSignUpForm() {
+        resetAllForms();
+        if (signUpForm) signUpForm.style.display = "grid";
+        if (regContent) regContent.style.display = "grid";
+        if (signUp) {
+            signUp.classList.add("active");
+            signUp.style.color = "#cbcbcb";
+        }
+        if (signIn) {
+            signIn.classList.remove("active");
+            signIn.style.color = "#5c5c5c";
+        }
+    }
+
+    // Показать форму заявки
+    function showRequestForm() {
+        resetAllForms();
+        if (requestContent) requestContent.style.display = "grid";
+        if (regContent) regContent.style.display = "none"; // скрываем блок входа/регистрации
+    }
+
+    // Определяем начальное состояние в зависимости от авторизации
+    if (userAuthenticated) {
+        showRequestForm();
+    } else {
+        showSignInForm();
+    }
+
+    // Обработчики переключения
+    if (signIn) {
+        signIn.addEventListener("click", function(e) {
+            e.preventDefault();
+            console.log('Клик на вход');
+            showSignInForm();
         });
-        
-        skills.forEach(skill => {
-            const level = skill.level || 'unspecified';
-            if (groupedSkills[level]) {
-                groupedSkills[level].push(skill);
-            } else {
-                groupedSkills['unspecified'].push(skill);
+    }
+
+    if (signUp) {
+        signUp.addEventListener("click", function(e) {
+            e.preventDefault();
+            console.log('Клик на регистрацию');
+            showSignUpForm();
+        });
+    }
+
+    // Функция для полей "Другое"
+    function setupOtherField(selectId, otherFieldId) {
+        const select = document.getElementById(selectId);
+        const otherContainer = document.getElementById(otherFieldId);
+
+        if (!select || !otherContainer) return;
+
+        function toggleOtherField() {
+            otherContainer.style.display = select.value === 'other' ? 'block' : 'none';
+        }
+
+        toggleOtherField();
+        select.addEventListener('change', toggleOtherField);
+    }
+
+    // Настройка полей "Другое"
+    setupOtherField('id_activity_area', 'activityAreaOther');
+    setupOtherField('id_it_skill', 'itSkillOther');
+    setupOtherField('id_team_role', 'teamRoleOther');
+    setupOtherField('id_work_schedule', 'workScheduleOther');
+
+    // Код для технологий (оставляем как есть)
+    const technologiesContainer = document.getElementById('technologiesContainer');
+    const technologiesDataInput = document.getElementById('technologiesDataInput');
+
+    if (technologiesContainer && technologiesDataInput) {
+        let technologies = [];
+
+        try {
+            if (technologiesDataInput.value && technologiesDataInput.value !== '[]') {
+                technologies = JSON.parse(technologiesDataInput.value);
             }
-        });
-        
-        // Очищаем контейнер
-        skillsContainer.innerHTML = '';
-        
-        // Рендерим каждую группу
-        let hasSkills = false;
-        
-        levelOrder.forEach(level => {
-            const levelSkills = groupedSkills[level] || [];
-            if (levelSkills.length === 0) return;
-            
-            hasSkills = true;
-            
-            // Создаем группу
-            const groupClone = groupTemplate.content.cloneNode(true);
-            const groupElement = groupClone.querySelector('.skill-group');
-            const groupTitle = groupClone.querySelector('.skill-group-title');
-            const groupItems = groupClone.querySelector('.skill-group-items');
-            
-            groupTitle.textContent = levelNames[level] || 'Уровень не указан';
-            
-            // Добавляем навыки в группу
-            levelSkills.forEach(skill => {
-                const skillClone = skillTemplate.content.cloneNode(true);
-                const skillElement = skillClone.querySelector('.skill-item');
-                const skillName = skillClone.querySelector('.skill-name');
-                const skillLevel = skillClone.querySelector('.skill-level-badge');
-                const removeBtn = skillClone.querySelector('.skill-remove');
-                
-                skillName.textContent = skill.name;
-                skillLevel.textContent = levelNames[skill.level] || '';
-                skillElement.dataset.skillName = skill.name;
-                skillElement.dataset.skillLevel = skill.level || 'unspecified';
-                
-                // Обработчик удаления
-                removeBtn.addEventListener('click', function() {
-                    removeSkill(skill.name);
-                });
-                
-                groupItems.appendChild(skillElement);
+        } catch (e) {
+            console.error('Ошибка парсинга технологий:', e);
+        }
+
+        const techModalOverlay = document.getElementById('techModalOverlay');
+        const showTechModalBtn = document.getElementById('showTechModalBtn');
+        const closeTechModalBtn = document.getElementById('closeTechModal');
+        const cancelTechModalBtn = document.getElementById('cancelTechModal');
+        const addTechBtn = document.getElementById('addTechBtn');
+        const techNameInput = document.getElementById('techName');
+        const techLevelSelect = document.getElementById('techLevel');
+
+        // Функция рендеринга технологий
+        function renderTechnologies() {
+            if (!technologiesContainer) return;
+
+            const levelNames = {
+                'expert': 'Эксперт',
+                'senior': 'Senior',
+                'middle': 'Middle',
+                'junior': 'Junior',
+                'beginner': 'Начинающий',
+                'unspecified': 'Уровень не указан'
+            };
+
+            const groupedTechs = {};
+            technologies.forEach(tech => {
+                const level = tech.level || 'unspecified';
+                if (!groupedTechs[level]) groupedTechs[level] = [];
+                groupedTechs[level].push(tech);
             });
-            
-            skillsContainer.appendChild(groupElement);
-        });
-        
-        // Если нет навыков, показываем сообщение
-        if (!hasSkills) {
-            const emptyMessage = document.createElement('div');
-            emptyMessage.className = 'empty-skills';
-            emptyMessage.innerHTML = '<p>Навыки не добавлены. Нажмите "+ Добавить навык"</p>';
-            skillsContainer.appendChild(emptyMessage);
-        }
-        
-        // Обновляем скрытое поле
-        skillsDataInput.value = JSON.stringify(skills);
-    }
-    
-    // Функция добавления навыка
-    function addSkill() {
-        const name = skillNameInput.value.trim();
-        if (!name) {
-            alert('Введите название навыка');
-            return;
-        }
-        
-        // Проверка на дубликат
-        if (skills.some(s => s.name.toLowerCase() === name.toLowerCase())) {
-            alert('Такой навык уже добавлен');
-            return;
-        }
-        
-        const level = skillLevelSelect.value;
-        
-        skills.push({
-            name: name,
-            level: level
-        });
-        
-        // Очищаем поля
-        skillNameInput.value = '';
-        skillLevelSelect.value = 'unspecified';
-        
-        // Закрываем модальное окно
-        closeModal();
-        
-        // Рендерим обновленный список
-        renderSkills();
-    }
-    
-    // Функция удаления навыка
-    function removeSkill(skillName) {
-        skills = skills.filter(s => s.name !== skillName);
-        renderSkills();
-    }
-    
-    // Функции открытия/закрытия модального окна
-    function openModal() {
-        modalOverlay.style.display = 'flex';
-        skillNameInput.focus();
-    }
-    
-    function closeModal() {
-        modalOverlay.style.display = 'none';
-        skillNameInput.value = '';
-        skillLevelSelect.value = 'unspecified';
-    }
-    
-    // Обработчики событий
-    if (showModalBtn) {
-        showModalBtn.addEventListener('click', openModal);
-    }
-    
-    if (closeModalBtn) {
-        closeModalBtn.addEventListener('click', closeModal);
-    }
-    
-    if (cancelModalBtn) {
-        cancelModalBtn.addEventListener('click', closeModal);
-    }
-    
-    if (addSkillBtn) {
-        addSkillBtn.addEventListener('click', addSkill);
-    }
-    
-    // Закрытие по клику на оверлей
-    if (modalOverlay) {
-        modalOverlay.addEventListener('click', function(e) {
-            if (e.target === modalOverlay) {
-                closeModal();
+
+            technologiesContainer.innerHTML = '';
+
+            let hasTechs = false;
+
+            Object.keys(groupedTechs).forEach(level => {
+                const levelTechs = groupedTechs[level];
+                if (levelTechs.length === 0) return;
+
+                hasTechs = true;
+
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'skill-group';
+                groupDiv.innerHTML = `
+                    <div class="skill-group-header">
+                        <h4 class="skill-group-title">${levelNames[level] || 'Уровень не указан'}</h4>
+                    </div>
+                    <div class="skill-group-items" id="tech-group-${level}"></div>
+                `;
+
+                technologiesContainer.appendChild(groupDiv);
+
+                const groupItems = groupDiv.querySelector('.skill-group-items');
+
+                levelTechs.forEach(tech => {
+                    const techElement = document.createElement('div');
+                    techElement.className = 'skill-item';
+                    techElement.innerHTML = `
+                        <div class="skill-item-content">
+                            <span class="skill-name">${tech.name}</span>
+                            <span class="skill-level-badge">${levelNames[tech.level] || ''}</span>
+                        </div>
+                        <button type="button" class="skill-remove" onclick="removeTechnology('${tech.name}')">×</button>
+                    `;
+
+                    groupItems.appendChild(techElement);
+                });
+            });
+
+            if (!hasTechs) {
+                technologiesContainer.innerHTML = '<div class="empty-skills"><p>Технологии не добавлены. Нажмите "+ Добавить технологию"</p></div>';
             }
-        });
-    }
-    
-    // Добавление по Enter
-    if (skillNameInput) {
-        skillNameInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
+
+            technologiesDataInput.value = JSON.stringify(technologies);
+        }
+
+        // Функция добавления технологии
+        window.addTechnology = function() {
+            const name = techNameInput.value.trim();
+            if (!name) {
+                alert('Введите название технологии');
+                return;
+            }
+
+            if (technologies.some(t => t.name.toLowerCase() === name.toLowerCase())) {
+                alert('Такая технология уже добавлена');
+                return;
+            }
+
+            technologies.push({
+                name: name,
+                level: techLevelSelect.value
+            });
+
+            techNameInput.value = '';
+            techLevelSelect.value = 'unspecified';
+            closeTechModal();
+            renderTechnologies();
+        };
+
+        // Функция удаления технологии
+        window.removeTechnology = function(techName) {
+            technologies = technologies.filter(t => t.name !== techName);
+            renderTechnologies();
+        };
+
+        // Функции открытия/закрытия модального окна
+        function openTechModal() {
+            if (techModalOverlay) techModalOverlay.style.display = 'flex';
+            if (techNameInput) techNameInput.focus();
+        }
+
+        function closeTechModal() {
+            if (techModalOverlay) techModalOverlay.style.display = 'none';
+            if (techNameInput) techNameInput.value = '';
+            if (techLevelSelect) techLevelSelect.value = 'unspecified';
+        }
+
+        // Обработчики событий
+        if (showTechModalBtn) showTechModalBtn.addEventListener('click', openTechModal);
+        if (closeTechModalBtn) closeTechModalBtn.addEventListener('click', closeTechModal);
+        if (cancelTechModalBtn) cancelTechModalBtn.addEventListener('click', closeTechModal);
+
+        if (addTechBtn) {
+            addTechBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                addSkill();
-            }
-        });
+                window.addTechnology();
+            });
+        }
+
+        if (techModalOverlay) {
+            techModalOverlay.addEventListener('click', function(e) {
+                if (e.target === techModalOverlay) closeTechModal();
+            });
+        }
+
+        if (techNameInput) {
+            techNameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    window.addTechnology();
+                }
+            });
+        }
+
+        // Первоначальный рендеринг
+        renderTechnologies();
     }
-    
-    // Инициализация
-    renderSkills();
 });
 </script>
-{%endblock%}
-
+{% endblock %}
