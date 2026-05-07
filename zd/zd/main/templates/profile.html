@@ -66,8 +66,15 @@
 
                         
                         <div class="create-project">
-                            <p><span>Готовые проекты</p>
+                            <p><span>Мои проекты</p>
                             <a href="{% url 'project_list' %}" class="create-project-link">
+                                <button class="create-project-button">Перейти</button>
+                            </a>
+                        </div>
+
+                        <div class="create-project">
+                            <p><span>Все проекты</p>
+                            <a href="{% url 'all_projects' %}" class="create-project-link">
                                 <button class="create-project-button">Перейти</button>
                             </a>
                         </div>

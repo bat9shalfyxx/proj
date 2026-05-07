@@ -1,0 +1,192 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}Все проекты{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'main/css/all_projects.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="all-projects-page">
+    <div class="container">
+        <div class="page-header">
+            <h1>Все проекты</h1>
+            <p>Изучите проекты, которые ищут участников, или создайте свой</p>
+            <a href="{% url 'project_create' %}" class="btn-create">
+                + Создать новый проект
+            </a>
+        </div>
+
+        <!-- Фильтры и поиск -->
+        <div class="filters-section">
+            <div class="search-box">
+                <input type="text" 
+                       id="searchInput" 
+                       class="search-input" 
+                       placeholder="Поиск по названию, описанию или ключевым словам...">
+                <button class="search-btn" id="searchBtn">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="filter-tabs">
+                <button class="filter-btn active" data-filter="all">Все</button>
+                <button class="filter-btn" data-filter="active">Активные</button>
+                <button class="filter-btn" data-filter="in_progress">В работе</button>
+                <button class="filter-btn" data-filter="completed">Завершенные</button>
+            </div>
+        </div>
+
+        <!-- Список проектов -->
+        {% if projects %}
+        <div class="projects-grid" id="projectsGrid">
+            {% for project in projects %}
+            <div class="project-card" data-status="{{ project.status }}">
+                <div class="project-card-header">
+                    <h3 class="project-title">
+                        <a href="{% url 'project_detail' project.id %}">{{ project.name }}</a>
+                    </h3>
+                    <span class="project-status status-{{ project.status }}">
+                        {{ project.get_status_display }}
+                    </span>
+                </div>
+                
+                <div class="project-description">
+                    {{ project.description|truncatechars:150 }}
+                </div>
+                
+                <!-- Ключевые слова, если есть -->
+                {% if project.keywords %}
+                <div class="project-keywords">
+                    {% for keyword in project.keywords|slice:":5" %}
+                        <span class="keyword-tag">{{ keyword }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div class="project-meta">
+                    <div class="meta-item">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 1a3 3 0 100 6 3 3 0 000-6zM2 8a6 6 0 1112 0A6 6 0 012 8z"/>
+                        </svg>
+                        <span>Автор: {{ project.creator.username }}</span>
+                    </div>
+                    
+                    <div class="meta-item">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 1a3 3 0 100 6 3 3 0 000-6zM2 8a6 6 0 1112 0A6 6 0 012 8z"/>
+                        </svg>
+                        <span>{{ project.get_active_participants_count }} участников</span>
+                    </div>
+                    
+                    {% if project.budget %}
+                    <div class="meta-item budget">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M1 3a1 1 0 011-1h12a1 1 0 011 1v10a1 1 0 01-1 1H2a1 1 0 01-1-1V3z"/>
+                        </svg>
+                        <span>{{ project.budget|floatformat:0 }} ₽</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="project-footer">
+                    <div class="project-dates">
+                        {% if project.start_date %}
+                        <span>С: {{ project.start_date|date:"d.m.Y" }}</span>
+                        {% endif %}
+                        {% if project.end_date %}
+                        <span>По: {{ project.end_date|date:"d.m.Y" }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <a href="{% url 'project_detail' project.id %}" class="btn-view">
+                        Подробнее
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Пагинация -->
+        {% if projects.has_other_pages %}
+        <div class="pagination">
+            {% if projects.has_previous %}
+                <a href="?page={{ projects.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="page-link">←</a>
+            {% endif %}
+            
+            {% for i in projects.paginator.page_range %}
+                {% if projects.number == i %}
+                    <span class="page-link active">{{ i }}</span>
+                {% else %}
+                    <a href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="page-link">{{ i }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if projects.has_next %}
+                <a href="?page={{ projects.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="page-link">→</a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="no-projects">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M3 9l9-6 9 6v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <h3>Проектов пока нет</h3>
+            <p>Станьте первым создателем проекта</p>
+            <a href="{% url 'project_create' %}" class="btn-create-large">
+                Создать проект
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Фильтрация по статусу
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const projects = document.querySelectorAll('.project-card');
+    const searchInput = document.getElementById('searchInput');
+    
+    function filterProjects() {
+        const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+        const searchTerm = searchInput.value.toLowerCase();
+        
+        projects.forEach(project => {
+            const status = project.dataset.status;
+            const title = project.querySelector('.project-title a').textContent.toLowerCase();
+            const description = project.querySelector('.project-description').textContent.toLowerCase();
+            
+            const matchesFilter = activeFilter === 'all' || status === activeFilter;
+            const matchesSearch = searchTerm === '' || title.includes(searchTerm) || description.includes(searchTerm);
+            
+            project.style.display = matchesFilter && matchesSearch ? 'block' : 'none';
+        });
+    }
+    
+    // Фильтр по статусу
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            filterProjects();
+        });
+    });
+    
+    // Поиск с debounce
+    let searchTimeout;
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(filterProjects, 300);
+        });
+    }
+});
+</script>
+{% endblock %}

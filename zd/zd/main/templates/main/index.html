@@ -183,9 +183,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.head.appendChild(style);
     
     // Отображение Django messages (если есть)
-    {% for message in messages %}
-        showNotification('{{ message }}', '{{ message.tags|default:"info" }}');
-    {% endfor %}
+    // {% for message in messages %}
+    //     showNotification('{{ message }}', '{{ message.tags|default:"info" }}');
+    // {% endfor %}
 });
 </script>
     <script defer>

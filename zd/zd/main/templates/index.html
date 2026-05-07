@@ -14,9 +14,7 @@
     <script src="../../static/main/scripts/profileScript.js" defer></script>
     <script src="../../static/main/scripts/formPage.js" defer></script>
     <script src="../../static/main/scripts/budget.js" defer></script>
-    <script src="../../static/main/scripts/hiddenNav.js" defer></script>
     <script src="../../static/main/scripts/nav.js" defer></script>
-    <script src="../../static/main/scripts/dropdown.js" defer></script>
     <script src="../../static/main/scripts/skills.js" defer></script>
     <script src="../../static/main/scripts/createProject.js" defer></script>
     {% include "scripts.html" %}
@@ -40,6 +38,9 @@
                     {% if user.is_authenticated %}
                     <div class="header-right-info">
                         <a class="link req-btn" href="{% url 'form_page' %}">заявки</a>
+                    </div>
+                    <div class="header-right-info" style="margin-left: 8px;">
+                        <a class="link req-btn" href="{% url 'all_projects' %}">проекты</a>
                     </div>
                     {% endif %}
                     
@@ -122,7 +123,7 @@
                                 <h5>Проекты</h5>
                                 <p>Нет информации</p>
 
-                                <button class="nav-dropdown-button">Перейти</button>
+                                <a class="nav-dropdown-button nav-project-link" href="{% url 'project_list' %}" target="_self">Перейти</a>
                                 <img src="../../static/main/src/section1/money.svg" />
                             </div>
 

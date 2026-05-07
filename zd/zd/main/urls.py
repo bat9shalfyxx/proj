@@ -10,6 +10,7 @@ urlpatterns = [
     path('form_page/', views.form_page, name='form_page'),
     path('create_team/', views.create_team, name='create_team'),
     # Проекты (все маршруты здесь, без отдельного приложения)
+    path('all/', views.all_projects, name='all_projects'),
     path('projects/', views.project_list, name='project_list'),
     path('projects/create/', views.project_create, name='project_create'),
     path('projects/<int:project_id>/', views.project_detail, name='project_detail'),

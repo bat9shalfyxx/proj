@@ -418,6 +418,27 @@ from .models import (
 )
 from main.models_application import Application
 
+from django.core.paginator import Paginator
+
+@login_required
+def all_projects(request):
+    """Страница со всеми проектами платформы"""
+    projects_list = Project.objects.exclude(status='draft').order_by('-created_at')
+    
+    # Поиск
+    search_query = request.GET.get('q')
+    if search_query:
+        projects_list = projects_list.filter(
+            models.Q(name__icontains=search_query) |
+            models.Q(description__icontains=search_query) |
+            models.Q(keywords__icontains=search_query)
+        )
+    
+    paginator = Paginator(projects_list, 12)
+    page_number = request.GET.get('page')
+    projects = paginator.get_page(page_number)
+    
+    return render(request, 'all_projects.html', {'projects': projects})
 
 @login_required
 def project_list(request):
