@@ -1060,3 +1060,9 @@ def api_applications(request):
         })
     
     return JsonResponse(data, safe=False)
+
+def hub(request):
+    projects = Project.objects.filter(status__in=['active', 'in_progress']).order_by('-created_at')[:10]
+    return render(request, 'hub.html', {
+        'projects': projects
+    })

@@ -147,31 +147,6 @@
     }
 
 
-    // SECTION 3
-    .section-3 {
-        padding: 7vw !important;
-    }
-    .sec3 {
-        &-header {
-            margin-bottom: clamp(50px, 15vw, 120px) !important;
-            p {
-                font-size: clamp(20px, 6vw, 50px) !important;
-            }
-            &-link {
-                font-size: clamp(15px, 5vw, 30px) !important;
-            }
-        }
-        &-content {
-            &-block {
-                padding: 30px 20px;
-                p {
-                    font-size: clamp(20px, 6vw, 40px) !important;
-                    margin-bottom: clamp(40px, 15vw, 200px) !important;
-                }
-            }
-        }
-    }
-
     // SECTION 4
     .section-4 {
         padding: clamp(10px, 10vw, 70px);

@@ -1,5 +1,3 @@
-/* static/main/css/all_projects.css */
-
 .all-projects-page {
     min-height: calc(100vh + 60px);
     background: linear-gradient(135deg, #a7182d 60%, #fff 40%);
@@ -16,8 +14,9 @@
     padding: 40px;
 }
 
-/* Заголовок страницы */
 .page-header {
+    display: flex;
+    align-items: center;
     text-align: center;
     margin-bottom: 40px;
 }
@@ -52,7 +51,6 @@
     box-shadow: 0 8px 25px rgba(167, 24, 45, 0.4);
 }
 
-/* Фильтры */
 .filters-section {
     margin-bottom: 40px;
 }
@@ -121,7 +119,6 @@
     color: white;
 }
 
-/* Сетка проектов */
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -129,12 +126,12 @@
     margin-bottom: 40px;
 }
 
-/* Карточка проекта */
 .project-card {
     background: white;
     border: 2px solid #e0e0e0;
     border-radius: 15px;
     padding: 20px;
+    margin-top: 1rem;
     transition: all 0.3s ease;
     animation: fadeIn 0.5s ease-out;
 }
@@ -194,7 +191,6 @@
     min-height: 70px;
 }
 
-/* Ключевые слова */
 .project-keywords {
     display: flex;
     flex-wrap: wrap;
@@ -211,7 +207,6 @@
     font-weight: 500;
 }
 
-/* Мета-информация */
 .project-meta {
     display: flex;
     flex-wrap: wrap;
@@ -240,7 +235,6 @@
     font-weight: 600;
 }
 
-/* Подвал карточки */
 .project-footer {
     display: flex;
     flex-wrap: wrap;
@@ -272,7 +266,6 @@
     color: white;
 }
 
-/* Пустое состояние */
 .no-projects {
     text-align: center;
     padding: 60px 20px;
@@ -311,7 +304,6 @@
     transition: all 0.3s ease;
 }
 
-/* Пагинация */
 .pagination {
     display: flex;
     justify-content: center;
@@ -345,7 +337,6 @@
     color: white;
 }
 
-/* Адаптивность */
 @media (max-width: 768px) {
     .all-projects-page {
         padding: 100px 15px;
@@ -381,7 +372,6 @@
     }
 }
 
-/* Темная тема */
 @media (prefers-color-scheme: dark) {
     .all-projects-page .container {
         background: #1a1a1a;
@@ -425,7 +415,6 @@
     }
 }
 
-/* Анимации */
 @keyframes fadeIn {
     from {
         opacity: 0;

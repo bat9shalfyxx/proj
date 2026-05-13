@@ -461,8 +461,6 @@
     background: #1a1a1a !important;
     border-radius: 20px !important;
     padding: 40px !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
-    border: 1px solid #333 !important;
 }
 
 .form-request {
@@ -481,7 +479,6 @@
     font-family: inherit !important;
 }
 
-/* Стили для полей ввода в темной теме */
 .form-request input[type="text"],
 .form-request input[type="email"],
 .form-request input[type="url"],

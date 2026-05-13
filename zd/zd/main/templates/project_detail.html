@@ -5,10 +5,8 @@
 {% block title %}{{ project.name }}{% endblock %}
 
 {% block content %}
-<!-- Контейнер для уведомлений -->
 <div id="notificationContainer" class="notification-container"></div>
 
-<!-- Модальное окно для поиска участников -->
 <div id="candidateModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header">
@@ -16,7 +14,6 @@
             <button type="button" class="modal-close" onclick="closeCandidateModal()">×</button>
         </div>
         <div class="modal-body">
-            <!-- Фильтр по навыкам -->
             <div class="filter-controls-modal">
                 <label for="skillFilterModal">Фильтровать по навыкам (через запятую):</label>
                 <input type="text" id="skillFilterModal" class="filter-input-modal" 
@@ -27,7 +24,6 @@
                 </div>
             </div>
             
-            <!-- Результаты поиска -->
             <div id="candidatesList" class="candidates-list">
                 <div class="no-candidates">
                     <p>Загрузка кандидатов...</p>
@@ -149,7 +145,6 @@
             {% endif %}
         </div>
 
-        <!-- Участники проекта -->
         <div class="participants-section">
             <h2>Участники ({{ participants.count }})</h2>
             {% if participants %}
@@ -181,7 +176,6 @@
     </div>
 </div>
 
-<!-- Модальное окно удаления -->
 <div id="deleteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
     <div style="background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
         <h3 style="margin: 0 0 15px 0; color: #2c3e50; font-size: 20px;">Удаление проекта</h3>
@@ -199,7 +193,6 @@
 
 <script>
 const csrfToken = '{{ csrf_token }}';
-// ==================== УВЕДОМЛЕНИЯ ====================
 let notificationId = 0;
 
 function showNotification(title, message, type = 'info') {
@@ -338,7 +331,6 @@ function filterAndDisplayCandidates() {
 }
 
 function inviteCandidate(applicationId) {
-    // Показываем индикатор загрузки на кнопке
     const button = event?.target;
     const originalText = button?.innerText;
     if (button) {
@@ -359,7 +351,6 @@ function inviteCandidate(applicationId) {
     .then(data => {
         if (data.success) {
             showNotification('Успех', 'Приглашение успешно отправлено', 'success');
-            // Обновляем список кандидатов (скрываем приглашенного)
             if (typeof filterAndDisplayCandidates === 'function') {
                 filterAndDisplayCandidates();
             }

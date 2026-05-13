@@ -156,33 +156,67 @@
         
         <section class="section-3">
             <div class="sec3-header">
-                <p>
-                    Узнайте, какими проектами поддержки <br />
-                    уже воспользовались участники ЦНП
-                </p>
+                <div class="sec3-header-left">
+                    <p>
+                        Узнайте, какими проектами поддержки <br />
+                        уже воспользовались участники ЦНП
+                    </p>
+                </div>
                 <a class="sec3-header-link" href="{% url 'all_projects' %}">
                     Смотреть все проекты
                     <img src="../../static/main/src/section3/right-arrow.svg" alt="arrow" />
                 </a>
             </div>
-        
+
             <div class="sec3-content">
-                <ul class="sec3-content-list">
-                    <li class="sec3-content-block">
-                        <div class="sec3-content-img"><img src="../../static/main/src/section3/3-1.png" alt="cars" loading="lazy" /></div>
-                        <p class="sec3-content-text">НЕТ ИНФОРМАЦИИ</p>
-                    </li>
-        
-                    <li class="sec3-content-block">
-                        <div class="sec3-content-img"><img src="../../static/main/src/section3/3-2.png" alt="trains" loading="lazy" /></div>
-                        <p class="sec3-content-text">НЕТ ИНФОРМАЦИИ</p>
-                    </li>
-        
-                    <li class="sec3-content-block">
-                        <div class="sec3-content-img"><img src="../../static/main/src/section3/3-3.png" alt="robot" loading="lazy" /></div>
-                        <p class="sec3-content-text">НЕТ ИНФОРМАЦИИ</p>
-                    </li>
-                </ul>
+                <button class="scroll-btn scroll-left" id="scrollLeftBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                
+                <div class="projects-scroll-container" id="projectsScrollContainer">
+                    <ul class="sec3-content-list">
+                        {% for project in projects %}
+                        <li class="sec3-content-block">
+                            <a href="{% url 'project_detail' project.id %}" class="project-card-link">
+                                <div class="sec3-content-img">
+                                    {% if project.image %}
+                                        <img src="{{ project.image.url }}" alt="{{ project.name }}" loading="lazy" />
+                                    {% else %}
+                                        <div class="project-placeholder-img">
+                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <path d="M3 9l9-6 9 6v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/>
+                                                <polyline points="9 22 9 12 15 12 15 22"/>
+                                            </svg>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="sec3-content-info">
+                                    <h4 class="project-name">{{ project.name|truncatechars:35 }}</h4>
+                                    <p class="project-description-short">{{ project.description|truncatechars:100 }}</p>
+                                    <div class="project-meta-short">
+                                        <span class="project-budget">{{ project.budget|default:"0"|floatformat:0 }} ₽</span>
+                                        <span class="project-status-small status-{{ project.status }}">
+                                            {{ project.get_status_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        {% empty %}
+                        <li class="sec3-content-block empty">
+                            <p>Проектов пока нет</p>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <button class="scroll-btn scroll-right" id="scrollRightBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
             </div>
         </section>
         
@@ -241,4 +275,81 @@
             </div>
         </section>
     </div>
+
+<script>
+// Скроллбар
+document.addEventListener('DOMContentLoaded', function() {
+    const scrollContainer = document.getElementById('projectsScrollContainer');
+    const scrollLeftBtn = document.getElementById('scrollLeftBtn');
+    const scrollRightBtn = document.getElementById('scrollRightBtn');
+    
+    if (scrollContainer) {
+        scrollContainer.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            const scrollAmount = e.deltaY || e.deltaX;
+            scrollContainer.scrollLeft += e.deltaY * 3;
+            scrollContainer.scrollLeft += scrollAmount;
+        }, { passive: false });
+        
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+        
+        scrollContainer.addEventListener('mousedown', function(e) {
+            isDown = true;
+            scrollContainer.style.cursor = 'grabbing';
+            startX = e.pageX - scrollContainer.offsetLeft;
+            scrollLeft = scrollContainer.scrollLeft;
+        });
+        
+        scrollContainer.addEventListener('mouseleave', function() {
+            isDown = false;
+            scrollContainer.style.cursor = 'grab';
+        });
+        
+        scrollContainer.addEventListener('mouseup', function() {
+            isDown = false;
+            scrollContainer.style.cursor = 'grab';
+        });
+        
+        scrollContainer.addEventListener('mousemove', function(e) {
+            if (!isDown) return;
+            e.preventDefault();
+            const walk = (x - startX) * 2;
+            scrollContainer.scrollLeft = scrollLeft - walk;
+            const x = e.pageX - scrollContainer.offsetLeft;
+        });
+        
+        // ======== Кнопки прокрутки ========
+        if (scrollLeftBtn && scrollRightBtn) {
+            function checkScrollButtons() {
+                const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+                scrollLeftBtn.classList.toggle('disabled', scrollContainer.scrollLeft <= 0);
+                scrollRightBtn.classList.toggle('disabled', scrollContainer.scrollLeft >= maxScroll - 5);
+            }
+            
+            scrollLeftBtn.addEventListener('click', function() {
+                scrollContainer.scrollBy({
+                    left: -scrollContainer.clientWidth / 1.5,
+                    behavior: 'smooth'
+                });
+            });
+            
+            scrollRightBtn.addEventListener('click', function() {
+                scrollContainer.scrollBy({
+                    left: scrollContainer.clientWidth / 1.5,
+                    behavior: 'smooth'
+                });
+            });
+            
+            scrollContainer.addEventListener('scroll', checkScrollButtons);
+            window.addEventListener('resize', checkScrollButtons);
+            checkScrollButtons();
+        }
+        
+        // Устанавливаем курсор grab
+        scrollContainer.style.cursor = 'grab';
+    }
+});
+</script>
 {% endblock %}
