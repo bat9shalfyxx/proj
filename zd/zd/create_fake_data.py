@@ -1,4 +1,3 @@
-# create_fake_data.py
 import os
 import django
 import json
@@ -15,7 +14,6 @@ from django.contrib.auth import get_user_model
 fake = Faker('ru_RU')
 User = get_user_model()
 
-# Константы для генерации
 STATUSES = ['new', 'in_progress', 'approved', 'rejected']
 TEAM_ROLES = ['visionary', 'implementer', 'leader', 'organizer', 'analyst', 
               'communicator', 'perfectionist', 'resource_investigator', 
@@ -82,7 +80,6 @@ def create_fake_applications(count=15):
     """Создание фейковых заявок"""
     user = create_test_user()
     
-    # Список организаций для генерации
     org_names = [
         'ООО ТехноИнновации', 'ИП Цифровые Решения', 'ЗАО Альфа-Софт',
         'ООО Бизнес-Аналитика', 'ИП Веб-Студия', 'ООО АйТи Решения',
@@ -114,7 +111,6 @@ def create_fake_applications(count=15):
             user=user if random.choice([True, False]) else None,
             status=random.choice(STATUSES),
             
-            # Личная информация
             contact_last_name=fake.last_name(),
             contact_first_name=fake.first_name(),
             contact_middle_name=fake.middle_name() if random.choice([True, False]) else '',
@@ -122,22 +118,17 @@ def create_fake_applications(count=15):
             contact_email=fake.email(),
             age=random.randint(18, 65) if random.choice([True, False]) else None,
             
-            # Информация о себе
             about_me=fake.paragraph(nb_sentences=3) if random.choice([True, False]) else '',
             
-            # Роль в команде
             team_role=random.choice(TEAM_ROLES) if random.choice([True, False]) else None,
             
-            # Навыки
             skill_list=skill_list,
             skills_json=skills_json,
             
-            # Организация
             organization_name=random.choice(org_names),
             organization_inn=str(random.randint(1000000000, 999999999999)),
             organization_website=fake.url() if random.choice([True, False]) else '',
             
-            # Ресурсы
             requirement_name=', '.join(requirement_names) if requirement_names else '',
             requirement_price=', '.join(requirement_prices) if requirement_prices else ''
         )
@@ -170,20 +161,16 @@ if __name__ == '__main__':
     print("🚀 НАЧАЛО СОЗДАНИЯ ФЕЙКОВЫХ ДАННЫХ")
     print("="*50)
     
-    # Создаем тестового пользователя (задаем пароль вручную)
     user = create_test_user()
     user.set_password('testpass123')
     user.save()
     
-    # Создаем проекты
     print("\n📁 Создание проектов...")
     create_fake_projects(10)
     
-    # Создаем заявки
     print("\n📋 Создание заявок...")
     create_fake_applications(15)
     
-    # Показываем статистику
     show_statistics()
     
     print("\n" + "="*50)
