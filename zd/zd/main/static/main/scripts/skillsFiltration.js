@@ -1,118 +1,94 @@
-const jsonData = JSON.parse('{{ application_json|safe }}'); 
-console.log(jsonData + 1);
-console.log('test');
 
-const filterInputJs = document.getElementById('filter-skills-js');
-    const applyFilterBtnJs = document.getElementById('apply-filter-js');
-    const resetFilterBtnJs = document.getElementById('reset-filter-js');
-    const applicationsListContainerJs = document.querySelector('.profile-second-request-list');
+document.addEventListener('DOMContentLoaded', function() {
+// Фильтрация по статусу
+    const statusBtns = document.querySelectorAll('.filter-status-btn');
+    const applicationsList = document.getElementById('applications-list');
+    const filterInput = document.getElementById('filter-skills-js');
+    const applyBtn = document.getElementById('apply-filter-js');
+    const resetBtn = document.getElementById('reset-filter-js');
 
-    let allApplicationsData = []; 
-    let currentRenderedApplications = [];
+    let currentStatus = 'all';
+    let currentSkills = '';
 
-    function getAllApplicationsFromDOM() {
-        const applicationElements = applicationsListContainerJs.querySelectorAll('.profile-second-request-el');
-        const applicationsData = [];
-
-        applicationElements.forEach(el => {
-            const idElement = el.querySelector('h3');
-            const id = idElement ? idElement.textContent.replace('Заявка № ', '').trim() : 'N/A';
-            
-            let organizationName = '';
-            let solutionName = '';
-            const skillListElement = el.querySelector('.skillList');
-            const skillListText = skillListElement ? skillListElement.textContent.trim() : '';
-
-            const nonSkillParagraphs = Array.from(el.querySelectorAll('p')).filter(p => !p.classList.contains('skillList'));
-            
-            if (nonSkillParagraphs.length > 0) {
-                organizationName = nonSkillParagraphs[0].textContent.trim();
-            }
-            if (nonSkillParagraphs.length > 1) {
-                solutionName = nonSkillParagraphs[1].textContent.trim();
-            }
-
-            applicationsData.push({
-                id: id,
-                organization_name: organizationName,
-                solution_name: solutionName,
-                skill_list_text: skillListText 
-            });
-        });
-        return applicationsData;
-    }
-
-    function renderApplicationsJs(applicationsToRender) {
-        if (!applicationsListContainerJs) {
-            console.error('Контейнер ".profile-second-request-list" не найден!');
-            return;
-        }
-        applicationsListContainerJs.innerHTML = '';
-
-        if (applicationsToRender.length === 0) {
-            applicationsListContainerJs.innerHTML = '<p>Нет заявок, соответствующих вашим критериям.</p>';
-            return;
-        }
-
-        applicationsToRender.forEach(app => {
-            const appElement = document.createElement('div');
-            appElement.classList.add('profile-second-request-el');
-            
-            const skillsString = app.skill_list_text;
-
-            appElement.innerHTML = `
-                <h3>Заявка № ${app.id}</h3>
-                <p>${app.organization_name}</p>
-                <p>${app.solution_name}</p>
-                <p class="skillList">${skillsString}</p>
-            `;
-            applicationsListContainerJs.appendChild(appElement);
-        });
-        currentRenderedApplications = applicationsToRender; 
-    }
-
-    function parseSkillsString(skillsString) {
-        if (!skillsString || typeof skillsString !== 'string') {
-            return [];
-        }
-        return skillsString.split(/,\s*/)
-                           .map(s => s.trim().toLowerCase())
-                           .filter(s => s);
-    }
-
-    function applyFilterJs() {
-        const filterText = filterInputJs.value.trim().toLowerCase();
+    function filterApplications() {
+        if (!applicationsList) return;
         
-        const requiredSkills = parseSkillsString(filterText);
-
-        let filteredApplications = [];
-
-        if (requiredSkills.length === 0) {
-            filteredApplications = allApplicationsData;
-        } else {
-            filteredApplications = allApplicationsData.filter(app => {
-                const appSkills = parseSkillsString(app.skill_list_text);
-                return requiredSkills.some(reqSkill => appSkills.includes(reqSkill));
-            });
+        const items = applicationsList.querySelectorAll('.profile-second-request-el');
+        let visibleCount = 0;
+        
+        items.forEach(item => {
+            const status = item.dataset.status;
+            const skills = item.dataset.skills || '';
+            
+            let showByStatus = (currentStatus === 'all' || status === currentStatus);
+            
+            let showBySkills = true;
+            if (currentSkills) {
+                const skillList = currentSkills.split(',').map(s => s.trim().toLowerCase());
+                showBySkills = skillList.some(skill => skills.includes(skill));
+            }
+            
+            if (showByStatus && showBySkills) {
+                item.style.display = 'block';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        let noResultsMsg = document.querySelector('.no-results-message');
+        if (visibleCount === 0 && items.length > 0) {
+            if (!noResultsMsg) {
+                const msg = document.createElement('div');
+                msg.className = 'no-results-message';
+                msg.innerHTML = `
+                    <div class="profile-second-not-found">
+                        <img src="{% static 'main/src/profile/search.svg' %}" alt="не найдено">
+                        <h3>Ничего не найдено</h3>
+                        <p>Попробуйте изменить условия поиска</p>
+                        <button class="reset-filters" onclick="resetAllFilters()">Сбросить фильтры</button>
+                    </div>
+                `;
+                applicationsList.appendChild(msg);
+            }
+        } else if (noResultsMsg) {
+            noResultsMsg.remove();
         }
-        renderApplicationsJs(filteredApplications);
     }
 
-    if (applyFilterBtnJs) {
-        applyFilterBtnJs.addEventListener('click', applyFilterJs);
-    }
-    if (resetFilterBtnJs) {
-        resetFilterBtnJs.addEventListener('click', () => {
-            filterInputJs.value = '';
-            applyFilterJs();
+    statusBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            statusBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentStatus = this.dataset.status;
+            filterApplications();
+        });
+    });
+
+    if (applyBtn) {
+        applyBtn.addEventListener('click', function() {
+            currentSkills = filterInput.value.trim();
+            filterApplications();
         });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        if (applicationsListContainerJs) {
-            allApplicationsData = getAllApplicationsFromDOM();
-            renderApplicationsJs(allApplicationsData);
-        } else {
-            console.error("Контейнер '.profile-second-request-list' не найден.");
-        }
-    });
+    window.resetAllFilters = function() {
+        currentStatus = 'all';
+        currentSkills = '';
+        filterInput.value = '';
+        
+        statusBtns.forEach(btn => {
+            if (btn.dataset.status === 'all') {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        
+        filterApplications();
+    };
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetAllFilters);
+    }
+});

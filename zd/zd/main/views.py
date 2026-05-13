@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from .forms import ProfileEditForm
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -170,10 +171,13 @@ def hub(request):
 
 @login_required
 def profile(request):
-    applications = Application.objects.filter(user=request.user).order_by('-created_at')
+    applications = Application.objects.all().order_by('-created_at')
+
+    profile_form = ProfileEditForm(instance=request.user)
 
     print(f"Пользователь: {request.user.email} (ID: {request.user.id})")
     print(f"Найдено заявок: {applications.count()}")
+
     for app in applications:
         print(f"  - Заявка #{app.id}: {app.organization_name}, статус: {app.status}")
 
@@ -193,6 +197,7 @@ def profile(request):
         'title': 'Профиль',
         'user': request.user,
         'applications': applications,
+        'form': profile_form,
     })
 
 @login_required
@@ -744,7 +749,7 @@ def project_change_status(request, project_id):
 
 @login_required
 def invite_to_project(request, project_id):
-    #Приглашение участника в проект
+    """Приглашение участника в проект"""
     project = get_object_or_404(Project, id=project_id, creator=request.user)
     
     if request.method == 'POST':
@@ -773,21 +778,18 @@ def invite_to_project(request, project_id):
                 message=message
             )
             
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': True,
-                    'invitation_id': invitation.id,
-                    'message': 'Приглашение отправлено'
-                })
-            
-            messages.success(request, 'Приглашение отправлено')
+            return JsonResponse({
+                'success': True,
+                'invitation_id': invitation.id,
+                'message': 'Приглашение отправлено'
+            })
             
         except Application.DoesNotExist:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'success': False, 'error': 'Заявка не найдена'})
-            messages.error(request, 'Заявка не найдена')
+            return JsonResponse({'success': False, 'error': 'Заявка не найдена'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
     
-    return redirect('project_detail', project_id=project.id)
+    return JsonResponse({'success': False, 'error': 'Неверный метод запроса'})
 
 
 @login_required
@@ -969,4 +971,92 @@ def api_applications(request):
             'skill_list': app.skill_list,
             'skills_json': app.skills_json,
         })
+    return JsonResponse(data, safe=False)
+
+from django.db.models import Q
+from django.shortcuts import render
+from .models_application import Application
+from .models import CustomUser
+
+def global_search(request):
+    """Глобальный поиск по всему сайту"""
+    from project.models import Project
+    query = request.GET.get('q', '').strip()
+    
+    context = {
+        'query': query,
+        'projects': [],
+        'applications': [],
+        'users': [],
+        'has_results': False
+    }
+    
+    if query:
+        projects = Project.objects.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query) |
+            Q(keywords__icontains=query),
+            status__in=['active', 'in_progress']
+        ).order_by('-created_at')[:10]
+        
+        applications = Application.objects.filter(
+            Q(organization_name__icontains=query) |
+            Q(contact_first_name__icontains=query) |
+            Q(contact_last_name__icontains=query) |
+            Q(skill_list__icontains=query) |
+            Q(technologies_text__icontains=query),
+            status='approved'
+        ).order_by('-created_at')[:10]
+        
+        users = CustomUser.objects.filter(
+            Q(username__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(email__icontains=query)
+        ).order_by('username')[:10]
+        
+        context['projects'] = projects
+        context['applications'] = applications
+        context['users'] = users
+        context['has_results'] = projects or applications or users
+    
+    return render(request, 'search_results.html', context)
+
+@login_required
+def edit_profile(request):
+    """Редактирование профиля пользователя (AJAX через модальное окно)"""
+    if request.method == 'POST':
+        form = ProfileEditForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Профиль успешно обновлен!')
+            return redirect('profile')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+            return redirect('profile')
+    
+    return redirect('profile')
+
+def api_applications(request):
+    """API для получения списка заявок (кандидатов)"""
+    applications = Application.objects.filter(status='approved').order_by('-created_at')
+    
+    data = []
+    for app in applications:
+        data.append({
+            'id': app.id,
+            'contact_first_name': app.contact_first_name,
+            'contact_last_name': app.contact_last_name,
+            'contact_email': app.contact_email,
+            'contact_phone': app.contact_phone,
+            'organization_name': app.organization_name,
+            'skill_list': app.skill_list,
+            'age': app.age,
+            'team_role': app.team_role,
+            'team_role_display': dict(Application.TEAM_ROLE_CHOICES).get(app.team_role, ''),
+            'status': app.status,
+        })
+    
     return JsonResponse(data, safe=False)

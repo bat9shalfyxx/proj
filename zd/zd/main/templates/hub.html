@@ -1,4 +1,10 @@
 {% extends "index.html" %}
+{% load static %}
+
+{% block extra_js %}
+<script src="{% static 'main/scripts/hub-search.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
     <div class="hubPage">
         <section class="section-1">
@@ -13,10 +19,15 @@
         
                 <div class="main-content">
                     <div class="main-content-info">
-                        <div class="main-input">
-                            <input type="text" placeholder="Поиск" />
-                            <img src="../../static/main/src/profile/lupka.svg" alt="лупа" class="link">
-                        </div>
+                        <form class="main-input" action="{% url 'global_search' %}" method="get">
+                            <input type="search" 
+                                name="q" 
+                                placeholder="Поиск по проектам, заявкам, пользователям..." 
+                                value="{{ request.GET.q }}">
+                            <button type="submit" class="search-btn" style="background: none; border: none; cursor: pointer;">
+                                <img src="../../static/main/src/profile/lupka.svg" alt="лупа" class="link">
+                            </button>   
+                        </form>
         
                         <div class="main-grid">
                             <div class="main-grid-less">
@@ -149,7 +160,7 @@
                     Узнайте, какими проектами поддержки <br />
                     уже воспользовались участники ЦНП
                 </p>
-                <a class="sec3-header-link">
+                <a class="sec3-header-link" href="{% url 'all_projects' %}">
                     Смотреть все проекты
                     <img src="../../static/main/src/section3/right-arrow.svg" alt="arrow" />
                 </a>

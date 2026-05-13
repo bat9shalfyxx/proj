@@ -1,103 +1,495 @@
-.requirement-row {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 10px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+/* profile.css - полные стили для страницы профиля */
 
-    input {
-        margin-bottom: 10px;
-    }
+/* Основной контейнер */
+.profilePage {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #a7182d 60%, #fff 40%);
+    padding: 100px 40px;
 }
-.requirement-row > div {
-    padding: 0 5px;
+
+.profile-container {
+    max-width: 1400px;
+    margin: 0 auto;
 }
-.form-input {
-    margin-bottom: 5px;
+
+.profile-main-content {
+    display: flex;
+    gap: 30px;
+    position: relative;
 }
-.formset-separator {
-    border: 0;
-    height: 1px;
-    background: #eee;
+
+/* Сайдбар */
+.sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 100px;
+    height: fit-content;
 }
-.alert.alert-danger {
-    color: red;
-    font-size: 0.9em;
-    margin-top: 5px;
+
+.sidebar-menu-header p {
+    font-size: 22px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
 }
-.remove-requirement-btn {
-    margin-top: 5px;
-}
-.reqs-form-holder {
-    display: grid;
-    margin-bottom: 10px;
-}
-.form-group {
-    display: grid;
+
+.sidebar-list {
+    display: flex;
+    flex-direction: column;
     gap: 10px;
 }
-.col-md-5, .col-md-4, .col-md-2 {
-    display: grid;
-    padding: 0 5px;
+
+.sidebar-el {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
-////
-.profile {
-    &-container {
-        position: relative;
-        height: 100%;
-        min-height: 100vh;
-        padding: clamp(50px, 7vw, 87px) clamp(100px, 10vw, 200px);
-        background: linear-gradient(to bottom, var(--light-red-col), var(--dark-gray-col), var(--light-red-col));
+
+.sidebar-el:hover {
+    background: rgba(167, 24, 45, 0.1);
+    transform: translateX(5px);
+}
+
+.sidebar-el.active {
+    background: linear-gradient(135deg, #a7182d 0%, #764ba2 100%);
+}
+
+.sidebar-el.active p {
+    color: white;
+}
+
+.sidebar-el.active img {
+    filter: brightness(0) invert(1);
+}
+
+.sidebar-img {
+    width: 24px;
+    height: 24px;
+}
+
+.sidebar-el p {
+    margin: 0;
+    font-size: 16px;
+    color: #555;
+    font-weight: 500;
+}
+
+/* Основной блок профиля */
+.profile-block {
+    flex: 1;
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Хедер профиля */
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 25px;
+    border-bottom: 2px solid #f0f0f0;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.profile-header-left {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+/* Аватарка */
+.profile-header-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #a7182d;
+    background: #f5f5f5;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.profile-header-img:hover {
+    transform: scale(1.02);
+    box-shadow: 0 5px 20px rgba(167, 24, 45, 0.3);
+}
+
+.profile-header-left h2 {
+    font-size: 28px;
+    color: #333;
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Ручка редактирования */
+.pen {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    background: #f5f5f5;
+    flex-shrink: 0;
+}
+
+.pen:hover {
+    background: rgba(167, 24, 45, 0.1);
+    transform: rotate(15deg);
+}
+
+/* Карточки действий */
+.add-organization,
+.create-project {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.add-organization:hover,
+.create-project:hover {
+    background: #f0f0f0;
+    transform: translateX(8px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.add-organization p,
+.create-project p {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    color: #666;
+}
+
+.add-organization span,
+.create-project span {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+}
+
+.add-organization button,
+.create-project button {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #a7182d 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.add-organization button:hover,
+.create-project button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(167, 24, 45, 0.3);
+}
+
+/* Кнопка меню (мобильная) */
+.profile-menu-btn {
+    display: none;
+}
+
+/* ===== АДАПТИВНОСТЬ ===== */
+
+/* Ноутбуки и ПК (1280px - 1920px) */
+@media (min-width: 1280px) and (max-width: 1920px) {
+    .profilePage {
+        padding: 120px 60px;
     }
-    &-main-content {
-        position: relative;
-        min-height: 100vh;
-        display: flex;
-        margin: 0 auto;
-        padding: clamp(12px, 2vw, 48px) clamp(12px, 3.3vw, 61px);
-        border-radius: clamp(20px, 4vw, 50px);
-        background: linear-gradient(to bottom, var(--light-col), var(--light-gray-col));
+
+    .profile-container {
+        max-width: 1600px;
     }
-    &-block {
-        height: fit-content;
-        padding: clamp(5px, 1vw, 10px) clamp(40px, 4vw, 90px);
-        display: grid;
-        text-align: left;
-        margin-bottom: 150px;
+    
+    .profile-block {
+        padding: 50px;
     }
-    &-menu-btn {
-        display: none;  
+    
+    .profile-header-img {
+        width: 240px;
+        height: 240px;
+    }
+    
+    .profile-header-left h2 {
+        font-size: 32px;
+    }
+    
+    .pen {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .sidebar {
+        width: 320px;
+        padding: 30px;
+    }
+    
+    .sidebar-el {
+        padding: 14px 18px;
+    }
+    
+    .sidebar-el p {
+        font-size: 17px;
+    }
+    
+    .add-organization,
+    .create-project {
+        padding: 30px;
+    }
+    
+    .add-organization span,
+    .create-project span {
+        font-size: 22px;
     }
 }
 
-.sidebar {
-    &-menu-header {
-        display: flex;
-        font-size: clamp(20px, 7vw, 40px) !important;
-        color: var(--dark-col);
-        margin-bottom: clamp(34px, 12vw, 60px);
+/* Большие экраны (1920px+) */
+@media (min-width: 1920px) {
+    .profilePage {
+        padding: 140px 80px;
+    }
+    
+    .profile-container {
+        max-width: 1800px;
+    }
+    
+    .profile-block {
+        padding: 60px;
+    }
+    
+    .profile-header-img {
+        width: 160px;
+        height: 160px;
+        border-width: 5px;
+    }
+    
+    .profile-header-left h2 {
+        font-size: 38px;
+    }
+    
+    .pen {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .sidebar {
+        width: 350px;
+        padding: 35px;
+    }
+    
+    .sidebar-el p {
+        font-size: 18px;
+    }
+}
 
-        .sidebar-cross {
-            width: clamp(12px, 4vw, 25px);
-        }
+/* Планшеты (768px - 1279px) */
+@media (max-width: 1279px) and (min-width: 768px) {
+    .profilePage {
+        padding: 80px 30px;
     }
-    &-list {
+    
+    .profile-main-content {
+        gap: 20px;
+    }
+    
+    .sidebar {
+        width: 240px;
+        padding: 20px;
+    }
+    
+    .profile-block {
+        padding: 30px;
+    }
+    
+    .profile-header-img {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .profile-header-left h2 {
+        font-size: 24px;
+    }
+    
+    .pen {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+/* Мобильные устройства (до 768px) */
+@media (max-width: 768px) {
+    .profilePage {
+        padding: 70px 15px;
+    }
+    
+    .profile-main-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .sidebar {
+        width: 100%;
+        position: static;
+        padding: 20px;
+    }
+    
+    .sidebar-list {
         display: grid;
-        gap: clamp(10px, 4vw, 30px);
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
     }
-    &-el {
-        display: flex;
+    
+    .sidebar-el {
+        justify-content: center;
+    }
+    
+    .profile-block {
+        padding: 25px;
+    }
+    
+    .profile-header {
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+    
+    .profile-header-left {
+        gap: 20px;
+    }
+    
+    .profile-header-img {
+        width: 90px;
+        height: 90px;
+        border-width: 3px;
+    }
+    
+    .profile-header-left h2 {
+        font-size: 20px;
+    }
+    
+    .pen {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .add-organization,
+    .create-project {
+        padding: 20px;
+    }
+    
+    .add-organization span,
+    .create-project span {
+        font-size: 18px;
+    }
+    
+    .add-organization button,
+    .create-project button {
+        width: 100%;
+        padding: 12px;
+    }
+    
+    .profile-menu-btn {
+        display: block;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 100;
+    }
+}
+
+/* Маленькие мобильные (до 480px) */
+@media (max-width: 480px) {
+    .profilePage {
+        padding: 60px 12px;
+    }
+    
+    .profile-block {
+        padding: 20px;
+    }
+    
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .profile-header-left {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .profile-header-img {
+        width: 75px;
+        height: 75px;
+    }
+    
+    .profile-header-left h2 {
+        font-size: 18px;
+    }
+    
+    .pen {
+        align-self: flex-end;
+    }
+    
+    .sidebar-list {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .sidebar-el {
+        padding: 10px 12px;
+    }
+    
+    .sidebar-el p {
+        font-size: 13px;
+    }
+    
+    .sidebar-img {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* Очень маленькие (до 360px) */
+@media (max-width: 360px) {
+    .profile-header-left {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
         align-items: center;
-        font-size: clamp(14px, 4vw, 31px);
-        
-        color: var(--dark-col);
-        border-radius: 20px;
-        cursor: pointer;
-        background: var(--light-col);
     }
-    &-onclick   {
-        padding: 4px clamp(6px, 3vw, 19px);  
+    
+    .profile-header-img {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .profile-header-left h2 {
+        font-size: 18px;
+    }
+    
+    .sidebar-list {
+        grid-template-columns: 1fr;
     }
 }

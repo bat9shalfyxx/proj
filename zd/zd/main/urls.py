@@ -34,4 +34,10 @@ urlpatterns = [
     # AJAX валидация
     path('validate-email/', views.validate_email, name='validate_email'),
     path('validate-phone/', views.validate_phone, name='validate_phone'),
+    # Поиск
+    path('search/', views.global_search, name='global_search'),
+    # Edit
+    path('profile/edit/', views.edit_profile, name='edit_profile'),
+    # api заявок
+    path('api/applications/', views.api_applications, name='api_applications'),
 ]

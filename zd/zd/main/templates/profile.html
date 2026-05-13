@@ -46,15 +46,69 @@
                     <div class="profile-block block-1">
                         <div class="profile-header">
                             <div class="profile-header-left">
-                                <img src="{% static 'main/src/profile/img-placeholder.svg' %}" alt="img-placeholder" class="profile-header-img">
-                                
-                                {% if user.is_authenticated %}
-                                    <h2>{{ user.username }}</h2>
+                                {% if user.profile_image %}
+                                    <img src="{{ user.profile_image.url }}" alt="{{ user.username }}" class="profile-header-img">
                                 {% else %}
-                                    <h2>Здесь будет <br>ваше имя</h2>
-                                {% endif %}            
+                                    <img src="{% static 'main/src/profile/img-placeholder.svg' %}" alt="img-placeholder" class="profile-header-img">
+                                {% endif %}
+                                <h2>{{ user.username }}</h2>
                             </div>
                             <img src="{% static 'main/src/profile/pen.svg' %}" alt="pen" class="link pen">
+                        </div>
+
+                        <div class="modal-overlay" id="editProfileModal" style="display: none;">
+                            <div class="modal-container">
+                                <div class="modal-header">
+                                    <h3>Редактирование профиля</h3>
+                                    <button class="modal-close" onclick="closeEditModal()">&times;</button>
+                                </div>
+                                
+                                <form method="post" action="{% url 'edit_profile' %}" enctype="multipart/form-data" id="editProfileForm">
+                                    {% csrf_token %}
+                                    
+                                    <div class="modal-body">
+                                        <div class="avatar-section">
+                                            <div class="current-avatar">
+                                                {% if user.profile_image %}
+                                                    <img src="{{ user.profile_image.url }}" alt="avatar" id="currentAvatar">
+                                                {% else %}
+                                                    <img src="{% static 'main/src/profile/img-placeholder.svg' %}" alt="avatar" id="currentAvatar">
+                                                {% endif %}
+                                            </div>
+                                            <label for="id_profile_image" class="upload-btn">
+                                                Загрузить новое фото
+                                            </label>
+                                            {{ form.profile_image }}
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Имя пользователя</label>
+                                            {{ form.username }}
+                                        </div>
+                                        
+                                        <div class="form-row">
+                                            <div class="form-group half">
+                                                <label>Имя</label>
+                                                {{ form.first_name }}
+                                            </div>
+                                            <div class="form-group half">
+                                                <label>Фамилия</label>
+                                                {{ form.last_name }}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Email</label>
+                                            {{ form.email }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn-cancel" onclick="closeEditModal()">Отмена</button>
+                                        <button type="submit" class="btn-save">Сохранить изменения</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
 
                         <div class="add-organization">
@@ -81,69 +135,60 @@
                     </div>
         
                     <div class="profile-block block-2" style="display: none;">
-                        <h2>Заявки</h2>
+                        <h2>Мои заявки</h2>
 
-                        <ul class="profile-second-select-list">
-                            <li class="profile-second-select">
-                                <p>Аккаунты</p>
-                                <select name="Аккаунты" id="fitsr">Аккаунты</select>
-                            </li>
-        
-                            <li class="profile-second-select">
-                                <p>Тип усслуги</p>
-                                <select name="Тип усслуги" id="second">Тип усслуги</select>
-                            </li>
-        
-                            <li class="profile-second-select">
-                                <p>Номер заявки</p>
-                                <select name="Номер заявки" id="fird">Номер заявки</select>
-                            </li>
-                        </ul>
-        
                         <div class="profile-second-btn-row">
-                            <a href="#!" class="profile-row-el">Все</a>
-                            <a href="#!" class="profile-row-el">На рассмотрении</a>
-                            <a href="#!" class="profile-row-el">Ждет вашего ответа</a>
-                            <a href="#!" class="profile-row-el">Одобренные</a>
-                            <a href="#!" class="profile-row-el">Отклоненные</a>
-                            <a href="#!" class="profile-row-el">Черновики</a>
+                            <button class="profile-row-el filter-status-btn active" data-status="all">Все</button>
+                            <button class="profile-row-el filter-status-btn" data-status="new">Новые</button>
+                            <button class="profile-row-el filter-status-btn" data-status="in_progress">В обработке</button>
+                            <button class="profile-row-el filter-status-btn" data-status="approved">Одобренные</button>
+                            <button class="profile-row-el filter-status-btn" data-status="rejected">Отклоненные</button>
                         </div>
-        
+
                         <div class="filter-controls">
                             <label for="filter-skills-js">Фильтровать по навыкам (через запятую):</label>
                             <input type="text" id="filter-skills-js" placeholder="Например: Python, JS">
-                            
                             <button id="apply-filter-js">Применить фильтр</button>
                             <button id="reset-filter-js">Сбросить фильтр</button>
                         </div>
 
-                        {% block requests-display %}
-                            {% if applications %}   
-                            <div class="profile-second-request-list">
-                                {% for el in applications%}
-                                    <div class="profile-second-request-el">
-                                        <h3>Заявка № {{ el.id }}</h3>
-                                        <p>{{ el.organization_name }}</p>
-                                        <p>Инициатор: {{ el.contact_first_name }} {{ el.contact_last_name }}</p>
-                                        <p>{{ el.solution_name }}</p>
-                                        <p class="skillList">{{ el.skill_list }}</p>
-                                        <p>Итоговая сумма: {{ total_price }}</p>
+                        {% if applications %}
+                            <div class="profile-second-request-list" id="applications-list">
+                                {% for app in applications %}
+                                    <div class="profile-second-request-el" 
+                                        data-status="{{ app.status }}"
+                                        data-skills="{{ app.skill_list|lower }}">
+                                        <h3>Заявка №{{ app.id }}</h3>
+                                        <p><strong>Организация:</strong> {{ app.organization_name }}</p>
+                                        <p><strong>Инициатор:</strong> {{ app.contact_first_name }} {{ app.contact_last_name }}</p>
+                                        <p><strong>Телефон:</strong> {{ app.contact_phone }}</p>
+                                        <p><strong>Email:</strong> {{ app.contact_email }}</p>
+                                        <p><strong>Роль в команде:</strong> {{ app.get_team_role_display|default:"Не указана" }}</p>
+                                        <p><strong>Возраст:</strong> {{ app.age|default:"Не указан" }}</p>
+                                        <p><strong>Навыки:</strong> {{ app.skill_list|default:"Не указаны" }}</p>
+                                        <p><strong>Статус:</strong> 
+                                            {% if app.status == 'new' %}Новая
+                                            {% elif app.status == 'in_progress' %}В обработке
+                                            {% elif app.status == 'approved' %}Одобрена
+                                            {% elif app.status == 'rejected' %}Отклонена
+                                            {% else %}{{ app.status }}{% endif %}
+                                        </p>
+                                        <p><strong>Дата создания:</strong> {{ app.created_at|date:"d.m.Y H:i" }}</p>
                                     </div>
-                                    {% endfor %}    
+                                {% endfor %}
                             </div>
-                            {% else %}
-                                <div class="profile-second-not-found">
-                                    <div class="not-found-block">
-                                        <img src="../../static/main/src/profile/search.svg" alt="">
-                                        <h2>Ничего не найдено</h2>
-                                    </div>
-                                    <p>Попробуйте изменить условия поиска</p>
-                                    <a href="#!">
-                                        <button class="reset-filters">Сбросить фильтры</button>
-                                    </a>
+                        {% else %}
+                            <div class="profile-second-not-found">
+                                <div class="not-found-block">
+                                    <img src="{% static 'main/src/profile/search.svg' %}" alt="не найдено">
+                                    <h2>У вас пока нет заявок</h2>
                                 </div>
-                            {% endif %}
-                        {% endblock %}
+                                <p>Создайте заявку, чтобы начать поиск команды</p>
+                                <a href="{% url 'form_page' %}">
+                                    <button class="reset-filters">Создать заявку</button>
+                                </a>
+                            </div>
+                        {% endif %}
                     </div>
         
                     <div class="profile-block block-3" style="display: none;">
@@ -351,4 +396,103 @@
             </div>
         </div>
     </div>
+
+<script>
+ document.addEventListener('DOMContentLoaded', function() {
+    const statusBtns = document.querySelectorAll('.filter-status-btn');
+    const applyBtn = document.getElementById('apply-filter-js');
+    const resetBtn = document.getElementById('reset-filter-js');
+    const filterInput = document.getElementById('filter-skills-js');
+    
+    let currentStatus = 'all';
+    let currentSkills = '';
+    
+    function filterApplications() {
+        const items = document.querySelectorAll('#applications-list .profile-second-request-el');
+        let visibleCount = 0;
+        
+        items.forEach(item => {
+            const status = item.dataset.status;
+            const skills = item.dataset.skills || '';
+            
+            let showByStatus = (currentStatus === 'all' || status === currentStatus);
+            
+            let showBySkills = true;
+            if (currentSkills) {
+                const skillList = currentSkills.toLowerCase().split(',').map(s => s.trim());
+                showBySkills = skillList.some(skill => skills.includes(skill));
+            }
+            
+            if (showByStatus && showBySkills) {
+                item.style.display = 'block';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        // Показываем сообщение если ничего не найдено
+        let noResultsMsg = document.getElementById('no-results-message');
+        if (visibleCount === 0 && items.length > 0) {
+            if (!noResultsMsg) {
+                const msgDiv = document.createElement('div');
+                msgDiv.id = 'no-results-message';
+                msgDiv.className = 'profile-second-not-found';
+                msgDiv.innerHTML = `
+                    <div class="not-found-block">
+                        <img src="{% static 'main/src/profile/search.svg' %}" alt="не найдено">
+                        <h3>Ничего не найдено</h3>
+                    </div>
+                    <p>Попробуйте изменить условия поиска</p>
+                    <button class="reset-filters" onclick="resetFilters()">Сбросить фильтры</button>
+                `;
+                document.getElementById('applications-list').after(msgDiv);
+            }
+        } else if (noResultsMsg) {
+            noResultsMsg.remove();
+        }
+    }
+    
+    // Обработчики кнопок статуса
+    statusBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            statusBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentStatus = this.dataset.status;
+            filterApplications();
+        });
+    });
+    
+    // Применить фильтр
+    if (applyBtn) {
+        applyBtn.addEventListener('click', function() {
+            currentSkills = filterInput.value.trim();
+            filterApplications();
+        });
+    }
+    
+    // Сброс фильтров
+    window.resetFilters = function() {
+        currentStatus = 'all';
+        currentSkills = '';
+        filterInput.value = '';
+        
+        statusBtns.forEach(btn => {
+            if (btn.dataset.status === 'all') {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        
+        filterApplications();
+    };
+    
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetFilters);
+    }
+});
+</script>
+
+
 {% endblock %}

@@ -1,0 +1,129 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}Поиск: {{ query }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'main/css/_search_results.scss' %}">
+{% endblock %}
+
+{% block content %}
+<div class="search-results-page">
+    <div class="container">
+        <div class="page-header">
+            <h1>Результаты поиска</h1>
+            <p>По запросу: <strong>"{{ query }}"</strong></p>
+            
+            <form class="search-form" action="{% url 'global_search' %}" method="get">
+                <div class="search-wrapper">
+                    <input type="search" 
+                           name="q" 
+                           value="{{ query }}" 
+                           placeholder="Уточните поиск...">
+                    <button type="submit" class="search-submit">
+                        <img src="{% static 'main/src/profile/lupka.svg' %}" alt="искать">
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {% if has_results %}
+            {% if projects %}
+            <div class="results-section">
+                <h2>Проекты <span class="results-count">{{ projects|length }}</span></h2>
+                <div class="results-grid">
+                    {% for project in projects %}
+                    <div class="result-card project-card">
+                        <div class="result-icon project-icon">📁</div>
+                        <div class="result-content">
+                            <h3>
+                                <a href="{% url 'project_detail' project.id %}">{{ project.name }}</a>
+                            </h3>
+                            <p class="result-description">{{ project.description|truncatechars:120 }}</p>
+                            <div class="result-meta">
+                                <span class="meta-tag">Автор: {{ project.creator.username }}</span>
+                                <span class="meta-tag status-{{ project.status }}">{{ project.get_status_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if projects|length == 10 %}
+                <div class="view-all">
+                    <a href="{% url 'all_projects' %}?q={{ query }}" class="view-all-link">
+                        Показать все проекты →
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if applications %}
+            <div class="results-section">
+                <h2>Заявки <span class="results-count">{{ applications|length }}</span></h2>
+                <div class="results-grid">
+                    {% for app in applications %}
+                    <div class="result-card application-card">
+                        <div class="result-icon app-icon">📄</div>
+                        <div class="result-content">
+                            <h3>
+                                <a href="{% url 'profile' %}?app={{ app.id }}">{{ app.organization_name }}</a>
+                            </h3>
+                            <p class="result-author">{{ app.contact_first_name }} {{ app.contact_last_name }}</p>
+                            <p class="result-description">{{ app.solution_description|truncatechars:100|default:"Нет описания" }}</p>
+                            <div class="result-meta">
+                                <span class="meta-tag skill-tag">Навыки: {{ app.skill_list|truncatechars:50 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="view-all">
+                    <a href="{% url 'create_team' %}?q={{ query }}" class="view-all-link">
+                        Смотреть все заявки →
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if users %}
+            <div class="results-section">
+                <h2>Пользователи <span class="results-count">{{ users|length }}</span></h2>
+                <div class="results-grid users-grid">
+                    {% for user in users %}
+                    <div class="result-card user-card">
+                        <div class="result-icon user-icon">👤</div>
+                        <div class="result-content">
+                            <h3>
+                                <a href="{% url 'profile' %}?user={{ user.id }}">{{ user.get_full_name|default:user.username }}</a>
+                            </h3>
+                            <p class="result-meta">{{ user.email }}</p>
+                            {% if user.phone_number %}
+                            <p class="result-meta">{{ user.phone_number }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        {% else %}
+            <div class="no-results">
+                <img src="{% static 'main/src/profile/lupka.svg' %}" alt="ничего не найдено" class="no-results-icon">
+                <h3>Ничего не найдено</h3>
+                <p>Попробуйте изменить поисковый запрос</p>
+                <div class="suggestions">
+                    <span>Возможно, вы искали:</span>
+                    <ul>
+                        <li>проект по Python</li>
+                        <li>frontend разработчика</li>
+                        <li>свой профиль</li>
+                        <li>инвестиции в IT</li>
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -66,16 +66,6 @@ if (profilePage) {
                 switchContent(6, e.target);
             }
         });
-        a
-        const profileTeamHolder = document.querySelector('.profile-team-list');
-        
-        const teamHTML = sessionStorage.getItem('newTeamData');
-        
-        profileTeamHolder.appendChild(teamHTML);
-        
-        sessionStorage.removeItem('newTeamData');
-    });
-    
-    document.addEventListener('DOMContentLoaded', () => {
     });
 }
+

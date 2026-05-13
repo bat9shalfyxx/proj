@@ -13,9 +13,9 @@
     
     <script src="../../static/main/scripts/profileScript.js" defer></script>
     <script src="../../static/main/scripts/formPage.js" defer></script>
-    <script src="../../static/main/scripts/budget.js" defer></script>
     <script src="../../static/main/scripts/nav.js" defer></script>
     <script src="../../static/main/scripts/skills.js" defer></script>
+    <script src="../../static/main/scripts/skillsFiltration.js" defer></script>
     <script src="../../static/main/scripts/createProject.js" defer></script>
     {% include "scripts.html" %}
 
@@ -37,7 +37,7 @@
                 <div class="header-right">
                     {% if user.is_authenticated %}
                     <div class="header-right-info">
-                        <a class="link req-btn" href="{% url 'form_page' %}">заявки</a>
+                        <a class="link req-btn" href="{% url 'form_page' %}">заявка</a>
                     </div>
                     <div class="header-right-info" style="margin-left: 8px;">
                         <a class="link req-btn" href="{% url 'all_projects' %}">проекты</a>

@@ -6,8 +6,8 @@
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid var(--dark-col);
-    padding: 42px 70px 16px;
-
+    padding: 38px 60px 14px;
+    
     &-left {
         display: flex;
         align-items: center;
@@ -15,12 +15,11 @@
         &-info {
             display: flex;
             align-items: center;
-            margin-left:  clamp(20px, 5vw, 90px);
+            margin-left:  clamp(20px, 3.5vw, 50px);
             font-size: clamp(14px, 3vw, 19px);
             
-            a,
-            p {
-                font-size: clamp(13px, 3vw, 25px);
+            a, p {
+                font-size: clamp(12px, 2vw, 20px);
                 margin: 0 10px;
                 color: var(--dark-gray-col);
             }
@@ -29,6 +28,7 @@
     
     &-right {
         display: flex;
+        justify-content: space-between;
         align-items: center;
         
         &-info {
@@ -530,23 +530,6 @@
 
     }
 
-    &-input {
-        display: flex;
-        justify-content: space-between;
-        padding-right: 10px;
-        font-size: clamp(12px, 2vw, 23px);
-        color: var(--dark-col);
-        opacity: 0.5;
-        border-radius: 35px;
-        border: 2px solid var(--dark-col, 0.5);
-        margin-bottom: 70px;
-        
-        input {
-            padding: 22px 40px;
-            width: 100%;
-        }
-    }
-
     &-for-buisness {
         margin: 20px 0 50px 110px;
         font-size: clamp(14px, 3.7vw, 40px);
@@ -625,3 +608,124 @@
     }
 }
 
+.main-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border-radius: 35px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    margin-bottom: 30px;
+    
+    &:focus-within {
+        border-color: #a7182d;
+        box-shadow: 0 0 0 3px rgba(167, 24, 45, 0.1);
+    }
+    
+    input {
+        flex: 1;
+        padding: 14px 20px;
+        border: none;
+        background: transparent;
+        font-size: 14px;
+        outline: none;
+        
+        &::placeholder {
+            color: #999;
+            font-size: 14px;
+        }
+    }
+    
+    img {
+        width: 20px;
+        height: 20px;
+        margin-right: 18px;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: all 0.3s ease;
+        
+        &:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        
+        &:active {
+            transform: scale(0.95);
+        }
+    }
+}
+
+.search-results-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    
+    .results-count {
+        font-size: 14px;
+        color: #666;
+        
+        strong {
+            color: #a7182d;
+            font-size: 16px;
+        }
+    }
+    
+    .clear-search {
+        background: none;
+        border: none;
+        color: #a7182d;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 5px 10px;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        
+        &:hover {
+            background: rgba(167, 24, 45, 0.1);
+        }
+    }
+}
+
+.projects-skeleton {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+    
+    .skeleton-card {
+        background: #f0f0f0;
+        border-radius: 15px;
+        padding: 20px;
+        animation: pulse 1.5s ease-in-out infinite;
+        
+        .skeleton-title {
+            height: 24px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            width: 70%;
+        }
+        
+        .skeleton-text {
+            height: 60px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .skeleton-meta {
+            height: 40px;
+            background: #e0e0e0;
+            border-radius: 4px;
+        }
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}

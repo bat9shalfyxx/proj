@@ -83,6 +83,12 @@ class CustomUser(AbstractUser):
         blank=True,
         null=True
     )
+    profile_image = models.ImageField(
+        'Фото профиля',
+        upload_to='profile_images/%Y/%m/',
+        blank=True,
+        null=True
+    )
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []  # username не требуется при создании

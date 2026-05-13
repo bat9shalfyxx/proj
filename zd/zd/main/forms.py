@@ -596,3 +596,30 @@ class QuickRequirementForm(forms.Form):
     skill_name = forms.CharField(max_length=200)
     level = forms.ChoiceField(choices=ProjectRequirement.SKILL_LEVEL_CHOICES, required=False)
     people_count = forms.IntegerField(min_value=1, initial=1)
+
+class ProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'first_name', 'last_name', 'email', 'profile_image']
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Имя пользователя'
+            }),
+            'first_name': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Имя'
+            }),
+            'last_name': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Фамилия'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Email'
+            }),
+            'profile_image': forms.FileInput(attrs={
+                'class': 'form-input-file',
+                'accept': 'image/*'
+            }),
+        }
