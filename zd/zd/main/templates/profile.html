@@ -135,7 +135,7 @@
                     </div>
         
                     <div class="profile-block block-2" style="display: none;">
-                        <h2>Мои заявки</h2>
+                        <h2>Заявки всех пользователей</h2>
 
                         <div class="profile-second-btn-row">
                             <button class="profile-row-el filter-status-btn active" data-status="all">Все</button>
@@ -176,17 +176,6 @@
                                         <p><strong>Дата создания:</strong> {{ app.created_at|date:"d.m.Y H:i" }}</p>
                                     </div>
                                 {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="profile-second-not-found">
-                                <div class="not-found-block">
-                                    <img src="{% static 'main/src/profile/search.svg' %}" alt="не найдено">
-                                    <h2>У вас пока нет заявок</h2>
-                                </div>
-                                <p>Создайте заявку, чтобы начать поиск команды</p>
-                                <a href="{% url 'form_page' %}">
-                                    <button class="reset-filters">Создать заявку</button>
-                                </a>
                             </div>
                         {% endif %}
                     </div>
@@ -491,6 +480,91 @@
     if (resetBtn) {
         resetBtn.addEventListener('click', resetFilters);
     }
+});
+// Функции для модального окна
+function openEditModal() {
+    document.getElementById('editProfileModal').style.display = 'flex';
+}
+
+function closeEditModal() {
+    document.getElementById('editProfileModal').style.display = 'none';
+}
+
+// Закрытие по клику на оверлей
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('editProfileModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeEditModal();
+            }
+        });
+    }
+    
+    // Превью загружаемого фото
+    const imageInput = document.getElementById('id_profile_image');
+    const currentAvatar = document.getElementById('currentAvatar');
+    
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    currentAvatar.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+
+// Обработчик для кнопки редактирования (ручка)
+document.querySelector('.pen')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    openEditModal();
+});
+
+document.getElementById('editProfileForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Обновляем данные на странице
+            document.querySelector('.profile-header-left h2').textContent = data.username;
+            
+            // Обновляем фото, если оно изменилось
+            if (data.profile_image) {
+                const avatarImg = document.querySelector('.profile-header-img');
+                avatarImg.src = data.profile_image;
+            }
+            
+            closeEditModal();
+            // Показываем сообщение об успехе (можно добавить toast)
+            alert('Профиль успешно обновлен!');
+        } else {
+            // Показываем ошибки
+            let errorMsg = 'Ошибка:\n';
+            for (const [field, errors] of Object.entries(data.errors)) {
+                errorMsg += `${field}: ${errors.join(', ')}\n`;
+            }
+            alert(errorMsg);
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при сохранении');
+    });
 });
 </script>
 

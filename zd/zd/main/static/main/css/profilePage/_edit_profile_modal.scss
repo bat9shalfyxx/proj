@@ -1,0 +1,87 @@
+/* Стили для формы редактирования */
+.modal-overlay {
+
+    .form-input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+        background: white;
+    }
+    
+    .form-input:focus {
+        border-color: #a7182d;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(167, 24, 45, 0.1);
+    }
+    
+    .form-input-file {
+        display: none;
+    }
+    
+    .upload-btn {
+        display: inline-block;
+        padding: 8px 20px;
+        background: #f0f0f0;
+        color: #a7182d;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .upload-btn:hover {
+        background: #a7182d;
+        color: white;
+    }
+    
+    .form-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .form-row .half {
+        flex: 1;
+    }
+    
+    .modal-container {
+        max-width: 500px;
+        width: 90%;
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .modal-footer {
+        padding: 15px 20px;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    
+    .btn-cancel, .btn-save {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    
+    .btn-cancel {
+        background: #f0f0f0;
+        color: #666;
+    }
+    
+    .btn-save {
+        background: linear-gradient(135deg, #a7182d 0%, #764ba2 100%);
+        color: white;
+    }
+}

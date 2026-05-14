@@ -1810,7 +1810,6 @@
   border-bottom: 3px dotted var(--light-col);
 }
 
-/* profile.css - полные стили для страницы профиля */
 /* Основной контейнер */
 .profilePage {
   min-height: 100vh;
@@ -2250,6 +2249,79 @@
     grid-template-columns: 1fr;
   }
 }
+/* Стили для формы редактирования */
+.modal-overlay .form-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s;
+  background: white;
+}
+.modal-overlay .form-input:focus {
+  border-color: #a7182d;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(167, 24, 45, 0.1);
+}
+.modal-overlay .form-input-file {
+  display: none;
+}
+.modal-overlay .upload-btn {
+  display: inline-block;
+  padding: 8px 20px;
+  background: #f0f0f0;
+  color: #a7182d;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+.modal-overlay .upload-btn:hover {
+  background: #a7182d;
+  color: white;
+}
+.modal-overlay .form-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+.modal-overlay .form-row .half {
+  flex: 1;
+}
+.modal-overlay .modal-container {
+  max-width: 500px;
+  width: 90%;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+}
+.modal-overlay .modal-body {
+  padding: 20px;
+}
+.modal-overlay .modal-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.modal-overlay .btn-cancel, .modal-overlay .btn-save {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.modal-overlay .btn-cancel {
+  background: #f0f0f0;
+  color: #666;
+}
+.modal-overlay .btn-save {
+  background: linear-gradient(135deg, #a7182d 0%, #764ba2 100%);
+  color: white;
+}
+
 @media screen and (max-width: 1830px) {
   .main-img {
     display: none;
@@ -2538,7 +2610,6 @@
     transform: translateY(0);
   }
 }
-/* Адаптивность */
 @media (max-width: 768px) {
   .name-fields {
     grid-template-columns: 1fr;
@@ -2584,12 +2655,10 @@
   box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
-/* Контейнер для навыков */
 .skills-container {
   min-height: 100px;
 }
 
-/* Группа навыков */
 .skill-group {
   margin-bottom: 20px;
 }
@@ -2615,7 +2684,6 @@
   gap: 10px;
 }
 
-/* Элемент навыка */
 .skill-item {
   display: inline-flex;
   align-items: center;
@@ -2663,7 +2731,6 @@
   transform: scale(1.2);
 }
 
-/* Модальное окно */
 .skill-modal-overlay {
   position: fixed;
   top: 0;
@@ -2791,7 +2858,6 @@
   box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
-/* Анимации */
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -2812,7 +2878,6 @@
     transform: translateY(0);
   }
 }
-/* Переводы уровней */
 [data-level=expert] .skill-level-badge {
   background: #ffd700;
   color: #000;
@@ -2922,7 +2987,6 @@
   font-family: inherit !important;
 }
 
-/* Стили для полей с ошибками */
 .form-request input.error,
 .form-request textarea.error,
 .form-request select.error {
@@ -2938,7 +3002,6 @@
   padding-left: 5px !important;
 }
 
-/* Стили для блока требований к ресурсам */
 .form-request h2 {
   font-size: 16px !important;
   font-weight: 500 !important;
@@ -2991,7 +3054,6 @@
   background: #404040 !important;
 }
 
-/* Кнопка добавления ресурса */
 .add-requirement-btn {
   width: 100% !important;
   padding: 15px !important;
@@ -3023,7 +3085,6 @@
   font-weight: 600 !important;
 }
 
-/* Кнопка отправки формы */
 .form-button {
   width: 100% !important;
   padding: 15px 30px !important;
@@ -3054,7 +3115,6 @@
   transform: none !important;
 }
 
-/* Стили для групп полей */
 .form-group {
   margin-bottom: 15px !important;
 }
@@ -3067,7 +3127,6 @@
   font-weight: 500 !important;
 }
 
-/* Стили для чекбоксов и радио */
 .form-request input[type=checkbox],
 .form-request input[type=radio] {
   width: auto !important;
@@ -3085,7 +3144,6 @@
   padding: 10px 0 !important;
 }
 
-/* Стили для выпадающего списка */
 .form-request select {
   -webkit-appearance: none !important;
      -moz-appearance: none !important;
