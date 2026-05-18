@@ -569,3 +569,366 @@
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(167, 24, 45, 0.3);
 }
+
+// рекомендуемые кандидаты
+.match-score-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.match-score {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.match-score.match-high {
+    background: #28a745;
+    color: white;
+}
+
+.match-score.match-medium {
+    background: #ffc107;
+    color: #333;
+}
+
+.match-score.match-low {
+    background: #fd7e14;
+    color: white;
+}
+
+.match-score.match-none {
+    background: #6c757d;
+    color: white;
+}
+
+.top-badge {
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    color: #333;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.top-match {
+    border: 2px solid #ffd700;
+    background: linear-gradient(135deg, #fff9e6, #fff);
+}
+
+.top-match-badge {
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    color: #333;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-block;
+    margin-bottom: 12px;
+}
+
+.match-progress {
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 12px 0;
+}
+
+.match-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #a7182d, #764ba2);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f0f0f0;
+    border-top-color: #a7182d;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.candidate-skills {
+    margin-bottom: 15px;
+}
+
+.candidate-skills strong {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* ===== РЕКОМЕНДУЕМЫЕ КАНДИДАТЫ (ТОП-3) ===== */
+.candidate-card.top-match {
+    background: linear-gradient(135deg, #fff9e6 0%, #fff5d6 100%);
+    border: 2px solid #ffd700;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.2);
+}
+
+.candidate-card.top-match::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ffd700, #ff8c00, #ffd700);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -100%; }
+    100% { background-position: 200%; }
+}
+
+.top-match-badge {
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    color: #333;
+    padding: 6px 14px;
+    border-radius: 25px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-block;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+
+.top-badge {
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    color: #333;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 10px;
+}
+
+/* ===== ОБЫЧНЫЕ КАНДИДАТЫ ===== */
+.candidate-card:not(.top-match) {
+    background: white;
+    border: 1px solid #e0e0e0;
+    opacity: 0.85;
+    transition: all 0.3s ease;
+}
+
+.candidate-card:not(.top-match):hover {
+    opacity: 1;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: #a7182d;
+}
+
+/* ===== РАЗДЕЛИТЕЛЬ МЕЖДУ РЕКОМЕНДУЕМЫМИ И ОСТАЛЬНЫМИ ===== */
+.candidates-divider {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 25px 0 20px;
+    padding: 10px 0;
+}
+
+.candidates-divider-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #a7182d, #764ba2, #a7182d, transparent);
+}
+
+.candidates-divider-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #a7182d;
+    background: #fff5f5;
+    padding: 6px 18px;
+    border-radius: 30px;
+    white-space: nowrap;
+}
+
+/* ===== КАРТОЧКИ КАНДИДАТОВ (ОБЩИЕ) ===== */
+.candidate-card {
+    border-radius: 20px;
+    padding: 22px;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.candidate-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.candidate-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 5px 0;
+}
+
+.organization-name {
+    font-size: 13px;
+    color: #a7182d;
+    background: rgba(167, 24, 45, 0.1);
+    padding: 3px 12px;
+    border-radius: 20px;
+}
+
+/* Рейтинг соответствия */
+.match-score-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.match-score {
+    padding: 5px 14px;
+    border-radius: 25px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.match-score.match-high {
+    background: #28a745;
+    color: white;
+}
+
+.match-score.match-medium {
+    background: #ffc107;
+    color: #333;
+}
+
+.match-score.match-low {
+    background: #fd7e14;
+    color: white;
+}
+
+.match-score.match-none {
+    background: #6c757d;
+    color: white;
+}
+
+/* Прогресс-бар соответствия */
+.match-progress {
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.match-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #a7182d, #764ba2);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+/* Детали кандидата */
+.candidate-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.detail-label {
+    font-size: 11px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-value {
+    font-size: 14px;
+    color: #333;
+}
+
+/* Навыки */
+.candidate-skills {
+    margin-bottom: 18px;
+}
+
+.candidate-skills strong {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skill-tag {
+    background: #f0f0f0;
+    color: #666;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.skill-tag.match {
+    background: #a7182d;
+    color: white;
+}
+
+/* Кнопка приглашения */
+.invite-button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #a7182d 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.invite-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(167, 24, 45, 0.4);
+}
+
+/* Заголовок секции */
+.section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #a7182d;
+    display: inline-block;
+}

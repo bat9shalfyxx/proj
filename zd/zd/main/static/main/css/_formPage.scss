@@ -6,7 +6,7 @@
     background: #2d2d2d;
     border-radius: 15px;
     padding: 25px;
-    margin: 20px 0;
+    margin: 10px 0;
     border: 2px solid #404040;
 }
 
@@ -58,7 +58,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 6px;
 }
 
 .field-hint {
@@ -159,12 +159,13 @@
     }
 }
 
-.add-skill-btn {
+.add-skill-btn, .add-key-skill-btn {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
     border-radius: 8px;
     padding: 8px 16px;
+    margin-block: 8px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -174,6 +175,9 @@
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
     }
+}
+.add-key-skill-btn {
+    margin-top: 0px;
 }
 
 .skills-container {
@@ -436,7 +440,7 @@
     padding: 30px;
     background: #2d2d2d;
     border-radius: 10px;
-    border: 2px dashed #404040;
+    border: 4px dashed #404040;
     
     p {
         color: #888;
@@ -459,7 +463,7 @@
 .form-request {
     display: flex !important;
     flex-direction: column !important;
-    gap: 20px !important;
+    gap: 2px !important;
 }
 
 .form-request p {
@@ -817,4 +821,79 @@ summary:hover {
     margin: 0 0 15px !important;
     padding-left: 10px !important;
     border-left: 3px solid #667eea !important;
+}
+
+.technologies-section {
+    h3 {
+        margin-top: 10px;
+    }
+}
+
+.additional-info-field {
+    margin-top: 20px;
+}
+
+.formPage-header {
+    margin-bottom: 40px !important;
+}
+
+///стили для ошибок в форме заявок
+/* Стили для отображения ошибок */
+.field-wrapper {
+    margin-bottom: 10px;
+}
+
+.error-message {
+    color: #ff6b6b;
+    background: rgba(255, 75, 75, 0.15);
+    border-left: 3px solid #ff4757;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 8px;
+    margin-top: 8px;
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Стили для полей с ошибкой */
+.form-input.error,
+.form-select.error,
+.form-textarea.error,
+input.error,
+select.error,
+textarea.error {
+    border-color: #ff4757 !important;
+    background: rgba(255, 71, 87, 0.1) !important;
+}
+
+.form-input.error:focus,
+.form-select.error:focus,
+.form-textarea.error:focus {
+    box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.2) !important;
+}
+
+.non-field-errors {
+    background: rgba(255, 75, 75, 0.15);
+    border: 1px solid #ff4757;
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin: 20px 0;
+}
+
+.non-field-errors .error-message {
+    margin-top: 0;
+    background: transparent;
+    padding: 5px 0;
+}
+
+/* Анимация появления ошибки */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

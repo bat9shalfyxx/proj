@@ -4,7 +4,6 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'main/css/formPage.css' %}">
 <style>
-    /* Улучшенные стили для отступов */
     .personal-section,
     .role-section,
     .organization-section,
@@ -297,7 +296,6 @@
         margin: 0;
     }
     
-    /* Стили для требований исполнителя */
     .budget-section h4 {
         color: #b0b0b0;
         font-size: 16px;
@@ -501,7 +499,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- Модальное окно для добавления технологии -->
 <div class="skill-modal-overlay" id="skillModalOverlay" style="display: none;">
     <div class="skill-modal">
         <div class="skill-modal-header">
@@ -534,7 +531,6 @@
         
         <div class="formPage-header formPage-header-request">
             <p href="#!" class="link" style="color: white;">Заявка</p>
-            <a href="#!">Посмотреть доступные</a>
         </div>
 
         <form class="formPage-form" method="post" action="{% url 'form_page' %}" id="application-form">
@@ -550,31 +546,45 @@
                     
                     <!-- Контактные данные -->
                     <div class="name-fields">
-                        {{ application_form.contact_last_name }}
-                        {{ application_form.contact_first_name }}
-                        {{ application_form.contact_middle_name }}
+                        <div class="field-wrapper">
+                            {{ application_form.contact_last_name }}
+                            {% if application_form.contact_last_name.errors %}
+                                <div class="error-message">{{ application_form.contact_last_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="field-wrapper">
+                            {{ application_form.contact_first_name }}
+                            {% if application_form.contact_first_name.errors %}
+                                <div class="error-message">{{ application_form.contact_first_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="field-wrapper">
+                            {{ application_form.contact_middle_name }}
+                            {% if application_form.contact_middle_name.errors %}
+                                <div class="error-message">{{ application_form.contact_middle_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
                     </div>
                     
-                    {% if application_form.contact_last_name.errors %}
-                        <div class="error">{{ application_form.contact_last_name.errors }}</div>
-                    {% endif %}
+                    <div class="field-wrapper">
+                        {{ application_form.contact_phone }}
+                        {% if application_form.contact_phone.errors %}
+                            <div class="error-message">{{ application_form.contact_phone.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                     
-                    {{ application_form.contact_phone }}
-                    {% if application_form.contact_phone.errors %}
-                        <div class="error">{{ application_form.contact_phone.errors }}</div>
-                    {% endif %}
-                    
-                    {{ application_form.contact_email }}
-                    {% if application_form.contact_email.errors %}
-                        <div class="error">{{ application_form.contact_email.errors }}</div>
-                    {% endif %}
+                    <div class="field-wrapper">
+                        {{ application_form.contact_email }}
+                        {% if application_form.contact_email.errors %}
+                            <div class="error-message">{{ application_form.contact_email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                     
                     <!-- Возраст -->
-                    <div class="age-field">
-                        <label for="{{ application_form.age.id_for_label }}">Возраст</label>
+                    <div class="field-wrapper">
                         {{ application_form.age }}
                         {% if application_form.age.errors %}
-                            <div class="error">{{ application_form.age.errors }}</div>
+                            <div class="error-message">{{ application_form.age.errors.0 }}</div>
                         {% endif %}
                     </div>
                     
@@ -609,20 +619,15 @@
                         <input type="text" 
                             id="keySkillsInput" 
                             class="form-input" 
-                            placeholder="Введите навыки через запятую (например: управление проектами, Python, анализ данных)">
-                        <button type="button" class="add-key-skill-btn" id="addKeySkillBtn">+ Добавить навыки</button>
-                        <span class="key-skills-hint">Введите навыки через запятую и нажмите кнопку "Добавить"</span>
+                            placeholder="Введите название навыка и затем нажмите кнопку ниже"
+                        >
+                        <button type="button" class="add-key-skill-btn" id="addKeySkillBtn">+ Добавить навык</button>
                         
-                        <!-- Контейнер для добавленных ключевых навыков -->
-                        <div class="key-skills-container" id="keySkillsContainer">
-                            <!-- Добавленные навыки будут отображаться здесь -->
-                        </div>
-                        
-                        <!-- Скрытое поле для хранения данных ключевых навыков -->
+                        <div class="key-skills-container" id="keySkillsContainer"></div>
                         <input type="hidden" name="key_skills_data" id="keySkillsData" value="[]">
                     </div>
-                    
-                    <!-- Шаблон для ключевого навыка -->
+
+                    <!-- Шаблон -->
                     <template id="keySkillItemTemplate">
                         <div class="skill-item" data-skill-name="">
                             <span class="skill-name"></span>
@@ -630,21 +635,19 @@
                         </div>
                     </template>
                     
-                    <!-- Знание технологий -->
+                    <!-- Технологии -->
                     <div class="technologies-section">
                         <div class="technologies-header">
                             <h3>Знание технологий</h3>
-                            <button type="button" class="add-skill-btn" id="showSkillModalBtn">
-                                + Добавить технологию
-                            </button>
                         </div>
                         
-                        <!-- Контейнер для технологий -->
                         <div class="skills-container" id="skillsContainer">
-                            <!-- Технологии будут добавляться сюда динамически -->
                         </div>
+
+                        <button type="button" class="add-skill-btn" id="showSkillModalBtn">
+                            + Добавить технологию
+                        </button>
                         
-                        <!-- Скрытое поле для хранения данных технологий -->
                         <input type="hidden" name="skills_data" id="skillsDataInput" value="[]">
                     </div>
                     
@@ -668,7 +671,7 @@
                         <label for="{{ application_form.about_me.id_for_label }}">Расскажите о себе</label>
                         {{ application_form.about_me }}
                         {% if application_form.about_me.errors %}
-                            <div class="error">{{ application_form.about_me.errors }}</div>
+                            <div class="error-message">{{ application_form.about_me.errors.0 }}</div>
                         {% endif %}
                         <span class="field-hint">Опыт работы, образование, цели, интересы, достижения</span>
                     </div>
@@ -682,19 +685,9 @@
                     </div>
                     
                     <div class="role-select-wrapper">
-                        <select name="team_role" id="teamRole" class="role-select">
-                            <option value="">Выберите роль в команде</option>
-                            <option value="visionary">Генератор идей - создаю новые концепции и нестандартные решения</option>
-                            <option value="implementer">Исполнитель - воплощаю идеи в жизнь, довожу задачи до результата</option>
-                            <option value="leader">Лидер - координирую работу, принимаю решения, веду команду к цели</option>
-                            <option value="organizer">Организатор - структурирую процессы, распределяю ресурсы, слежу за сроками</option>
-                            <option value="analyst">Аналитик - оцениваю риски, ищу оптимальные пути, работаю с данными</option>
-                            <option value="communicator">Коммуникатор - выстраиваю связи, разрешаю конфликты, поддерживаю атмосферу</option>
-                            <option value="perfectionist">Контролер качества - проверяю детали, ищу ошибки, стремлюсь к идеалу</option>
-                            <option value="resource_investigator">Исследователь ресурсов - ищу возможности, контакты, новые инструменты</option>
-                        </select>
+                        {{ application_form.team_role }}
                         {% if application_form.team_role.errors %}
-                            <div class="error">{{ application_form.team_role.errors }}</div>
+                            <div class="error-message">{{ application_form.team_role.errors.0 }}</div>
                         {% endif %}
                     </div>
                     
@@ -713,20 +706,26 @@
                         <h3>Организация</h3>
                     </div>
                     
-                    {{ application_form.organization_name }}
-                    {% if application_form.organization_name.errors %}
-                        <div class="error">{{ application_form.organization_name.errors }}</div>
-                    {% endif %}
+                    <div class="field-wrapper">
+                        {{ application_form.organization_name }}
+                        {% if application_form.organization_name.errors %}
+                            <div class="error-message">{{ application_form.organization_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                     
-                    {{ application_form.organization_inn }}
-                    {% if application_form.organization_inn.errors %}
-                        <div class="error">{{ application_form.organization_inn.errors }}</div>
-                    {% endif %}
+                    <div class="field-wrapper">
+                        {{ application_form.organization_inn }}
+                        {% if application_form.organization_inn.errors %}
+                            <div class="error-message">{{ application_form.organization_inn.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                     
-                    {{ application_form.organization_website }}
-                    {% if application_form.organization_website.errors %}
-                        <div class="error">{{ application_form.organization_website.errors }}</div>
-                    {% endif %}
+                    <div class="field-wrapper">
+                        {{ application_form.organization_website }}
+                        {% if application_form.organization_website.errors %}
+                            <div class="error-message">{{ application_form.organization_website.errors.0 }}</div>
+                        {% endif %}
+                    </div>
                 </div>
                 
                 <!-- Требования исполнителя -->
@@ -788,9 +787,9 @@
                 
                 <!-- Общие ошибки формы -->
                 {% if application_form.non_field_errors %}
-                    <div class="error">
+                    <div class="non-field-errors">
                         {% for error in application_form.non_field_errors %}
-                            {{ error }}
+                            <div class="error-message">{{ error }}</div>
                         {% endfor %}
                     </div>
                 {% endif %}
@@ -802,7 +801,6 @@
         </form>
     </div>          
     
-    <!-- Блок авторизации - показываем только для неавторизованных пользователей -->
     {% if not user.is_authenticated %}
     <div class="formPage-block reg-form">
         <!-- ВХОД-РЕГИСТРАЦИЯ -->
@@ -872,7 +870,7 @@
                 {% if registration_form.password1.errors %}
                     <div class="error">{{ registration_form.password1.errors }}</div>
                 {% endif %}
-                <p>Минимум 8 символов</p>
+                <p style="color: white;">Минимум 8 символов</p>
                 
                 {{ registration_form.password2 }}
                 {% if registration_form.password2.errors %}
@@ -1113,7 +1111,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ========== КЛЮЧЕВЫЕ НАВЫКИ (ввод через запятую) ==========
     const keySkillsInput = document.getElementById('keySkillsInput');
     const addKeySkillBtn = document.getElementById('addKeySkillBtn');
     const keySkillsContainer = document.getElementById('keySkillsContainer');
@@ -1140,20 +1137,20 @@ document.addEventListener('DOMContentLoaded', function() {
         if (keySkills.length === 0) {
             const emptyMessage = document.createElement('div');
             emptyMessage.className = 'empty-skills';
-            emptyMessage.innerHTML = '<p>Навыки не добавлены. Введите навыки через запятую и нажмите "Добавить"</p>';
+            emptyMessage.innerHTML = '<p>Навыки не добавлены. Введите навык и нажмите "Добавить навык"</p>';
             keySkillsContainer.appendChild(emptyMessage);
         } else {
             keySkills.forEach(skill => {
                 const skillClone = keySkillTemplate.content.cloneNode(true);
                 const skillElement = skillClone.querySelector('.skill-item');
-                const skillName = skillClone.querySelector('.skill-name');
+                const skillNameSpan = skillClone.querySelector('.skill-name');
                 const removeBtn = skillClone.querySelector('.skill-remove');
                 
-                skillName.textContent = skill.trim();
-                skillElement.dataset.skillName = skill.trim();
+                skillNameSpan.textContent = skill;
+                skillElement.dataset.skillName = skill;
                 
                 removeBtn.addEventListener('click', function() {
-                    removeKeySkill(skill.trim());
+                    removeKeySkill(skill);
                 });
                 
                 keySkillsContainer.appendChild(skillElement);
@@ -1163,49 +1160,38 @@ document.addEventListener('DOMContentLoaded', function() {
         keySkillsData.value = JSON.stringify(keySkills);
     }
     
-    function addKeySkills() {
-        const inputText = keySkillsInput.value.trim();
-        if (!inputText) {
-            alert('Введите навыки');
+    function addKeySkill() {
+        const inputValue = keySkillsInput.value.trim();
+        if (!inputValue) {
+            alert('Введите название навыка');
             return;
         }
         
-        // Разделяем по запятой и очищаем от лишних пробелов
-        const newSkills = inputText.split(',').map(s => s.trim()).filter(s => s.length > 0);
-        
-        if (newSkills.length === 0) {
-            alert('Введите хотя бы один навык');
+        if (keySkills.includes(inputValue)) {
+            alert('Такой навык уже добавлен');
+            keySkillsInput.value = '';
             return;
         }
         
-        // Добавляем новые навыки, избегая дубликатов
-        newSkills.forEach(skill => {
-            if (!keySkills.includes(skill)) {
-                keySkills.push(skill);
-            }
-        });
-        
-        // Очищаем поле ввода
+        keySkills.push(inputValue);
         keySkillsInput.value = '';
-        
         renderKeySkills();
     }
     
-    function removeKeySkill(skillValue) {
-        keySkills = keySkills.filter(s => s !== skillValue);
+    function removeKeySkill(skillName) {
+        keySkills = keySkills.filter(s => s !== skillName);
         renderKeySkills();
     }
     
     if (addKeySkillBtn) {
-        addKeySkillBtn.addEventListener('click', addKeySkills);
+        addKeySkillBtn.addEventListener('click', addKeySkill);
     }
     
-    // Добавление по Enter
     if (keySkillsInput) {
         keySkillsInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                addKeySkills();
+                addKeySkill();
             }
         });
     }

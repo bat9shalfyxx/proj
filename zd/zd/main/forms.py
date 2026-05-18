@@ -4,6 +4,104 @@ from django.core.exceptions import ValidationError
 from .models import CustomUser, Application, Project, ProjectRequirement
 import re
 import json
+from django.utils.translation import gettext_lazy as _
+
+
+class CustomAuthenticationForm(AuthenticationForm):
+    """
+    Единая форма аутентификации с русскими сообщениями и поддержкой
+    email/телефон/логин
+    """
+    
+    # Кастомные сообщения об ошибках (русские)
+    error_messages = {
+        'invalid_login': _(
+            "Неверный email/телефон или пароль. Пожалуйста, проверьте введённые данные."
+        ),
+        'inactive': _("Этот аккаунт заблокирован. Обратитесь к администратору."),
+    }
+    
+    # Переопределяем поля с нужными плейсхолдерами
+    username = forms.CharField(
+        label='',
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Телефон, электронная почта или логин',
+            'autocomplete': 'on',
+            'class': 'form-input',
+            'required': 'required'
+        })
+    )
+    password = forms.CharField(
+        label='',
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Введите пароль',
+            'autocomplete': 'on',
+            'class': 'form-input',
+            'required': 'required'
+        })
+    )
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].label = ''
+        self.fields['password'].label = ''
+    
+    def normalize_username(self, username):
+        """Нормализует введенное значение для поиска пользователя"""
+        if '@' in username:
+            return username.lower()
+        
+        phone = re.sub(r'[^\d+]', '', username)
+        if phone.startswith('8'):
+            phone = '+7' + phone[1:]
+        elif phone.startswith('7'):
+            phone = '+' + phone
+        elif not phone.startswith('+7'):
+            phone = '+7' + phone
+        
+        return phone
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        username = cleaned_data.get('username')
+        password = cleaned_data.get('password')
+        
+        if username and password:
+            normalized_username = self.normalize_username(username)
+            
+            from django.contrib.auth import get_user_model
+            from django.db.models import Q
+            User = get_user_model()
+            
+            try:
+                user = User.objects.get(
+                    Q(email=normalized_username) | 
+                    Q(phone_number=normalized_username) |
+                    Q(username=username)
+                )
+            except User.DoesNotExist:
+                raise ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login'
+                )
+            except User.MultipleObjectsReturned:
+                user = User.objects.filter(
+                    Q(email=normalized_username) | 
+                    Q(phone_number=normalized_username) |
+                    Q(username=username)
+                ).first()
+            
+            if not user.check_password(password):
+                raise ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login'
+                )
+            
+            self.confirm_login_allowed(user)
+            self.user_cache = user
+        
+        return cleaned_data
+
 
 class ApplicationForm(forms.ModelForm):
     skills_data = forms.CharField(widget=forms.HiddenInput(), required=False)
@@ -257,89 +355,6 @@ class ApplicationForm(forms.ModelForm):
             instance.save()
         
         return instance
-
-
-class CustomAuthenticationForm(AuthenticationForm):
-    username = forms.CharField(
-        label='',
-        widget=forms.TextInput(attrs={
-            'placeholder': 'Телефон, электронная почта или логин',
-            'autocomplete': 'on',
-            'class': 'form-input',
-            'required': 'required'
-        })
-    )
-    password = forms.CharField(
-        label='',
-        widget=forms.PasswordInput(attrs={
-            'placeholder': 'Введите пароль',
-            'autocomplete': 'on',
-            'class': 'form-input',
-            'required': 'required'
-        })
-    )
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['username'].label = ''
-        self.fields['password'].label = ''
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        username = cleaned_data.get('username')
-        password = cleaned_data.get('password')
-        
-        if username and password:
-            normalized_username = self.normalize_username(username)
-            
-            from django.contrib.auth import get_user_model
-            from django.db.models import Q
-            User = get_user_model()
-            
-            try:
-                user = User.objects.get(
-                    Q(email=normalized_username) | 
-                    Q(phone_number=normalized_username) |
-                    Q(username=username)  
-                )
-            except User.DoesNotExist:
-                raise ValidationError(
-                    'Неверный email/телефон/логин или пароль.',
-                    code='invalid_login'
-                )
-            except User.MultipleObjectsReturned:
-                user = User.objects.filter(
-                    Q(email=normalized_username) | 
-                    Q(phone_number=normalized_username) |
-                    Q(username=username)
-                ).first()
-            
-            if not user.check_password(password):
-                raise ValidationError(
-                    'Неверный email/телефон/логин или пароль.',
-                    code='invalid_login'
-                )
-            
-            self.confirm_login_allowed(user)
-            self.user_cache = user
-        
-        return cleaned_data
-    
-    def normalize_username(self, username):
-        """Нормализует введенное значение для поиска пользователя"""
-        
-        if '@' in username:
-            return username.lower()
-        
-        phone = re.sub(r'[^\d+]', '', username)
-        if phone.startswith('8'):
-            phone = '+7' + phone[1:]
-        elif phone.startswith('7'):
-            phone = '+' + phone
-        elif not phone.startswith('+7'):
-            phone = '+7' + phone
-        
-        return phone
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -596,6 +611,7 @@ class QuickRequirementForm(forms.Form):
     skill_name = forms.CharField(max_length=200)
     level = forms.ChoiceField(choices=ProjectRequirement.SKILL_LEVEL_CHOICES, required=False)
     people_count = forms.IntegerField(min_value=1, initial=1)
+
 
 class ProfileEditForm(forms.ModelForm):
     class Meta:

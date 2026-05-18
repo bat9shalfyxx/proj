@@ -614,8 +614,6 @@ def project_create(request):
     })
 
 
-# views.py (дополните существующую функцию project_detail для отображения требований)
-
 @login_required
 def project_detail(request, project_id):
     project = get_object_or_404(Project, id=project_id)
@@ -631,22 +629,17 @@ def project_detail(request, project_id):
     if not (is_creator or is_participant):
         return HttpResponseForbidden("У вас нет доступа к этому проекту")
     
-    # Получаем все требования к проекту
     requirements = project.requirements.all().order_by('-is_mandatory', 'skill_name')
     
-    # Группировка требований по обязательности
     mandatory_requirements = requirements.filter(is_mandatory=True)
     optional_requirements = requirements.filter(is_mandatory=False)
     
-    # Подсчет общего количества требуемых специалистов
     total_people_needed = requirements.aggregate(
         total=models.Sum('people_count')
     )['total'] or 0
     
-    # Участники проекта
     participants = project.participants.filter(status='active')
     
-    # Приглашения
     invitations = project.invitations.all().order_by('-invited_at')
     
     context = {
@@ -665,13 +658,11 @@ def project_detail(request, project_id):
 
 @login_required
 def project_edit(request, project_id):
-    #Редактирование проекта
     project = get_object_or_404(Project, id=project_id, creator=request.user)
     
     if request.method == 'POST':
         try:
             with transaction.atomic():
-                # Обновляем основные поля
                 project.name = request.POST.get('name')
                 project.description = request.POST.get('description')
                 project.team_activities = request.POST.get('team_activities', '')
@@ -681,10 +672,8 @@ def project_edit(request, project_id):
                 project.budget = request.POST.get('budget') or None
                 project.save()
                 
-                # Удаляем старые требования
                 project.requirements.all().delete()
                 
-                # Создаем новые требования
                 requirement_names = request.POST.getlist('requirement_name[]')
                 requirement_levels = request.POST.getlist('requirement_level[]')
                 requirement_counts = request.POST.getlist('requirement_count[]')
@@ -720,7 +709,6 @@ def project_edit(request, project_id):
 
 @login_required
 def project_delete(request, project_id):
-    #Удаление проекта
     project = get_object_or_404(Project, id=project_id, creator=request.user)
     
     if request.method == 'POST':
@@ -734,7 +722,6 @@ def project_delete(request, project_id):
 
 @login_required
 def project_change_status(request, project_id):
-    #Изменение статуса проекта
     project = get_object_or_404(Project, id=project_id, creator=request.user)
     
     if request.method == 'POST':
@@ -759,7 +746,6 @@ def invite_to_project(request, project_id):
         try:
             application = Application.objects.get(id=application_id)
             
-            # Проверяем, не приглашен ли уже
             existing = ProjectInvitation.objects.filter(
                 project=project, 
                 application=application
@@ -794,7 +780,6 @@ def invite_to_project(request, project_id):
 
 @login_required
 def respond_to_invitation(request, invitation_id):
-    #Ответ на приглашение
     invitation = get_object_or_404(
         ProjectInvitation, 
         id=invitation_id,
@@ -822,7 +807,6 @@ def respond_to_invitation(request, invitation_id):
 
 @login_required
 def cancel_invitation(request, invitation_id):
-    #Отмена приглашения (только для создателя)
     invitation = get_object_or_404(
         ProjectInvitation, 
         id=invitation_id,
@@ -838,7 +822,6 @@ def cancel_invitation(request, invitation_id):
 
 @login_required
 def remove_participant(request, project_id, participant_id):
-    #Удаление участника из проекта
     project = get_object_or_404(Project, id=project_id, creator=request.user)
     participant = get_object_or_404(ProjectParticipant, id=participant_id, project=project)
     
@@ -851,10 +834,8 @@ def remove_participant(request, project_id, participant_id):
 
 @login_required
 def add_comment(request, project_id):
-    #Добавление комментария
     project = get_object_or_404(Project, id=project_id)
     
-    # Проверка доступа
     is_creator = (project.creator == request.user)
     is_participant = ProjectParticipant.objects.filter(
         project=project, 
@@ -893,10 +874,8 @@ def add_comment(request, project_id):
 
 @login_required
 def upload_file(request, project_id):
-    #Загрузка файла в проект
     project = get_object_or_404(Project, id=project_id)
     
-    # Проверка доступа
     is_creator = (project.creator == request.user)
     is_participant = ProjectParticipant.objects.filter(
         project=project, 
@@ -935,7 +914,6 @@ def upload_file(request, project_id):
 
 @login_required
 def delete_file(request, project_id, file_id):
-    #Удаление файла
     project = get_object_or_404(Project, id=project_id)
     file_obj = get_object_or_404(ProjectFile, id=file_id, project=project)
     
@@ -953,7 +931,7 @@ def delete_file(request, project_id, file_id):
     return redirect('project_detail', project_id=project.id)
 
 @login_required
-def api_applications(request):
+def api_applications_all(request):
     """API для получения списка всех заявок"""
     applications = Application.objects.all().order_by('-created_at')
     data = []
@@ -1039,6 +1017,7 @@ def edit_profile(request):
     
     return redirect('profile')
 
+@login_required
 def api_applications(request):
     """API для получения списка заявок (кандидатов)"""
     applications = Application.objects.filter(status='approved').order_by('-created_at')
@@ -1066,3 +1045,58 @@ def hub(request):
     return render(request, 'hub.html', {
         'projects': projects
     })
+
+def calculate_match_score(application, requirements):
+    """Расчет степени соответствия кандидата требованиям проекта"""
+    if not requirements.exists():
+        return 0
+    
+    app_skills = set(s.lower().strip() for s in application.skill_list.split(',') if s.strip())
+    
+    total_score = 0
+    max_score = len(requirements) * 100
+    
+    for req in requirements:
+        req_skill = req.skill_name.lower().strip()
+        
+        if req_skill in app_skills:
+            total_score += 100
+        else:
+            for app_skill in app_skills:
+                if req_skill in app_skill or app_skill in req_skill:
+                    total_score += 50
+                    break
+    
+    if max_score > 0:
+        return int((total_score / max_score) * 100)
+    return 0
+
+def api_applications_for_project(request, project_id):
+    """API для получения кандидатов с рейтингом для конкретного проекта"""
+    from main.models_application import Application
+    
+    project = get_object_or_404(Project, id=project_id)
+    requirements = project.requirements.all()
+    
+    applications = Application.objects.filter(status='approved')
+    
+    candidates_data = []
+    for app in applications:
+        match_score = calculate_match_score(app, requirements)
+        candidates_data.append({
+            'id': app.id,
+            'contact_first_name': app.contact_first_name,
+            'contact_last_name': app.contact_last_name,
+            'contact_email': app.contact_email,
+            'contact_phone': app.contact_phone,
+            'organization_name': app.organization_name,
+            'skill_list': app.skill_list,
+            'age': app.age,
+            'team_role': app.team_role,
+            'team_role_display': dict(Application.TEAM_ROLE_CHOICES).get(app.team_role, ''),
+            'match_score': match_score
+        })
+    
+    candidates_data.sort(key=lambda x: x['match_score'], reverse=True)
+    
+    return JsonResponse({'candidates': candidates_data, 'total': len(candidates_data)})

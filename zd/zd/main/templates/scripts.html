@@ -1,6 +1,5 @@
-
 <script defer>
-    function getCSRFToken() {
+function getCSRFToken() {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
@@ -14,122 +13,246 @@
     }
     return cookieValue;
 }
-    document.addEventListener('DOMContentLoaded', function() {
-        // AJAX обработка форм
-        const loginForm = document.getElementById('login-form');
-        const registrationForm = document.getElementById('registration-form');
-        
-        function submitForm(form, actionType) {
-            const formData = new FormData(form);
-            formData.append('action', actionType);
-            
-            const submitButton = form.querySelector('input[type="submit"]');
+
+// Единая функция показа уведомлений
+function showNotification(message, type = 'success') {
+    const oldNotifications = document.querySelectorAll('.notification');
+    oldNotifications.forEach(notification => notification.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+        z-index: 10000;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        animation: slideIn 0.3s ease-out;
+        max-width: 400px;
+        word-wrap: break-word;
+    `;
+    
+    if (type === 'success') {
+        notification.style.backgroundColor = '#4CAF50';
+    } else if (type === 'error') {
+        notification.style.backgroundColor = '#f44336';
+    } else {
+        notification.style.backgroundColor = '#ff9800';
+    }
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 5000);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // ========== ЛОГИН ==========
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('input[type="submit"]');
             const originalText = submitButton.value;
             
-            submitButton.value = actionType === 'login' ? 'Вход...' : 'Регистрация...';
+            submitButton.value = 'Вход...';
             submitButton.disabled = true;
             
-            // Удаляем старые ошибки
-            const errorElements = form.querySelectorAll('.error');
+            const errorElements = this.querySelectorAll('.error');
             errorElements.forEach(el => el.remove());
 
-            fetch(form.action, {
+            fetch(this.action, {
                 method: 'POST',
                 body: formData,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRFToken': getCSRFToken(),   // ← Добавить эту строку
+                    'X-CSRFToken': getCSRFToken(),
                 }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const message = actionType === 'login' ? 'Вход выполнен успешно!' : 'Регистрация прошла успешно!';
-                    showNotification(message, 'success');
+                    showNotification('Вход выполнен успешно!', 'success');
                     setTimeout(() => {
                         window.location.href = data.redirect_url;
                     }, 1000);
                 } else {
                     if (data.errors) {
                         Object.keys(data.errors).forEach(fieldName => {
-                            if (fieldName === 'general') {
-                                showNotification(data.errors[fieldName][0].message, 'error');
-                            } else {
-                                const field = form.querySelector(`[name="${fieldName}"]`);
-                                if (field) {
-                                    const errorDiv = document.createElement('div');
-                                    errorDiv.className = 'error';
-                                    errorDiv.textContent = data.errors[fieldName][0].message;
-                                    field.parentNode.insertBefore(errorDiv, field.nextSibling);
-                                }
+                            const field = loginForm.querySelector(`[name="${fieldName}"]`);
+                            if (field && fieldName !== 'general') {
+                                const errorDiv = document.createElement('div');
+                                errorDiv.className = 'error';
+                                errorDiv.textContent = data.errors[fieldName][0];
+                                field.parentNode.insertBefore(errorDiv, field.nextSibling);
                             }
                         });
+                        if (data.errors.general) {
+                            showNotification(data.errors.general[0], 'error');
+                        }
                     }
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                showNotification('Произошла ошибка при отправке формы', 'error');
+                showNotification('Ошибка соединения с сервером', 'error');
             })
             .finally(() => {
                 submitButton.value = originalText;
                 submitButton.disabled = false;
             });
-        }
-        
-        if (loginForm) {
-            loginForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                submitForm(this, 'login');
+        });
+    }
+    
+    // ========== РЕГИСТРАЦИЯ ==========
+    const registrationForm = document.getElementById('registration-form');
+    if (registrationForm) {
+        registrationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('input[type="submit"]');
+            const originalText = submitButton.value;
+            
+            submitButton.value = 'Регистрация...';
+            submitButton.disabled = true;
+            
+            const errorElements = this.querySelectorAll('.error');
+            errorElements.forEach(el => el.remove());
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCSRFToken(),
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Регистрация прошла успешно!', 'success');
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 1000);
+                } else {
+                    if (data.errors) {
+                        Object.keys(data.errors).forEach(fieldName => {
+                            const field = registrationForm.querySelector(`[name="${fieldName}"]`);
+                            if (field && fieldName !== 'general') {
+                                const errorDiv = document.createElement('div');
+                                errorDiv.className = 'error';
+                                errorDiv.textContent = data.errors[fieldName][0];
+                                field.parentNode.insertBefore(errorDiv, field.nextSibling);
+                            }
+                        });
+                        if (data.errors.general) {
+                            showNotification(data.errors.general[0], 'error');
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                showNotification('Ошибка соединения с сервером', 'error');
+            })
+            .finally(() => {
+                submitButton.value = originalText;
+                submitButton.disabled = false;
             });
-        }
-        
-        if (registrationForm) {
-            registrationForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                submitForm(this, 'register');
-            });
-        }
-        
-        function showNotification(message, type) {
-            const oldNotifications = document.querySelectorAll('.notification');
-            oldNotifications.forEach(notification => notification.remove());
+        });
+    }
+    
+    // ========== ЗАЯВКА ==========
+    const applicationForm = document.getElementById('application-form');
+    if (applicationForm) {
+        applicationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
+            const submitButton = this.querySelector('#application-submit') || this.querySelector('button[type="submit"]');
+            const originalText = submitButton ? submitButton.textContent || submitButton.value : 'Отправить';
             
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 20px;
-                border-radius: 5px;
-                color: white;
-                font-weight: bold;
-                z-index: 10000;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                animation: slideIn 0.3s ease-out;
-            `;
-            
-            if (type === 'success') {
-                notification.style.backgroundColor = '#4CAF50';
-                notification.style.backgroundColor = '#f44336';
+            if (submitButton) {
+                submitButton.disabled = true;
+                if (submitButton.tagName === 'BUTTON') {
+                    submitButton.textContent = 'Отправка...';
+                } else {
+                    submitButton.value = 'Отправка...';
+                }
             }
             
-            document.body.appendChild(notification);
+            const formData = new FormData(this);
             
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease-in';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
+            const errorElements = this.querySelectorAll('.error');
+            errorElements.forEach(el => el.remove());
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCSRFToken(),
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message || 'Заявка успешно отправлена!', 'success');
+                    this.reset();
+                    if (data.redirect_url) {
+                        setTimeout(() => {
+                            window.location.href = data.redirect_url;
+                        }, 1500);
                     }
-                }, 300);
-            }, 5000);
-        }
-        
+                } else {
+                    if (data.errors) {
+                        Object.keys(data.errors).forEach(fieldName => {
+                            const field = applicationForm.querySelector(`[name="${fieldName}"]`);
+                            if (field) {
+                                const errorDiv = document.createElement('div');
+                                errorDiv.className = 'error';
+                                const errorText = Array.isArray(data.errors[fieldName]) 
+                                    ? data.errors[fieldName].join(', ') 
+                                    : data.errors[fieldName];
+                                errorDiv.textContent = errorText;
+                                field.parentNode.insertBefore(errorDiv, field.nextSibling);
+                            }
+                        });
+                    }
+                    showNotification(data.message || 'Ошибка при отправке заявки', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Ошибка соединения с сервером', 'error');
+            })
+            .finally(() => {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    if (submitButton.tagName === 'BUTTON') {
+                        submitButton.textContent = originalText;
+                    } else {
+                        submitButton.value = originalText;
+                    }
+                }
+            });
+        });
+    }
+    
+    // Добавляем CSS анимации, если их нет
+    if (!document.querySelector('#notification-styles')) {
         const style = document.createElement('style');
+        style.id = 'notification-styles';
         style.textContent = `
             @keyframes slideIn {
                 from { transform: translateX(100%); opacity: 0; }
@@ -141,75 +264,17 @@
             }
             .error {
                 color: #f44336;
-                font-size: 14px;
+                font-size: 13px;
                 margin-top: 5px;
+                margin-bottom: 5px;
+                padding-left: 5px;
+                border-left: 3px solid #f44336;
+            }
+            .notification {
+                font-size: 14px;
             }
         `;
         document.head.appendChild(style);
-    });
+    }
+});
 </script>
-
-<!--  -->
-
-<script defer>
-    document.addEventListener('DOMContentLoaded', function() {
-        const applicationForm = document.getElementById('application-form');
-        
-        if (applicationForm) {
-            applicationForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                console.log(1);
-                
-                
-                const submitButton = document.getElementById('application-submit');
-
-                const formData = new FormData(this);
-                formData.append('action', 'application')
-
-                const originalText = submitButton.value;
-                
-                submitButton.value = 'Отправка...';
-                submitButton.disabled = true;
-                
-                const errorElements = document.querySelectorAll('#application-form .error');
-                errorElements.forEach(el => el.remove());
-
-                fetch(this.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRFToken': getCSRFToken(),   // ← Добавить эту строку
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        applicationForm.reset();
-                    } else {
-                        if (data.errors) {
-                            Object.keys(data.errors).forEach(fieldName => {
-                                const field = applicationForm.querySelector(`[name="${fieldName}"]`);
-                                if (field) {
-                                    const errorDiv = document.createElement('div');
-                                    errorDiv.className = 'error';
-                                    errorDiv.textContent = data.errors[fieldName][0].message;
-                                    field.parentNode.insertBefore(errorDiv, field.nextSibling);
-                                }
-                            });
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                })
-                .finally(() => {
-                    submitButton.value = originalText;
-                    submitButton.disabled = false;
-                    
-                });
-            });
-        }
-    });
-</script>
-

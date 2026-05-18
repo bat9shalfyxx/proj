@@ -231,24 +231,27 @@ let currentSkillFilter = '';
 function openCandidateModal() {
     document.getElementById('candidateModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    loadAllCandidates();
+    loadProjectCandidates();
 }
 
 function closeCandidateModal() {
     document.getElementById('candidateModal').style.display = 'none';
     document.body.style.overflow = '';
     currentSkillFilter = '';
-    document.getElementById('skillFilterModal').value = '';
+    const filterInput = document.getElementById('skillFilterModal');
+    if (filterInput) filterInput.value = '';
 }
 
-function loadAllCandidates() {
+function loadProjectCandidates() {
     const candidatesList = document.getElementById('candidatesList');
-    candidatesList.innerHTML = '<div class="no-candidates"><p>Загрузка кандидатов...</p></div>';
+    candidatesList.innerHTML = '<div class="no-candidates"><div class="loading-spinner"></div><p>Загрузка кандидатов...</p></div>';
+
+    const url = `/api/projects/{{ project.id }}/candidates/`;
     
-    fetch('/api/applications/')
+    fetch(url)
         .then(response => response.json())
         .then(data => {
-            allCandidates = data;
+            allCandidates = data.candidates;
             filterAndDisplayCandidates();
         })
         .catch(error => {
@@ -265,7 +268,6 @@ function filterAndDisplayCandidates() {
     
     if (skillFilter) {
         const skillsToFilter = skillFilter.toLowerCase().split(',').map(s => s.trim());
-        
         filteredCandidates = filteredCandidates.filter(candidate => {
             if (!candidate.skill_list) return false;
             const candidateSkills = candidate.skill_list.toLowerCase().split(',').map(s => s.trim());
@@ -273,61 +275,40 @@ function filterAndDisplayCandidates() {
         });
     }
     
+    filteredCandidates.sort((a, b) => (b.match_score || 0) - (a.match_score || 0));
+    
     if (filteredCandidates.length === 0) {
-        candidatesList.innerHTML = `
-            <div class="no-candidates">
-                <p>${skillFilter ? 'Нет кандидатов с указанными навыками' : 'Нет доступных кандидатов'}</p>
-            </div>
-        `;
+        candidatesList.innerHTML = `<div class="no-candidates"><p>${skillFilter ? 'Нет кандидатов с указанными навыками' : 'Нет доступных кандидатов'}</p></div>`;
         return;
     }
     
-    candidatesList.innerHTML = filteredCandidates.map(candidate => {
-        const candidateSkills = candidate.skill_list ? candidate.skill_list.split(',').map(s => s.trim()) : [];
-        const skillFilterList = skillFilter ? skillFilter.toLowerCase().split(',').map(s => s.trim()) : [];
-        
-        return `
-            <div class="candidate-card" data-organization="${candidate.organization_name}">
-                <div class="candidate-header">
-                    <h4 class="candidate-name">${candidate.contact_first_name} ${candidate.contact_last_name}</h4>
-                    <span class="organization-name">${candidate.organization_name || 'Не указана'}</span>
-                </div>
-                
-                <div class="candidate-details">
-                    <div class="detail-item">
-                        <span class="detail-label">Роль в команде</span>
-                        <span class="detail-value">${candidate.team_role_display || 'Не указана'}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Email</span>
-                        <span class="detail-value">${candidate.contact_email}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Телефон</span>
-                        <span class="detail-value">${candidate.contact_phone}</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">Возраст</span>
-                        <span class="detail-value">${candidate.age || 'Не указан'}</span>
-                    </div>
-                </div>
-                
-                ${candidate.skill_list ? `
-                <div class="candidate-skills">
-                    ${candidateSkills.map(skill => `
-                        <span class="skill-tag ${skillFilterList.includes(skill.toLowerCase()) ? 'match' : ''}">
-                            ${skill}
-                        </span>
-                    `).join('')}
-                </div>
-                ` : ''}
-                
-                <button class="invite-button" onclick="inviteCandidate(${candidate.id})">
-                    Пригласить в проект
-                </button>
+    const topCandidates = filteredCandidates.slice(0, 3);
+    const otherCandidates = filteredCandidates.slice(3);
+    
+    let html = '';
+    
+    if (topCandidates.length > 0) {
+        html += `<div class="section-title">⭐ Рекомендуемые кандидаты</div>`;
+        html += topCandidates.map((candidate, index) => renderCandidateCard(candidate, index, true, skillFilter)).join('');
+    }
+    
+    if (topCandidates.length > 0 && otherCandidates.length > 0) {
+        html += `
+            <div class="candidates-divider">
+                <div class="candidates-divider-line"></div>
+                <span class="candidates-divider-text">Другие кандидаты (${otherCandidates.length})</span>
+                <div class="candidates-divider-line"></div>
             </div>
         `;
-    }).join('');
+    } else if (otherCandidates.length > 0) {
+        html += `<div class="section-title">📋 Все кандидаты</div>`;
+    }
+    
+    if (otherCandidates.length > 0) {
+        html += otherCandidates.map((candidate, index) => renderCandidateCard(candidate, index + 3, false, skillFilter)).join('');
+    }
+    
+    candidatesList.innerHTML = html;
 }
 
 function inviteCandidate(applicationId) {
@@ -345,15 +326,13 @@ function inviteCandidate(applicationId) {
             'X-CSRFToken': '{{ csrf_token }}',
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: `application_id=${applicationId}&message=Приглашаем вас присоединиться к проекту "{{ project.name }}"`
+        body: `application_id=${applicationId}&message=Приглашаем вас присоединиться к проекту "${escapeHtml('{{ project.name }}')}"`
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             showNotification('Успех', 'Приглашение успешно отправлено', 'success');
-            if (typeof filterAndDisplayCandidates === 'function') {
-                filterAndDisplayCandidates();
-            }
+            loadProjectCandidates();
         } else {
             showNotification('Ошибка', data.error || 'Не удалось отправить приглашение', 'error');
         }
@@ -377,6 +356,87 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+function renderCandidateCard(candidate, index, isTopMatch, skillFilter) {
+    const candidateSkills = candidate.skill_list ? candidate.skill_list.split(',').map(s => s.trim()) : [];
+    const skillFilterList = skillFilter ? skillFilter.toLowerCase().split(',').map(s => s.trim()) : [];
+    const matchScore = candidate.match_score || 0;
+    
+    let matchClass = '';
+    let matchText = '';
+    if (matchScore >= 80) {
+        matchClass = 'match-high';
+        matchText = 'Отличное соответствие';
+    } else if (matchScore >= 60) {
+        matchClass = 'match-medium';
+        matchText = 'Хорошее соответствие';
+    } else if (matchScore >= 40) {
+        matchClass = 'match-low';
+        matchText = 'Среднее соответствие';
+    } else {
+        matchClass = 'match-none';
+        matchText = 'Низкое соответствие';
+    }
+    
+    return `
+        <div class="candidate-card ${isTopMatch ? 'top-match' : ''}" data-score="${matchScore}">
+            ${isTopMatch ? '<div class="top-match-badge">⭐ Рекомендуемый кандидат</div>' : ''}
+            
+            <div class="candidate-header">
+                <div>
+                    <h4 class="candidate-name">${escapeHtml(candidate.contact_first_name)} ${escapeHtml(candidate.contact_last_name)}</h4>
+                    <span class="organization-name">${escapeHtml(candidate.organization_name || 'Не указана')}</span>
+                </div>
+                <div class="match-score-container">
+                    <span class="match-score ${matchClass}" title="${matchText}">
+                        ${matchScore}% совпадение
+                    </span>
+                    ${isTopMatch ? '<span class="top-badge">Рекомендуемый</span>' : ''}
+                </div>
+            </div>
+            
+            <div class="match-progress">
+                <div class="match-progress-bar" style="width: ${matchScore}%"></div>
+            </div>
+            
+            <div class="candidate-details">
+                <div class="detail-item">
+                    <span class="detail-label">Роль в команде</span>
+                    <span class="detail-value">${escapeHtml(candidate.team_role_display || 'Не указана')}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value">${escapeHtml(candidate.contact_email)}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Телефон</span>
+                    <span class="detail-value">${escapeHtml(candidate.contact_phone)}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Возраст</span>
+                    <span class="detail-value">${candidate.age || 'Не указан'}</span>
+                </div>
+            </div>
+            
+            ${candidate.skill_list ? `
+            <div class="candidate-skills">
+                <strong>Навыки:</strong>
+                <div class="skills-list">
+                    ${candidateSkills.map(skill => `
+                        <span class="skill-tag ${skillFilterList.includes(skill.toLowerCase()) ? 'match' : ''}">
+                            ${escapeHtml(skill)}
+                        </span>
+                    `).join('')}
+                </div>
+            </div>
+            ` : ''}
+            
+            <button class="invite-button" onclick="inviteCandidate(${candidate.id})">
+                Пригласить в проект
+            </button>
+        </div>
+    `;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
