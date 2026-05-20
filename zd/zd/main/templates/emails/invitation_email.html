@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Приглашение в проект</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .project-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        .project-info h3 {
+            margin: 0 0 10px 0;
+            color: #667eea;
+        }
+        .message-box {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-style: italic;
+        }
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-accept {
+            background: #28a745;
+            color: white;
+        }
+        .btn-decline {
+            background: #dc3545;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+        @media (max-width: 480px) {
+            .buttons {
+                flex-direction: column;
+            }
+            .btn {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Приглашение в проект</h1>
+            <p>Цифровая научная платформа</p>
+        </div>
+        
+        <div class="content">
+            <p>Здравствуйте, <strong>{{ candidate_name }}</strong>!</p>
+            
+            <p>Вас приглашают присоединиться к проекту <strong>"{{ project_name }}"</strong>.</p>
+            
+            <div class="project-info">
+                <h3>О проекте</h3>
+                <p>{{ project_description|default:"Описание проекта не указано" }}</p>
+            </div>
+            
+            <p><strong>Пригласил:</strong> {{ inviter_name }} ({{ inviter_email }})</p>
+            
+            {% if message %}
+            <div class="message-box">
+                <strong>Сообщение от пригласившего:</strong>
+                <p>{{ message }}</p>
+            </div>
+            {% endif %}
+            
+            <div class="buttons">
+                <a href="{{ accept_url }}" class="btn btn-accept">✓ Принять приглашение</a>
+                <a href="{{ decline_url }}" class="btn btn-decline">✗ Отклонить</a>
+            </div>
+            
+            <p style="margin-top: 20px; font-size: 14px; color: #666;">
+                Если вы не ожидали этого приглашения, просто проигнорируйте это письмо.
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>© {% now "Y" %} Цифровая научная платформа. Все права защищены.</p>
+            <p>Это автоматическое сообщение, пожалуйста, не отвечайте на него.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -20,8 +20,12 @@ urlpatterns = [
     path('api/applications_all/', views.api_applications_all, name='api_applications_all'),
     # Приглашения
     path('projects/<int:project_id>/invite/', views.invite_to_project, name='invite_to_project'),
-    path('invitation/<int:invitation_id>/', views.respond_to_invitation, name='respond_to_invitation'),
     path('invitation/<int:invitation_id>/cancel/', views.cancel_invitation, name='cancel_invitation'),
+    path('invitation/<int:invitation_id>/respond/', views.respond_to_invitation, name='respond_to_invitation'),
+    # Уведомления
+    path('api/notifications/', views.get_notifications, name='get_notifications'),
+    path('api/notifications/<int:notification_id>/read/', views.mark_notification_read, name='mark_notification_read'),
+    path('api/notifications/mark-all-read/', views.mark_all_notifications_read, name='mark_all_notifications_read'),
     # Участники
     path('projects/<int:project_id>/participant/<int:participant_id>/remove/', 
          views.remove_participant, name='remove_participant'),

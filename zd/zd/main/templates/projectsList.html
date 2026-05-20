@@ -120,7 +120,7 @@
                 <div class="project-card" data-status="{{ project.status }}">
                     <div class="project-card-header">
                         <h3 class="project-title">
-                            <a href="{% url 'project:project_detail' project.id %}">{{ project.name }}</a>
+                            <a href="{% url 'project_detail' project.id %}">{{ project.name }}</a>
                         </h3>
                         <span class="project-status status-{{ project.status }}">
                             {{ project.get_status_display }}
@@ -150,7 +150,7 @@
                     </div>
                     
                     <div class="project-footer">
-                        <a href="{% url 'project:project_detail' project.id %}" class="btn-view">
+                        <a href="{% url 'project_detail' project.id %}" class="btn-view">
                             Подробнее
                         </a>
                     </div>

@@ -15,7 +15,7 @@ import re
 import logging
 
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, ApplicationForm, ProjectForm, ProjectRequirementForm
-from .models import CustomUser, Application, Project, ProjectRequirement, ProjectInvitation, ProjectParticipant, ProjectFile, ProjectComment
+from .models import CustomUser, Application, Project, ProjectRequirement, ProjectInvitation, ProjectParticipant, ProjectFile, ProjectComment, Notification
 
 logger = logging.getLogger(__name__)
 def index(request):
@@ -167,7 +167,10 @@ def validate_phone(request):
     return JsonResponse({'valid': False, 'message': 'Недопустимый метод запроса'})
 
 def hub(request):
-    return render(request, 'hub.html', {'title': 'Хаб'})
+    projects = Project.objects.filter(status__in=['active', 'in_progress']).order_by('-created_at')[:10]
+    return render(request, 'hub.html', {
+        'projects': projects
+    })
 
 @login_required
 def profile(request):
@@ -735,92 +738,6 @@ def project_change_status(request, project_id):
 
 
 @login_required
-def invite_to_project(request, project_id):
-    """Приглашение участника в проект"""
-    project = get_object_or_404(Project, id=project_id, creator=request.user)
-    
-    if request.method == 'POST':
-        application_id = request.POST.get('application_id')
-        message = request.POST.get('message', '')
-        
-        try:
-            application = Application.objects.get(id=application_id)
-            
-            existing = ProjectInvitation.objects.filter(
-                project=project, 
-                application=application
-            ).exists()
-            
-            if existing:
-                return JsonResponse({
-                    'success': False,
-                    'error': 'Этот пользователь уже приглашен'
-                })
-            
-            invitation = ProjectInvitation.objects.create(
-                project=project,
-                application=application,
-                invited_by=request.user,
-                message=message
-            )
-            
-            return JsonResponse({
-                'success': True,
-                'invitation_id': invitation.id,
-                'message': 'Приглашение отправлено'
-            })
-            
-        except Application.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Заявка не найдена'})
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-    
-    return JsonResponse({'success': False, 'error': 'Неверный метод запроса'})
-
-
-@login_required
-def respond_to_invitation(request, invitation_id):
-    invitation = get_object_or_404(
-        ProjectInvitation, 
-        id=invitation_id,
-        application__user=request.user,
-        status='pending'
-    )
-    
-    if request.method == 'POST':
-        action = request.POST.get('action')
-        
-        if action == 'accept':
-            invitation.accept()
-            messages.success(request, f'Вы присоединились к проекту "{invitation.project.name}"')
-        elif action == 'decline':
-            invitation.decline()
-            messages.success(request, 'Приглашение отклонено')
-        
-        return redirect('project_list')
-    
-    context = {
-        'invitation': invitation,
-    }
-    return render(request, 'projects/respond_invitation.html', context)
-
-
-@login_required
-def cancel_invitation(request, invitation_id):
-    invitation = get_object_or_404(
-        ProjectInvitation, 
-        id=invitation_id,
-        project__creator=request.user
-    )
-    
-    if request.method == 'POST':
-        invitation.cancel()
-        messages.success(request, 'Приглашение отменено')
-    
-    return redirect('project_detail', project_id=invitation.project.id)
-
-
-@login_required
 def remove_participant(request, project_id, participant_id):
     project = get_object_or_404(Project, id=project_id, creator=request.user)
     participant = get_object_or_404(ProjectParticipant, id=participant_id, project=project)
@@ -1020,7 +937,7 @@ def edit_profile(request):
 @login_required
 def api_applications(request):
     """API для получения списка заявок (кандидатов)"""
-    applications = Application.objects.filter(status='approved').order_by('-created_at')
+    applications = Application.objects.filter(status__in=['new', 'in_progress', 'approved'])
     
     data = []
     for app in applications:
@@ -1040,11 +957,6 @@ def api_applications(request):
     
     return JsonResponse(data, safe=False)
 
-def hub(request):
-    projects = Project.objects.filter(status__in=['active', 'in_progress']).order_by('-created_at')[:10]
-    return render(request, 'hub.html', {
-        'projects': projects
-    })
 
 def calculate_match_score(application, requirements):
     """Расчет степени соответствия кандидата требованиям проекта"""
@@ -1078,7 +990,14 @@ def api_applications_for_project(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     requirements = project.requirements.all()
     
-    applications = Application.objects.filter(status='approved')
+    applications = Application.objects.exclude(status='rejected')
+    
+    invited_app_ids = project.invitations.values_list('application_id', flat=True)
+    participant_app_ids = project.participants.exclude(application=None).values_list('application_id', flat=True)
+    excluded_ids = list(invited_app_ids) + list(participant_app_ids)
+    
+    if excluded_ids:
+        applications = applications.exclude(id__in=excluded_ids)
     
     candidates_data = []
     for app in applications:
@@ -1100,3 +1019,139 @@ def api_applications_for_project(request, project_id):
     candidates_data.sort(key=lambda x: x['match_score'], reverse=True)
     
     return JsonResponse({'candidates': candidates_data, 'total': len(candidates_data)})
+
+@login_required
+def invite_to_project(request, project_id):
+    project = get_object_or_404(Project, id=project_id, creator=request.user)
+    
+    if request.method == 'POST':
+        application_id = request.POST.get('application_id')
+        message = request.POST.get('message', '')
+        
+        try:
+            application = get_object_or_404(Application, id=application_id)
+            
+            existing = ProjectInvitation.objects.filter(
+                project=project, 
+                application=application
+            ).exists()
+            
+            if existing:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Этот пользователь уже приглашен'
+                })
+            
+            invitation = ProjectInvitation.objects.create(
+                project=project,
+                application=application,
+                invited_by=request.user,
+                message=message
+            )
+            
+            email_sent = invitation.send_invitation_email()
+            
+            return JsonResponse({
+                'success': True,
+                'invitation_id': invitation.id,
+                'email_sent': email_sent,
+                'message': 'Приглашение отправлено' + (' на email' if email_sent else ' (email не отправлен)')
+            })
+            
+        except Application.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Заявка не найдена'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Неверный метод запроса'})
+
+@login_required
+def cancel_invitation(request, invitation_id):
+    invitation = get_object_or_404(
+        ProjectInvitation, 
+        id=invitation_id,
+        project__creator=request.user
+    )
+    
+    if request.method == 'POST':
+        invitation.cancel()
+        messages.success(request, 'Приглашение отменено')
+    
+    return redirect('project_detail', project_id=invitation.project.id)
+
+
+@login_required
+def respond_to_invitation(request, invitation_id):
+    """Ответ на приглашение"""
+    invitation = get_object_or_404(
+        ProjectInvitation,
+        id=invitation_id,
+        application__user=request.user,
+        status='pending'
+    )
+    
+    if request.method == 'GET':
+        action = request.GET.get('action')
+        
+        if action == 'accept':
+            invitation.accept()
+            messages.success(request, f'Вы присоединились к проекту "{invitation.project.name}"')
+            return redirect('project_list')
+        elif action == 'decline':
+            invitation.decline()
+            messages.success(request, 'Приглашение отклонено')
+            return redirect('project_list')
+        else:
+            return render(request, 'emails/respond_invitation.html', {'invitation': invitation})
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'accept':
+            invitation.accept()
+            messages.success(request, f'Вы присоединились к проекту "{invitation.project.name}"')
+        elif action == 'decline':
+            invitation.decline()
+            messages.success(request, 'Приглашение отклонено')
+        
+        return redirect('project_list')
+    
+    return redirect('project_list')
+
+#УВЕДОМЛЕНИЯ О СООБЩЕ   НИЯХ
+@login_required
+def get_notifications(request):
+    """API для получения уведомлений пользователя"""
+    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')[:20]
+    unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
+    
+    data = []
+    for notif in notifications:
+        data.append({
+            'id': notif.id,
+            'title': notif.title,
+            'message': notif.message,
+            'type': notif.type,
+            'is_read': notif.is_read,
+            'created_at': notif.created_at.strftime('%d.%m.%Y %H:%M'),
+            'invitation_id': notif.invitation_id,
+        })
+    
+    return JsonResponse({
+        'notifications': data,
+        'unread_count': unread_count
+    })
+
+@login_required
+def mark_notification_read(request, notification_id):
+    """Отметить уведомление как прочитанное"""
+    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+    notification.is_read = True
+    notification.save()
+    return JsonResponse({'success': True})
+
+@login_required
+def mark_all_notifications_read(request):
+    """Отметить все уведомления как прочитанные"""
+    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+    return JsonResponse({'success': True})

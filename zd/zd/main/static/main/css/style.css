@@ -6404,6 +6404,142 @@ summary:hover {
   display: inline-block;
 }
 
+.notification-icon {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  cursor: pointer;
+  z-index: 1000;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+.notification-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+.notification-icon .bell-icon {
+  width: 28px;
+  height: 28px;
+  filter: brightness(0) invert(1);
+}
+.notification-icon .notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff4757;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border: 2px solid white;
+}
+
+.notifications-dropdown {
+  position: fixed;
+  bottom: 100px;
+  right: 30px;
+  width: 380px;
+  max-height: 500px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease;
+}
+.notifications-dropdown .notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
+}
+.notifications-dropdown .notifications-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+.notifications-dropdown .notifications-header .mark-all-read {
+  background: none;
+  border: none;
+  color: #667eea;
+  cursor: pointer;
+  font-size: 13px;
+}
+.notifications-dropdown .notifications-header .mark-all-read:hover {
+  text-decoration: underline;
+}
+.notifications-dropdown .notifications-list {
+  overflow-y: auto;
+  max-height: 400px;
+}
+.notifications-dropdown .notifications-list .notification-item {
+  padding: 15px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.notifications-dropdown .notifications-list .notification-item:hover {
+  background: #f8f9fa;
+}
+.notifications-dropdown .notifications-list .notification-item.unread {
+  background: #e8f0fe;
+  border-left: 3px solid #667eea;
+}
+.notifications-dropdown .notifications-list .notification-item .notification-title {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+.notifications-dropdown .notifications-list .notification-item .notification-message {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 5px;
+}
+.notifications-dropdown .notifications-list .notification-item .notification-time {
+  font-size: 11px;
+  color: #999;
+}
+.notifications-dropdown .notifications-list .notification-empty {
+  padding: 40px;
+  text-align: center;
+  color: #999;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Адаптив для мобильных */
+@media (max-width: 768px) {
+  .notifications-dropdown {
+    width: calc(100vw - 40px);
+    right: 20px;
+    bottom: 90px;
+  }
+}
 @font-face {
   font-family: AA Stetica;
   src: url("../fonts/AA Stetica/AA Stetica Medium.otf");

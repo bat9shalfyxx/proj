@@ -217,6 +217,7 @@ class ProjectRequirement(models.Model):
     def __str__(self):
         return f"{self.skill_name} ({self.get_level_requirement_display()}) - {self.people_count} чел."
 
+
 class ProjectInvitation(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Ожидает ответа'),
@@ -234,13 +235,13 @@ class ProjectInvitation(models.Model):
     application = models.ForeignKey(
         Application, 
         on_delete=models.CASCADE, 
-        related_name='main_project_invitations',  # ИЗМЕНЕНО: добавлен префикс main_
+        related_name='main_project_invitations',
         verbose_name='Заявка'
     )
     invited_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
-        related_name='main_sent_invitations',  # ИЗМЕНЕНО: добавлен префикс main_
+        related_name='main_sent_invitations',
         verbose_name='Пригласил'
     )
     
@@ -249,6 +250,9 @@ class ProjectInvitation(models.Model):
     invited_at = models.DateTimeField('Дата приглашения', auto_now_add=True)
     responded_at = models.DateTimeField('Дата ответа', null=True, blank=True)
     
+    email_sent = models.BooleanField('Письмо отправлено', default=False)
+    email_sent_at = models.DateTimeField('Дата отправки письма', null=True, blank=True)
+
     class Meta:
         verbose_name = 'Приглашение'
         verbose_name_plural = 'Приглашения'
@@ -258,6 +262,52 @@ class ProjectInvitation(models.Model):
     def __str__(self):
         app_name = f"{self.application.contact_first_name} {self.application.contact_last_name}"
         return f"{app_name} -> {self.project.name}"
+    
+    def send_invitation_email(self):
+        """Отправка письма с приглашением"""
+        from django.core.mail import send_mail
+        from django.template.loader import render_to_string
+        from django.utils.html import strip_tags
+        from django.conf import settings
+        
+        candidate_email = self.application.contact_email
+        inviter_name = self.invited_by.get_full_name() or self.invited_by.username
+        
+        # Формируем ссылки для ответа
+        accept_url = f"{settings.SITE_URL}/invitation/{self.id}/respond/?action=accept"
+        decline_url = f"{settings.SITE_URL}/invitation/{self.id}/respond/?action=decline"
+        
+        context = {
+            'project_name': self.project.name,
+            'project_description': self.project.description[:200] if self.project.description else '',
+            'inviter_name': inviter_name,
+            'inviter_email': self.invited_by.email,
+            'message': self.message,
+            'accept_url': accept_url,
+            'decline_url': decline_url,
+            'candidate_name': f"{self.application.contact_first_name} {self.application.contact_last_name}",
+        }
+        
+        try:
+            # Рендерим HTML шаблон письма
+            html_message = render_to_string('emails/invitation_email.html', context)
+            plain_message = strip_tags(html_message)
+            
+            send_mail(
+                subject=f'Приглашение в проект "{self.project.name}"',
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[candidate_email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+            self.email_sent = True
+            self.email_sent_at = timezone.now()
+            self.save()
+            return True
+        except Exception as e:
+            print(f"Ошибка отправки письма: {e}")
+            return False
     
     def accept(self):
         self.status = 'accepted'
@@ -288,6 +338,57 @@ class ProjectInvitation(models.Model):
         self.status = 'cancelled'
         self.save()
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=ProjectInvitation)
+def create_notification_on_invitation(sender, instance, created, **kwargs):
+    """Создает уведомление при создании нового приглашения"""
+    if created:
+        from main.models import Notification
+        Notification.objects.create(
+            user=instance.application.user,
+            invitation=instance,
+            title=f'Новое приглашение в проект "{instance.project.name}"',
+            message=f'Пользователь {instance.invited_by.get_full_name() or instance.invited_by.username} приглашает вас присоединиться к проекту "{instance.project.name}"',
+            type='invitation',
+            is_read=False
+        )
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('invitation', 'Приглашение'),
+        ('project_update', 'Обновление проекта'),
+        ('comment', 'Комментарий'),
+        ('system', 'Системное'),
+    ]
+    
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        verbose_name='Пользователь'
+    )
+    invitation = models.ForeignKey(
+        'ProjectInvitation',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='notifications'
+    )
+    title = models.CharField('Заголовок', max_length=255)
+    message = models.TextField('Сообщение')
+    type = models.CharField('Тип', max_length=20, choices=NOTIFICATION_TYPES, default='system')
+    is_read = models.BooleanField('Прочитано', default=False)
+    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'Уведомление'
+        verbose_name_plural = 'Уведомления'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.title} - {self.user.username}"
 
 class ProjectParticipant(models.Model):
     STATUS_CHOICES = [

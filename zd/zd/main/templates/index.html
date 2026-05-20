@@ -12,9 +12,11 @@
     </head>
     
     <script src="../../static/main/scripts/profileScript.js" defer></script>
+    <script src="../../static/main/scripts/hub-search.js" defer></script>
     <script src="../../static/main/scripts/formPage.js" defer></script>
     <script src="../../static/main/scripts/nav.js" defer></script>
     <script src="../../static/main/scripts/skillsFiltration.js" defer></script>
+    <script src="../../static/main/scripts/notifications.js" defer></script>
     <script src="../../static/main/scripts/createProject.js" defer></script>
     {% include "scripts.html" %}
 
@@ -189,6 +191,21 @@
                     </li>
                 </ul>
             </nav>
+                
+            <div class="notification-icon" id="notificationIcon">
+                <img src="{% static 'main/src/notification-bell.svg' %}" alt="Уведомления" class="bell-icon">
+                <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+            </div>
+
+            <div class="notifications-dropdown" id="notificationsDropdown" style="display: none;">
+                <div class="notifications-header">
+                    <h3>Уведомления</h3>
+                    <button id="markAllRead" class="mark-all-read">Прочитать всё</button>
+                </div>
+                <div class="notifications-list" id="notificationsList">
+                    <div class="notification-empty">У вас нет уведомлений</div>
+                </div>
+            </div>
 
             <main class="switch-content">
                 {% block content %}

@@ -6,7 +6,7 @@ load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+    
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -133,3 +133,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CSRF_TRUSTED_ORIGINS = ['https://cnp.samgups.ru']
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'shokirovttt192@gmail.com'
+EMAIL_HOST_PASSWORD = 'tlib eeja edxu pmve'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# SITE_URL = 'https://cnp.samgups.ru'
+SITE_URL = 'http://127.0.0.1:8000'
+
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
