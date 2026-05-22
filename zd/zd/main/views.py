@@ -174,33 +174,83 @@ def hub(request):
 
 @login_required
 def profile(request):
-    applications = Application.objects.all().order_by('-created_at')
-
+    """Главная страница профиля (информация о пользователе)"""
     profile_form = ProfileEditForm(instance=request.user)
-
+    
     print(f"Пользователь: {request.user.email} (ID: {request.user.id})")
-    print(f"Найдено заявок: {applications.count()}")
-
-    for app in applications:
-        print(f"  - Заявка #{app.id}: {app.organization_name}, статус: {app.status}")
-
-    for app in applications:
-        if app.requirement_price:
-            try:
-                if isinstance(app.requirement_price, str) and ',' in app.requirement_price:
-                    prices = app.requirement_price.split(',')
-                    app.total_price = sum(float(p.strip()) for p in prices if p.strip())
-                else:
-                    app.total_price = float(app.requirement_price)
-            except (ValueError, TypeError):
-                app.total_price = app.requirement_price
-        else:
-            app.total_price = 0
-    return render(request, 'profile.html', {
+    print("Открыта главная страница профиля")
+    
+    return render(request, 'profile/main.html', {
         'title': 'Профиль',
+        'user': request.user,
+        'form': profile_form,
+        'active_tab': 'profile'
+    })
+
+@login_required
+def profile_applications(request):
+    """Страница со всеми заявками пользователей"""
+    applications = Application.objects.order_by('-created_at')
+    
+    print(f"Пользователь: {request.user.email} (ID: {request.user.id})")
+    print(f"Всего заявок в системе: {applications.count()}")
+    
+    profile_form = ProfileEditForm(instance=request.user)
+    
+    return render(request, 'profile/applications.html', {
+        'title': 'Все заявки',
         'user': request.user,
         'applications': applications,
         'form': profile_form,
+        'active_tab': 'applications'
+    })
+
+@login_required
+def profile_events(request):
+    """Страница мероприятий"""
+    profile_form = ProfileEditForm(instance=request.user)
+    
+    return render(request, 'profile/events.html', {
+        'title': 'Мероприятия',
+        'user': request.user,
+        'form': profile_form,
+        'active_tab': 'events'
+    })
+
+@login_required
+def profile_services(request):
+    """Страница сервисов"""
+    profile_form = ProfileEditForm(instance=request.user)
+    
+    return render(request, 'profile/services.html', {
+        'title': 'Сервисы',
+        'user': request.user,
+        'form': profile_form,
+        'active_tab': 'services'
+    })
+
+@login_required
+def profile_education(request):
+    """Страница обучения"""
+    profile_form = ProfileEditForm(instance=request.user)
+    
+    return render(request, 'profile/education.html', {
+        'title': 'Обучение',
+        'user': request.user,
+        'form': profile_form,
+        'active_tab': 'education'
+    })
+
+@login_required
+def profile_support(request):
+    """Страница поддержки"""
+    profile_form = ProfileEditForm(instance=request.user)
+    
+    return render(request, 'profile/support.html', {
+        'title': 'Поддержка',
+        'user': request.user,
+        'form': profile_form,
+        'active_tab': 'support'
     })
 
 @login_required

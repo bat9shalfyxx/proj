@@ -5,10 +5,16 @@ urlpatterns = [
     # Главные страницы
     path('', views.hub, name='home'),
     path('hub/', views.hub, name='hub'),
-    # Профиль и заявки
-    path('profile/', views.profile, name='profile'),
+    # заявки
     path('form_page/', views.form_page, name='form_page'),
-    path('create_team/', views.create_team, name='create_team'),
+    path('create_team/', views.create_team, name='create_team'),    
+    # Профиль и подстраницы
+    path('profile/', views.profile, name='profile'),
+    path('profile/applications/', views.profile_applications, name='profile_applications'),
+    path('profile/events/', views.profile_events, name='profile_events'),
+    path('profile/services/', views.profile_services, name='profile_services'),
+    path('profile/education/', views.profile_education, name='profile_education'),
+    path('profile/support/', views.profile_support, name='profile_support'),
     # Проекты (все маршруты здесь, без отдельного приложения)
     path('all/', views.all_projects, name='all_projects'),
     path('projects/', views.project_list, name='project_list'),

@@ -52,35 +52,36 @@
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
-}
-
-.sidebar-el:hover {
-    background: rgba(167, 24, 45, 0.1);
-    transform: translateX(5px);
-}
-
-.sidebar-el.active {
-    background: linear-gradient(135deg, #a7182d 0%, #764ba2 100%);
-}
-
-.sidebar-el.active p {
-    color: white;
-}
-
-.sidebar-el.active img {
-    filter: brightness(0) invert(1);
-}
-
-.sidebar-img {
-    width: 24px;
-    height: 24px;
-}
-
-.sidebar-el p {
-    margin: 0;
-    font-size: 16px;
-    color: #555;
-    font-weight: 500;
+    text-decoration: none;
+    
+    &:hover {
+        background: rgba(167, 24, 45, 0.1);
+        transform: translateX(5px);
+    }
+    
+    &.active {
+        background: linear-gradient(135deg, #a7182d 0%, #764ba2 100%);
+        
+        p {
+            color: white;
+        }
+        
+        img {
+            filter: brightness(0) invert(1);
+        }
+    }
+    
+    p {
+        margin: 0;
+        font-size: 16px;
+        color: #555;
+        font-weight: 500;
+    }
+    
+    img {
+        width: 24px;
+        height: 24px;
+    }
 }
 
 /* Основной блок профиля */

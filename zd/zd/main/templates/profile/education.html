@@ -1,0 +1,46 @@
+{% extends "profile/base.html" %} {% load static %} {% block profile_content %}
+<div class="profile-block block-5">
+  <div class="block-5-first-line">
+    <h2>Мое обучение</h2>
+    <div class="block-5-first-line-info">
+      <p>Начните обучение и информация о нем появится здесь</p>
+      <img
+        src="{% static 'main/src/profile/encyclopedia.svg' %}"
+        alt="encyclopedia"
+        class="encyclopedia"
+      />
+    </div>
+  </div>
+
+  <div class="block-5-second-line">
+    <h2>Доступное обучение</h2>
+  </div>
+
+  <div class="block-5-main">
+    <div class="block-5-main-block">
+      <img
+        src="{% static 'main/src/profile/education-brain.png' %}"
+        alt="education"
+      />
+      <p>Нет информации</p>
+      <button>Перейти в сервис</button>
+    </div>
+    <div class="block-5-main-block">
+      <img
+        src="{% static 'main/src/profile/education-brain.png' %}"
+        alt="education"
+      />
+      <p>Нет информации</p>
+      <button>Перейти в сервис</button>
+    </div>
+    <div class="block-5-main-block">
+      <img
+        src="{% static 'main/src/profile/education-brain.png' %}"
+        alt="education"
+      />
+      <p>Нет информации</p>
+      <button>Перейти в сервис</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

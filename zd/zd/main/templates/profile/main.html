@@ -1,0 +1,42 @@
+{% extends "profile/base.html" %}
+{% load static %}
+
+{% block profile_content %}
+<div class="profile-block block-1">
+    <div class="profile-header">
+        <div class="profile-header-left">
+            {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" alt="{{ user.username }}" class="profile-header-img">
+            {% else %}
+                <img src="{% static 'main/src/profile/img-placeholder.svg' %}" alt="img-placeholder" class="profile-header-img">
+            {% endif %}
+            <h2>{{ user.username }}</h2>
+        </div>
+        <img src="{% static 'main/src/profile/pen.svg' %}" alt="pen" class="link pen">
+    </div>
+
+    <div class="modal-overlay" id="editProfileModal" style="display: none;">
+    </div>
+
+    <div class="add-organization">
+        <p><span>Создайте проект</span><br>Чтобы использовать все возможности ЦНП</p>
+        <a href="{% url 'project_create' %}" class="btn-add-organization">
+            <button>Создать</button>
+        </a>
+    </div>
+
+    <div class="create-project">
+        <p><span>Мои проекты</p>
+        <a href="{% url 'project_list' %}" class="create-project-link">
+            <button class="create-project-button">Перейти</button>
+        </a>
+    </div>
+
+    <div class="create-project">
+        <p><span>Все проекты</p>
+        <a href="{% url 'all_projects' %}" class="create-project-link">
+            <button class="create-project-button">Перейти</button>
+        </a>
+    </div>
+</div>
+{% endblock %}

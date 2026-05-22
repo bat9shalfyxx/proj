@@ -1,0 +1,50 @@
+{% extends "profile/base.html" %} {% load static %} {% block profile_content %}
+<div class="profile-block block-4">
+  <div class="block-4-first-line">
+    <h2>Мои сервисы</h2>
+    <div class="block-4-first-line-info">
+      <p>Начните использовать сервисы и информация о них появится здесь</p>
+      <img
+        src="{% static 'main/src/profile/cog.svg' %}"
+        alt="cog"
+        class="cog-1"
+      />
+      <img
+        src="{% static 'main/src/profile/cog.svg' %}"
+        alt="cog"
+        class="cog-2"
+      />
+    </div>
+  </div>
+
+  <div class="block-4-second-line">
+    <h2>Мои сервисы</h2>
+    <div class="block-4-second-line-search">
+      <input type="search" placeholder="Найти" />
+      <img
+        src="{% static 'main/src/profile/lupka.svg' %}"
+        alt="лупа"
+        class="link"
+      />
+    </div>
+  </div>
+
+  <div class="block-4-main">
+    <div class="block-4-main-block">
+      <img src="{% static 'main/src/profile/brain.png' %}" alt="brain" />
+      <p>Нет информации</p>
+      <button>Перейти в сервис</button>
+    </div>
+    <div class="block-4-main-block">
+      <img src="{% static 'main/src/profile/brain.png' %}" alt="brain" />
+      <p>Нет информации</p>
+      <button>Перейти в сервис</button>
+    </div>
+    <div class="block-4-main-block">
+      <img src="{% static 'main/src/profile/brain.png' %}" alt="brain" />
+      <p>Нет информации</p>
+      <button>Перейти в сервис</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

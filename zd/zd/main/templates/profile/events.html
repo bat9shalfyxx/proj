@@ -1,0 +1,55 @@
+{% extends "profile/base.html" %} {% load static %} {% block profile_content %}
+<div class="profile-block block-3">
+  <div class="profile-third-1st-row">
+    <h2>Мероприятия</h2>
+    <div>
+      <a href="#!" class="link">Мои мероприятия</a>
+      <a href="#!" class="link">Все мероприятия</a>
+    </div>
+  </div>
+
+  <div class="profile-third-search">
+    <input type="text" placeholder="Поиск по мероприятиям" />
+    <a href="#!">
+      <img src="{% static 'main/src/profile/lupka.svg' %}" alt="искать" />
+    </a>
+  </div>
+
+  <div class="profile-third-last-row">
+    <div class="profile-third-last-block select">
+      <p>Все типы мероприятий</p>
+      <select name="мероприятия">
+        <option value="Выставка">Выставка</option>
+        <option value="Вебинар">Вебинар</option>
+        <option value="Встреча">Встреча</option>
+        <option value="Конференция">Конференция</option>
+        <option value="Обучение">Обучение</option>
+      </select>
+    </div>
+
+    <div class="profile-third-last-block">
+      <p>Дата</p>
+      <a href="#!">
+        <img
+          src="{% static 'main/src/profile/calendar.svg' %}"
+          alt="calendar"
+        />
+      </a>
+    </div>
+  </div>
+
+  <div class="profile-third-info">
+    <div class="profile-third-info-block">
+      <h2>Нет информации</h2>
+      <p>Нет информации</p>
+      <h3>Нет информации</h3>
+    </div>
+
+    <div class="profile-third-info-block">
+      <h2>Нет информации</h2>
+      <p>Нет информации</p>
+      <h3>Нет информации</h3>
+    </div>
+  </div>
+</div>
+{% endblock %}

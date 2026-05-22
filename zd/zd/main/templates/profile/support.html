@@ -1,0 +1,21 @@
+{% extends "profile/base.html" %}
+{% load static %}
+
+{% block profile_content %}
+<div class="profile-block block-6">
+    <p>Служба поддержки</p>
+    <div class="block-6-chat-bot">
+        <div class="block-6-chat-bot-text">
+            <h2>Скоро здесь будет наш новый чат-бот</h2>
+            <p>А пока вы можете обратиться в нашу службу поддержки</p>
+            
+            <div class="block-6-chat-bot-text-tech">
+                <p>Вопросы по сервисам</p>
+                <p>Техническая поддержка</p>
+                <p>Телефон</p>
+            </div>
+        </div>
+        <img src="{% static 'main/src/profile/cog-block-6.svg' %}" alt="cog">
+    </div>
+</div>
+{% endblock %}

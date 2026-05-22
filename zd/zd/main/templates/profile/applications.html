@@ -1,0 +1,54 @@
+{% extends "profile/base.html" %} {% load static %} {% block profile_content %}
+<div class="profile-block block-2">
+  <h2>Мои заявки</h2>
+
+  <div class="profile-second-btn-row">
+    <button class="profile-row-el filter-status-btn active" data-status="all">Все</button>
+    <button class="profile-row-el filter-status-btn" data-status="new">Новые</button>
+    <button class="profile-row-el filter-status-btn" data-status="in_progress">В обработке</button>
+    <button class="profile-row-el filter-status-btn" data-status="approved">Одобренные</button>
+    <button class="profile-row-el filter-status-btn" data-status="rejected">Отклоненные</button>
+  </div>
+
+  <div class="filter-controls">
+    <label for="filter-skills-js">Фильтровать по навыкам (через запятую):</label>
+    <input type="text" id="filter-skills-js" placeholder="Например: Python, JS" />
+    <button id="apply-filter-js">Применить фильтр</button>
+    <button id="reset-filter-js">Сбросить фильтр</button>
+  </div>
+
+  {% if applications %}
+  <div class="profile-second-request-list" id="applications-list">
+    {% for app in applications %}
+    <div class="profile-second-request-el" data-status="{{ app.status }}" data-skills="{{ app.skill_list|lower }}">
+      <h3>Заявка №{{ app.id }}</h3>
+      <p><strong>Организация:</strong> {{ app.organization_name }}</p>
+      <p><strong>Инициатор:</strong> {{ app.contact_first_name }} {{ app.contact_last_name }}</p>
+      <p><strong>Телефон:</strong> {{ app.contact_phone }}</p>
+      <p><strong>Email:</strong> {{ app.contact_email }}</p>
+      <p><strong>Роль в команде:</strong> {{ app.get_team_role_display|default:"Не указана" }}</p>
+      <p><strong>Возраст:</strong> {{ app.age|default:"Не указан" }}</p>
+      <p><strong>Навыки:</strong> {{ app.skill_list|default:"Не указаны" }}</p>
+      <p>
+        <strong>Статус:</strong>
+        {% if app.status == 'new' %}Новая {% elif app.status == 'in_progress' %}В обработке {% elif app.status == 'approved' %}Одобрена {% elif app.status == 'rejected' %}Отклонена {% else %}{{
+        app.status }} {% endif %}
+      </p>
+      <p><strong>Дата создания:</strong> {{ app.created_at|date:"d.m.Y H:i" }}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="profile-second-not-found">
+    <div class="not-found-block">
+      <img src="{% static 'main/src/profile/search.svg' %}" alt="не найдено" />
+      <h2>У вас пока нет заявок</h2>
+    </div>
+    <p>Создайте заявку, чтобы начать поиск команды</p>
+    <a href="{% url 'form_page' %}">
+      <button class="reset-filters">Создать заявку</button>
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

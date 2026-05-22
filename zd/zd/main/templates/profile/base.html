@@ -1,0 +1,111 @@
+<!-- templates/profile/base.html -->
+{% extends "index.html" %} {% load static %} {% block content %}
+<div class="profilePage">
+  <div class="profile-container">
+    <div class="profile-main-content">
+      <aside class="sidebar">
+        <div class="sidebar-menu-header">
+          <p>Меню</p>
+        </div>
+
+        <div class="sidebar-list">
+          <a
+            href="{% url 'profile' %}"
+            class="sidebar-el link {% if active_tab == 'profile' %}active{% endif %}"
+          >
+            <img
+              src="{% static 'main/src/profile/user.svg' %}"
+              alt="user"
+              class="sidebar-img"
+            />
+            <p>Профиль</p>
+          </a>
+
+          <a
+            href="{% url 'profile_applications' %}"
+            class="sidebar-el link {% if active_tab == 'applications' %}active{% endif %}"
+          >
+            <img
+              src="{% static 'main/src/profile/folder.svg' %}"
+              alt="folder"
+              class="sidebar-img"
+            />
+            <p>Заявки</p>
+          </a>
+
+          <a
+            href="{% url 'profile_events' %}"
+            class="sidebar-el link {% if active_tab == 'events' %}active{% endif %}"
+          >
+            <img
+              src="{% static 'main/src/profile/calendar.svg' %}"
+              alt="calendar"
+              class="sidebar-img"
+            />
+            <p>Мероприятия</p>
+          </a>
+
+          <a
+            href="{% url 'profile_services' %}"
+            class="sidebar-el link {% if active_tab == 'services' %}active{% endif %}"
+          >
+            <img
+              src="{% static 'main/src/profile/server.svg' %}"
+              alt="server"
+              class="sidebar-img"
+            />
+            <p>Сервисы</p>
+          </a>
+
+          <a
+            href="{% url 'profile_education' %}"
+            class="sidebar-el link {% if active_tab == 'education' %}active{% endif %}"
+          >
+            <img
+              src="{% static 'main/src/profile/educate.svg' %}"
+              alt="educate"
+              class="sidebar-img"
+            />
+            <p>Обучение</p>
+          </a>
+
+          <a
+            href="{% url 'profile_support' %}"
+            class="sidebar-el link {% if active_tab == 'support' %}active{% endif %}"
+          >
+            <img
+              src="{% static 'main/src/profile/dialog.svg' %}"
+              alt="dialog"
+              class="sidebar-img"
+            />
+            <p>Поддержка</p>
+          </a>
+        </div>
+      </aside>
+
+      <div class="profile-block">
+        {% block profile_content %} {% endblock %}
+      </div>
+
+      <button class="profile-menu-btn menu-btn">
+        <img
+          src="{% static 'main/src/section2/square.svg' %}"
+          class="menu-btn"
+        />
+        <img
+          src="{% static 'main/src/section2/square.svg' %}"
+          class="menu-btn"
+        />
+        <img
+          src="{% static 'main/src/section2/square.svg' %}"
+          class="menu-btn"
+        />
+        <img
+          src="{% static 'main/src/section2/square.svg' %}"
+          class="menu-btn"
+        />
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
