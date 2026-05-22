@@ -639,3 +639,19 @@ class ProfileEditForm(forms.ModelForm):
                 'accept': 'image/*'
             }),
         }
+    
+    def clean_username(self):
+        """Проверка уникальности username"""
+        username = self.cleaned_data.get('username')
+        if username:
+            if CustomUser.objects.exclude(pk=self.instance.pk).filter(username=username).exists():
+                raise forms.ValidationError('Это имя пользователя уже занято. Пожалуйста, выберите другое.')
+        return username
+    
+    def clean_email(self):
+        """Проверка уникальности email"""
+        email = self.cleaned_data.get('email')
+        if email:
+            if CustomUser.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
+                raise forms.ValidationError('Этот email уже используется. Пожалуйста, используйте другой.')
+        return email

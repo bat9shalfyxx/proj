@@ -919,18 +919,38 @@ def global_search(request):
 
 @login_required
 def edit_profile(request):
-    """Редактирование профиля пользователя (AJAX через модальное окно)"""
     if request.method == 'POST':
         form = ProfileEditForm(request.POST, request.FILES, instance=request.user)
+        
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Профиль успешно обновлен!')
-            return redirect('profile')
+            user = form.save()
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'username': user.username,
+                    'profile_image': user.profile_image.url if user.profile_image else None,
+                    'message': 'Профиль успешно обновлен!'
+                })
+            else:
+                messages.success(request, 'Профиль успешно обновлен!')
+                return redirect('profile')
         else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f'{field}: {error}')
-            return redirect('profile')
+            errors = {}
+            for field, field_errors in form.errors.items():
+                errors[field] = [str(error) for error in field_errors]
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'errors': errors,
+                    'message': 'Пожалуйста, исправьте ошибки в форме'
+                })
+            else:
+                for field, errors_list in errors.items():
+                    for error in errors_list:
+                        messages.error(request, f'{field}: {error}')
+                return redirect('profile')
     
     return redirect('profile')
 

@@ -11,7 +11,7 @@ if (profilePage) {
     menu.forEach((el) => {
         el.addEventListener("click", (e) => {
             e.preventDefault();
-    
+
             if (window.innerWidth <= 1200) {
                 if (e.target === el && !sidebar.classList.contains("visible")) {
                     sidebar.classList.add("visible");
