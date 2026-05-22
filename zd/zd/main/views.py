@@ -15,7 +15,7 @@ import re
 import logging
 
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, ApplicationForm, ProjectForm, ProjectRequirementForm
-from .models import CustomUser, Application, Project, ProjectRequirement, ProjectInvitation, ProjectParticipant, ProjectFile, ProjectComment, Notification
+from .models import CustomUser, Application, Project, ProjectRequirement, ProjectInvitation, ProjectParticipant, ProjectFile, ProjectComment, Notification, JoinRequest
 
 logger = logging.getLogger(__name__)
 def index(request):
@@ -270,16 +270,12 @@ def form_page(request):
     registration_form = CustomUserCreationForm()
     application_form = ApplicationForm()
     
-    # Для авторизованных пользователей сразу показываем только форму заявки
     show_auth_forms = not request.user.is_authenticated
 
-    # ОБРАБОТКА POST-ЗАПРОСОВ
     if request.method == 'POST':
         is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
         
-        # 1. ОБРАБОТКА ВХОДА
         if 'login_submit' in request.POST:
-            # Если пользователь уже авторизован, редиректим на профиль
             if request.user.is_authenticated:
                 if is_ajax:
                     return JsonResponse({
@@ -318,9 +314,7 @@ def form_page(request):
                     })
                 messages.error(request, 'Неверный email/телефон или пароль.')
         
-        # 2. ОБРАБОТКА РЕГИСТРАЦИИ
         elif 'registration_submit' in request.POST:
-            # Если пользователь уже авторизован, редиректим на профиль
             if request.user.is_authenticated:
                 if is_ajax:
                     return JsonResponse({
@@ -359,20 +353,16 @@ def form_page(request):
                     })
                 messages.error(request, 'Пожалуйста, исправьте ошибки в форме регистрации.')
         
-        # 3. ОБРАБОТКА ЗАЯВКИ
         elif 'application_submit' in request.POST:
             print("="*50)
             print("ОБРАБОТКА ЗАЯВКИ")
             print("="*50)
             
-            # Создаем копию POST данных для обработки
             post_data = request.POST.copy()
             
-            # Обрабатываем requirement_name и requirement_price из формы
             requirement_names = request.POST.getlist('requirement_name[]')
             requirement_prices = request.POST.getlist('requirement_price[]')
             
-            # Формируем JSON для требований
             requirements = []
             for i in range(len(requirement_names)):
                 if requirement_names[i].strip():
@@ -384,10 +374,8 @@ def form_page(request):
                             req['price'] = requirement_prices[i].strip()
                     requirements.append(req)
             
-            # Добавляем requirements_data в POST данные
             post_data['requirements_data'] = json.dumps(requirements)
             
-            # Создаем форму с обновленными данными
             application_form = ApplicationForm(post_data, request.FILES)
             
             print(f"Требования (JSON): {requirements}")
@@ -397,11 +385,9 @@ def form_page(request):
                 
                 application = application_form.save(commit=False)
                 
-                # Привязываем пользователя, если авторизован
                 if request.user.is_authenticated:
                     application.user = request.user
                 
-                # Данные уже обработаны в форме, просто сохраняем
                 application.save()
                 
                 print(f"✅ Заявка #{application.id} сохранена")
@@ -438,11 +424,9 @@ def form_page(request):
                 
                 messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
         
-        # 4. AJAX-ОБРАБОТКА (для совместимости)
         elif is_ajax and 'action' in request.POST:
             return handle_ajax_request(request)
     
-    # ВОЗВРАТ ДЛЯ GET-ЗАПРОСА
     return render(request, 'formPage.html', {
         'title': 'Форма',
         'login_form': login_form,
@@ -669,9 +653,9 @@ def project_create(request):
 
 @login_required
 def project_detail(request, project_id):
+    """Детальная страница проекта - просмотр доступен всем авторизованным пользователям"""
     project = get_object_or_404(Project, id=project_id)
     
-    # Проверка доступа
     is_creator = (project.creator == request.user)
     is_participant = ProjectParticipant.objects.filter(
         project=project, 
@@ -679,35 +663,41 @@ def project_detail(request, project_id):
         status='active'
     ).exists()
     
-    if not (is_creator or is_participant):
-        return HttpResponseForbidden("У вас нет доступа к этому проекту")
-    
     requirements = project.requirements.all().order_by('-is_mandatory', 'skill_name')
-    
-    mandatory_requirements = requirements.filter(is_mandatory=True)
-    optional_requirements = requirements.filter(is_mandatory=False)
-    
-    total_people_needed = requirements.aggregate(
-        total=models.Sum('people_count')
-    )['total'] or 0
-    
     participants = project.participants.filter(status='active')
-    
     invitations = project.invitations.all().order_by('-invited_at')
     
     context = {
         'project': project,
         'requirements': requirements,
-        'mandatory_requirements': mandatory_requirements,
-        'optional_requirements': optional_requirements,
-        'total_people_needed': total_people_needed,
         'participants': participants,
         'invitations': invitations,
         'total_requirements_sum': project.get_total_requirements_sum(),
         'is_creator': is_creator,
         'is_participant': is_participant,
+        'can_edit': is_creator or is_participant,
     }
     return render(request, 'project_detail.html', context)
+
+@login_required
+def leave_project(request, project_id):
+    """Участник покидает проект"""
+    project = get_object_or_404(Project, id=project_id)
+    participant = ProjectParticipant.objects.filter(
+        project=project,
+        user=request.user,
+        status='active'
+    ).first()
+    
+    if participant:
+        participant.status = 'left'
+        participant.left_at = timezone.now()
+        participant.save()
+        messages.success(request, f'Вы покинули проект "{project.name}"')
+    else:
+        messages.error(request, 'Вы не являетесь участником этого проекта')
+    
+    return redirect('project_list')
 
 @login_required
 def project_edit(request, project_id):
@@ -1225,3 +1215,133 @@ def mark_all_notifications_read(request):
     """Отметить все уведомления как прочитанные"""
     Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
     return JsonResponse({'success': True})
+
+@login_required
+def my_applications_api(request):
+    """API для получения заявок текущего пользователя"""
+    applications = Application.objects.filter(user=request.user).exclude(status='rejected')
+    data = []
+    for app in applications:
+        data.append({
+            'id': app.id,
+            'organization_name': app.organization_name,
+            'skill_list': app.skill_list,
+            'status': app.status,
+            'status_display': app.get_status_display(),
+            'team_role_display': app.get_team_role_display(),
+        })
+    return JsonResponse(data, safe=False)
+
+@login_required
+def send_join_request(request, project_id):
+    """Отправка запроса на присоединение к проекту"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Метод не разрешен'}, status=405)
+    
+    try:
+        from django.apps import apps
+        from django.utils import timezone
+        
+        Project = apps.get_model('main', 'Project')
+        ProjectParticipant = apps.get_model('main', 'ProjectParticipant')
+        Application = apps.get_model('main', 'Application')
+        JoinRequest = apps.get_model('main', 'JoinRequest')
+        Notification = apps.get_model('main', 'Notification')
+        
+        project = Project.objects.get(id=project_id)
+        
+        if project.creator == request.user:
+            return JsonResponse({'success': False, 'error': 'Вы создатель этого проекта'})
+        
+        is_participant = ProjectParticipant.objects.filter(
+            project=project, user=request.user, status='active'
+        ).exists()
+        if is_participant:
+            return JsonResponse({'success': False, 'error': 'Вы уже участник этого проекта'})
+        
+        data = json.loads(request.body)
+        application_id = data.get('application_id')
+        message = data.get('message', '')
+        
+        application = Application.objects.get(id=application_id, user=request.user)
+        
+        existing = JoinRequest.objects.filter(
+            project=project, application=application, status='pending'
+        ).exists()
+        if existing:
+            return JsonResponse({'success': False, 'error': 'Вы уже отправляли заявку'})
+        
+        join_request = JoinRequest.objects.create(
+            project=project,
+            application=application,
+            user=request.user,
+            message=message,
+            status='pending'
+        )
+        
+        Notification.objects.create(
+            user=project.creator,
+            title=f'Новый запрос на участие в проекте "{project.name}"',
+            message=f'Пользователь {request.user.get_full_name() or request.user.username} хочет присоединиться к вашему проекту.\n\nСообщение: {message[:200] if message else "Без сообщения"}',
+            type='join_request',
+            invitation_id=join_request.id
+        )
+        
+        return JsonResponse({'success': True, 'request_id': join_request.id})
+        
+    except Exception as e:
+        print(f"❌ Ошибка: {e}")
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+@login_required
+def project_join_requests(request, project_id):
+    """Страница запросов на присоединение (для создателя проекта)"""
+    from django.apps import apps
+    Project = apps.get_model('main', 'Project')
+    JoinRequest = apps.get_model('main', 'JoinRequest')
+    
+    project = get_object_or_404(Project, id=project_id, creator=request.user)
+    join_requests = JoinRequest.objects.filter(project=project).order_by('-created_at')
+    
+    return render(request, 'project_join_requests.html', {
+        'project': project,
+        'join_requests': join_requests,
+    })
+
+
+@login_required
+def respond_join_request(request, request_id):
+    """Ответ на запрос о присоединении"""
+    from django.apps import apps
+    JoinRequest = apps.get_model('main', 'JoinRequest')
+    Notification = apps.get_model('main', 'Notification')
+    
+    join_request = get_object_or_404(JoinRequest, id=request_id)
+    
+    if join_request.project.creator != request.user:
+        messages.error(request, 'У вас нет прав для этого действия')
+        return redirect('project_list')
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'accept':
+            join_request.accept()
+            messages.success(request, f'Заявка от {join_request.user.username} принята')
+            
+            Notification.objects.create(
+                user=join_request.user,
+                title=f'Заявка на проект "{join_request.project.name}" принята',
+                message=f'Вас приняли в проект "{join_request.project.name}"',
+                type='join_request_accepted'
+            )
+            
+        elif action == 'reject':
+            join_request.reject()
+            messages.success(request, 'Заявка отклонена')
+        
+        return redirect('project_join_requests', project_id=join_request.project.id)
+    
+    return render(request, 'respond_join_request.html', {'join_request': join_request})

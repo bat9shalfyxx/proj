@@ -1865,35 +1865,30 @@
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-decoration: none;
 }
-
 .sidebar-el:hover {
   background: rgba(167, 24, 45, 0.1);
   transform: translateX(5px);
 }
-
 .sidebar-el.active {
   background: linear-gradient(135deg, #a7182d 0%, #764ba2 100%);
 }
-
 .sidebar-el.active p {
   color: white;
 }
-
 .sidebar-el.active img {
   filter: brightness(0) invert(1);
 }
-
-.sidebar-img {
-  width: 24px;
-  height: 24px;
-}
-
 .sidebar-el p {
   margin: 0;
   font-size: 16px;
   color: #555;
   font-weight: 500;
+}
+.sidebar-el img {
+  width: 24px;
+  height: 24px;
 }
 
 /* Основной блок профиля */
@@ -2247,6 +2242,61 @@
   }
   .sidebar-list {
     grid-template-columns: 1fr;
+  }
+}
+.form-input.error {
+  border-color: #dc3545 !important;
+  background: rgba(220, 53, 69, 0.05) !important;
+}
+
+.field-error {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 5px;
+  padding: 5px 10px;
+  background: rgba(220, 53, 69, 0.1);
+  border-radius: 6px;
+  display: block;
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  z-index: 10000;
+  animation: slideIn 0.3s ease;
+}
+
+.notification.success {
+  background: #28a745;
+  color: white;
+}
+
+.notification.error {
+  background: #dc3545;
+  color: white;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
   }
 }
 /* Стили для формы редактирования */
@@ -5499,12 +5549,12 @@ summary:hover {
   display: inline-block;
 }
 
-.btn-primary {
+.btn-primary, .btn-info {
   background: linear-gradient(135deg, #a7182d 0%, #764ba2 100%);
   color: white;
 }
 
-.btn-primary:hover {
+.btn-primary:hover, .btn-info:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(167, 24, 45, 0.3);
 }
@@ -6404,6 +6454,525 @@ summary:hover {
   display: inline-block;
 }
 
+.application-option {
+  padding: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.application-option:hover {
+  border-color: #667eea;
+  background: #f8f9fa;
+}
+
+.application-option.selected {
+  border-color: #28a745;
+  background: #f0fff4;
+}
+
+.application-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.application-skills, .application-role {
+  font-size: 13px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.btn-send {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.user-applications-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+}
+
+.btn-apply {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-apply:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+  background: linear-gradient(135deg, #218838, #1ba87b);
+}
+
+.btn-apply:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+@media (max-width: 768px) {
+  .btn-apply {
+    padding: 10px 20px;
+    font-size: 14px;
+    width: 100%;
+    justify-content: center;
+  }
+}
+.btn-apply::before {
+  content: "✉️";
+  font-size: 16px;
+}
+
+.btn-apply-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+/* Эстетичное модальное окно - премиум дизайн */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: overlayFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes overlayFade {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(12px);
+  }
+}
+.modal-content {
+  background: #ffffff;
+  border-radius: 32px;
+  max-width: 640px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  animation: modalSlide 0.5s cubic-bezier(0.34, 1.2, 0.64, 1);
+  position: relative;
+}
+
+@keyframes modalSlide {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+/* Кастомный скроллбар */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+  margin: 10px 0;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #a7182d, #764ba2);
+  border-radius: 10px;
+}
+
+/* Шапка модального окна */
+.modal-header {
+  background: linear-gradient(135deg, #a7182d 0%, #764ba2 100%);
+  padding: 28px 32px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  color: white;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.modal-header h3::before {
+  content: "✨";
+  margin-right: 10px;
+  font-size: 22px;
+}
+
+.modal-close {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Тело модального окна */
+.modal-body {
+  padding: 32px;
+}
+
+/* Текст приглашения */
+.modal-body > p {
+  font-size: 15px;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0 0 8px 0;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+/* Список заявок */
+.user-applications-list {
+  max-height: 340px;
+  overflow-y: auto;
+  margin: 20px 0;
+  padding-right: 8px;
+}
+
+/* Карточка заявки - элегантный дизайн */
+.application-option {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  position: relative;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.application-option:hover {
+  border-color: #667eea;
+  transform: translateX(6px) translateY(-2px);
+  box-shadow: 0 12px 24px -12px rgba(102, 126, 234, 0.25);
+  background: linear-gradient(135deg, #ffffff, #faf5ff);
+}
+
+.application-option.selected {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  box-shadow: 0 8px 20px -12px rgba(16, 185, 129, 0.3);
+}
+
+.application-option.selected::after {
+  content: "✓";
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  width: 24px;
+  height: 24px;
+  background: #10b981;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+.application-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.application-header strong {
+  font-size: 17px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #1e293b, #334155);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Бейдж статуса */
+.status-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 30px;
+  letter-spacing: 0.3px;
+}
+
+.status-badge.status-new {
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+.status-badge.status-approved {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+/* Детали заявки */
+.application-skills,
+.application-role {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+.application-skills strong,
+.application-role strong {
+  color: #475569;
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+/* Текстовая область */
+.form-group {
+  margin-top: 28px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.form-group label::before {
+  content: "💬";
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.3s ease;
+  background: #ffffff;
+  line-height: 1.5;
+}
+
+.form-textarea:focus {
+  border-color: #667eea;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.form-textarea::-moz-placeholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.form-textarea::placeholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Футер с кнопками */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 2px solid #f1f5f9;
+}
+
+/* Кнопки */
+.btn-cancel {
+  background: #f1f5f9;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 40px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+  background: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+.btn-send {
+  background: linear-gradient(135deg, #a7182d 0%, #764ba2 100%);
+  border: none;
+  padding: 12px 30px;
+  border-radius: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-send::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-send:hover::before {
+  left: 100%;
+}
+
+.btn-send:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.45);
+}
+
+.btn-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Пустое состояние - элегантное */
+.empty-state {
+  text-align: center;
+  padding: 48px 32px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 24px;
+}
+
+.empty-state svg {
+  opacity: 0.5;
+  margin-bottom: 16px;
+}
+
+.empty-state p {
+  color: #64748b;
+  margin-bottom: 20px;
+  font-size: 15px;
+}
+
+.empty-state .btn-primary {
+  display: inline-block;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #a7182d 0%, #764ba2 100%);
+  color: white;
+  border-radius: 40px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.empty-state .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
+}
+
+/* Адаптивность */
+@media (max-width: 640px) {
+  .modal-content {
+    width: 92%;
+    border-radius: 24px;
+  }
+  .modal-header {
+    padding: 20px 24px;
+  }
+  .modal-header h3 {
+    font-size: 20px;
+  }
+  .modal-body {
+    padding: 24px;
+  }
+  .application-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .application-option.selected::after {
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+  }
+  .modal-footer {
+    flex-direction: column;
+  }
+  .btn-cancel,
+  .btn-send {
+    width: 100%;
+    text-align: center;
+  }
+}
 .notification-icon {
   position: fixed;
   bottom: 30px;

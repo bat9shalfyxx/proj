@@ -42,25 +42,68 @@
                     {{ project.get_status_display }}
                 </span>
             </div>
-            
-            {% if is_creator %}
+
+            {% if not is_creator and not is_participant %}
+                <button type="button" class="btn btn-apply" onclick="openJoinRequestModal()">
+                    Подать заявку на участие
+                </button>
+            {% endif %}
+
+            {% if can_edit %}
             <div class="project-actions">
-                <a href="{% url 'project_edit' project.id %}" class="btn btn-primary">Редактировать</a>
-                <form method="post" action="{% url 'project_change_status' project.id %}" style="display: inline;">
-                    {% csrf_token %}
-                    <select name="status" class="status-select" onchange="this.form.submit()">
-                        {% for status_code, status_name in project.STATUS_CHOICES %}
-                        <option value="{{ status_code }}" {% if project.status == status_code %}selected{% endif %}>
-                            {{ status_name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </form>
-                <button type="button" class="btn btn-success" onclick="openCandidateModal()">Добавить участников</button>
-                <button type="button" class="btn btn-danger" onclick="showDeleteModal()">Удалить</button>
+                {% if is_creator %}
+                    <a href="{% url 'project_edit' project.id %}" class="btn btn-primary">Редактировать</a>
+                    <a href="{% url 'project_join_requests' project.id %}" class="btn btn-info">Запросы на участие</a>
+                    <form method="post" action="{% url 'project_change_status' project.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <select name="status" class="status-select" onchange="this.form.submit()">
+                            {% for status_code, status_name in project.STATUS_CHOICES %}
+                            <option value="{{ status_code }}" {% if project.status == status_code %}selected{% endif %}>
+                                {{ status_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                    <button type="button" class="btn btn-success" onclick="openCandidateModal()">Добавить участников</button>
+                    <button type="button" class="btn btn-danger" onclick="showDeleteModal()">Удалить</button>
+                {% elif is_participant %}
+                    <form method="post" action="{% url 'leave_project' project.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Покинуть проект?')">Покинуть проект</button>
+                    </form>
+                {% endif %}
             </div>
             {% endif %}
         </div>
+
+        <div id="joinRequestModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h3>Подача заявки на участие в проекте "{{ project.name }}"</h3>
+                    <button type="button" class="modal-close" onclick="closeJoinRequestModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <p>Выберите заявку, которую хотите прикрепить к заявке на участие:</p>
+                    
+                    <div class="user-applications-list" id="userApplicationsList">
+                        <!-- Список заявок пользователя будет загружен здесь -->
+                        <div class="loading">Загрузка ваших заявок...</div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label for="joinMessage">Сопроводительное сообщение (необязательно):</label>
+                        <textarea id="joinMessage" class="form-textarea" rows="4" 
+                            placeholder="Расскажите, почему вы хотите присоединиться к проекту..."></textarea>
+                    </div>
+                    
+                    <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                        <button type="button" class="btn-cancel" onclick="closeJoinRequestModal()">Отмена</button>
+                        <button type="button" class="btn-send" id="sendJoinRequestBtn" disabled>Отправить заявку</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <div class="project-info">
             {% if project.description %}
@@ -192,6 +235,7 @@
 </div>
 
 <script>
+
 const csrfToken = '{{ csrf_token }}';
 let notificationId = 0;
 
@@ -490,6 +534,208 @@ document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
         hideDeleteModal();
         closeCandidateModal();
+    }
+});
+</script>
+
+<script>
+// ==================== ЗАЯВКА НА УЧАСТИЕ ====================
+let selectedApplicationId = null;
+const csrfTokenGlobal = '{{ csrf_token }}';
+
+function openJoinRequestModal() {
+    const modal = document.getElementById('joinRequestModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        loadUserApplications();
+    }
+}
+
+function closeJoinRequestModal() {
+    const modal = document.getElementById('joinRequestModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+        selectedApplicationId = null;
+        const sendBtn = document.getElementById('sendJoinRequestBtn');
+        if (sendBtn) sendBtn.disabled = true;
+        const messageField = document.getElementById('joinMessage');
+        if (messageField) messageField.value = '';
+    }
+}
+
+function loadUserApplications() {
+    const listContainer = document.getElementById('userApplicationsList');
+    if (!listContainer) return;
+    
+    listContainer.innerHTML = '<div class="loading" style="text-align: center; padding: 20px;">Загрузка ваших заявок...</div>';
+    
+    fetch('/api/my-applications/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка загрузки');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <p>У вас нет активных заявок</p>
+                        <a href="{% url 'form_page' %}" class="btn-primary">Создать заявку</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            listContainer.innerHTML = data.map(app => `
+                <div class="application-option" data-app-id="${app.id}" onclick="selectApplication(${app.id})">
+                    <div class="application-header">
+                        <strong>${escapeHtmlGlobal(app.organization_name) || 'Заявка №' + app.id}</strong>
+                        <span class="status-badge status-${app.status}">${getStatusText(app.status)}</span>
+                    </div>
+                    <div class="application-skills">
+                        <strong>Навыки:</strong> ${escapeHtmlGlobal(app.skill_list) || 'Не указаны'}
+                    </div>
+                    <div class="application-role">
+                        <strong>Роль:</strong> ${escapeHtmlGlobal(app.team_role_display) || 'Не указана'}
+                    </div>
+                </div>
+            `).join('');
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки заявок:', error);
+            listContainer.innerHTML = '<div class="error" style="text-align: center; padding: 20px; color: #dc3545;">Ошибка загрузки заявок</div>';
+        });
+}
+
+function getStatusText(status) {
+    const statusMap = {
+        'new': 'Новая',
+        'in_progress': 'В обработке',
+        'approved': 'Одобрена',
+        'rejected': 'Отклонена'
+    };
+    return statusMap[status] || status;
+}
+
+function selectApplication(appId) {
+    selectedApplicationId = appId;
+    
+    document.querySelectorAll('.application-option').forEach(el => {
+        el.classList.remove('selected');
+    });
+    
+    const selectedEl = document.querySelector(`.application-option[data-app-id="${appId}"]`);
+    if (selectedEl) {
+        selectedEl.classList.add('selected');
+    }
+    
+    const sendBtn = document.getElementById('sendJoinRequestBtn');
+    if (sendBtn) sendBtn.disabled = false;
+}
+
+function sendJoinRequest() {
+    if (!selectedApplicationId) {
+        alert('Выберите заявку для отправки');
+        return;
+    }
+    
+    const message = document.getElementById('joinMessage')?.value || '';
+    const sendBtn = document.getElementById('sendJoinRequestBtn');
+    const originalText = sendBtn?.textContent || 'Отправить';
+    
+    if (sendBtn) {
+        sendBtn.textContent = 'Отправка...';
+        sendBtn.disabled = true;
+    }
+    
+    // ПРАВИЛЬНЫЙ URL - с /api/ в начале
+    const url = `/api/projects/{{ project.id }}/join-request/`;
+    console.log('Отправка запроса на URL:', url);
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfTokenGlobal,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            application_id: selectedApplicationId,
+            message: message
+        })
+    })
+    .then(response => {
+        console.log('Статус ответа:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Ответ сервера:', data);
+        if (data.success) {
+            showNotificationGlobal('✅ Заявка успешно отправлена!', 'success');
+            closeJoinRequestModal();
+        } else {
+            showNotificationGlobal(data.error || 'Ошибка при отправке заявки', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+        showNotificationGlobal(error.message || 'Произошла ошибка при отправке', 'error');
+    })
+    .finally(() => {
+        if (sendBtn) {
+            sendBtn.textContent = originalText;
+            sendBtn.disabled = false;
+        }
+    });
+}
+
+function showNotificationGlobal(message, type) {
+    const existingNotif = document.querySelector('.custom-notification');
+    if (existingNotif) existingNotif.remove();
+    
+    const notification = document.createElement('div');
+    notification.className = `custom-notification ${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        background: ${type === 'success' ? '#10b981' : '#ef4444'};
+        color: white;
+        border-radius: 12px;
+        z-index: 10001;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+function escapeHtmlGlobal(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const sendBtn = document.getElementById('sendJoinRequestBtn');
+    if (sendBtn) {
+        sendBtn.addEventListener('click', sendJoinRequest);
     }
 });
 </script>

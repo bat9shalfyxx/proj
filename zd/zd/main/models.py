@@ -2,10 +2,10 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.core.validators import RegexValidator
 from django.conf import settings
+from django.utils import timezone
 import random
 import re
 import string
-from django.utils import timezone
 
 class CustomUserManager(BaseUserManager):
     """Менеджер для кастомной модели пользователя"""
@@ -527,3 +527,57 @@ class ProjectComment(models.Model):
     
     def __str__(self):
         return f"{self.author} - {self.created_at.strftime('%d.%m.%Y %H:%M')}"
+# main/models.py
+
+class JoinRequest(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Ожидает ответа'),
+        ('accepted', 'Принят'),
+        ('rejected', 'Отклонен'),
+    ]
+    
+    project = models.ForeignKey('Project', on_delete=models.CASCADE, related_name='join_requests')
+    application = models.ForeignKey('main.Application', on_delete=models.CASCADE, related_name='join_requests')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='join_requests')
+    message = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    responded_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        unique_together = ['project', 'application']
+        verbose_name = 'Запрос на присоединение'
+        verbose_name_plural = 'Запросы на присоединение'
+    
+    def __str__(self):
+        return f"Запрос от {self.user.username} в проект {self.project.name}"
+    
+    def accept(self):
+        """Принять запрос"""
+        self.status = 'accepted'
+        self.responded_at = timezone.now()
+        self.save()
+        
+        # Добавляем в участники проекта
+        from .models import ProjectParticipant
+        ProjectParticipant.objects.get_or_create(
+            project=self.project,
+            application=self.application,
+            defaults={
+                'user': self.user,
+                'full_name': f"{self.application.contact_first_name} {self.application.contact_last_name}",
+                'email': self.application.contact_email,
+                'phone': self.application.contact_phone,
+                'skills': self.application.skill_list,
+                'requirements': self.application.requirement_name,
+                'requirement_price': self.application.requirement_price,
+                'role': self.application.get_team_role_display() or 'Участник',
+                'status': 'active'
+            }
+        )
+    
+    def reject(self):
+        """Отклонить запрос"""
+        self.status = 'rejected'
+        self.responded_at = timezone.now()
+        self.save()
