@@ -1,0 +1,248 @@
+{% extends "index.html" %} {% load static %} {% block title %}Редактирование проекта - {{ project.name }}{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'main/css/createProject.css' %}" />
+{% endblock %} {% block content %}
+<div class="create-project-page" style="background: linear-gradient(135deg, #a7182d 60%, #f3f2f2 40%)">
+  <div class="container">
+    <div class="page-header" style="background: #ff3d5a">
+      <h1>Редактирование проекта</h1>
+      <p>Измените информацию о проекте</p>
+    </div>
+
+    <form method="post" class="project-form" id="projectForm">
+      {% csrf_token %}
+
+      <div class="form-section">
+        <h2>Основная информация</h2>
+
+        <div class="form-group">
+          <label for="name">Название проекта <span class="required">*</span></label>
+          <input type="text" name="name" id="name" class="form-control" value="{{ project.name }}" required />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Описание проекта <span class="required">*</span></label>
+          <textarea name="description" id="description" class="form-control" rows="5" required>{{ project.description }}</textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="team_activities">Чем планирует заниматься команда</label>
+          <textarea name="team_activities" id="team_activities" class="form-control" rows="4">{{ project.team_activities }}</textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="work_conditions">Условия работы</label>
+          <textarea name="work_conditions" id="work_conditions" class="form-control" rows="4">{{ project.work_conditions }}</textarea>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2>Сроки и бюджет</h2>
+
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="start_date">Дата начала</label>
+            <input type="date" name="start_date" id="start_date" class="form-control" value="{{ project.start_date|date:'Y-m-d' }}" />
+          </div>
+
+          <div class="form-group half">
+            <label for="end_date">Дата окончания</label>
+            <input type="date" name="end_date" id="end_date" class="form-control" value="{{ project.end_date|date:'Y-m-d' }}" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="budget">Бюджет проекта (₽)</label>
+          <input type="number" name="budget" id="budget" class="form-control" value="{{ project.budget|floatformat:0 }}" min="0" step="0.01" />
+        </div>
+
+        <div class="form-group">
+          <label for="keywords">Ключевые слова (через запятую)</label>
+          <input type="text" name="keywords" id="keywords" class="form-control" value="{{ project.keywords }}" />
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-header">
+          <h2>Требования к участникам</h2>
+          <span class="section-badge">Можно добавить несколько</span>
+        </div>
+
+        <div class="requirements-list" id="requirements-list">
+          {% for req in requirements %}
+          <div class="requirement-item">
+            <div class="requirement-header">
+              <h4>Требование</h4>
+              <button type="button" class="remove-requirement" title="Удалить требование">×</button>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group half">
+                <label>Навык <span class="required">*</span></label>
+                <input type="text" name="requirement_name[]" class="form-control" value="{{ req.skill_name }}" required />
+              </div>
+
+              <!-- prettier-ignore -->
+              <div class="form-group half">
+                <label>Уровень</label>
+                <select name="requirement_level[]" class="form-control">
+                    <option value="">Любой</option>
+                    <option value="beginner" {% if req.level_requirement == 'beginner' %}selected{% endif %}>Начинающий</option>
+                    <option value="junior" {% if req.level_requirement == 'junior' %}selected{% endif %}>Junior</option>
+                    <option value="middle" {% if req.level_requirement == 'middle' %}selected{% endif %}>Middle</option>
+                    <option value="senior" {% if req.level_requirement == 'senior' %}selected{% endif %}>Senior</option>
+                    <option value="expert" {% if req.level_requirement == 'expert' %}selected{% endif %}>Эксперт</option>
+                </select>
+            </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group half">
+                <label>Количество человек</label>
+                <input type="number" name="requirement_count[]" class="form-control" value="{{ req.people_count }}" min="1" step="1" />
+              </div>
+              <div class="form-group half">
+                <label>Обязательное</label>
+                <div class="checkbox-wrapper">
+                  <input type="checkbox" name="requirement_mandatory[]" class="form-checkbox" {% if req.is_mandatory %}checked{% endif %} />
+                  <span class="checkbox-label">Да, требуется обязательно</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Стоимость (₽)</label>
+              <input type="number" name="requirement_price[]" class="form-control" value="{{ req.price|floatformat:0 }}" min="0" step="0.01" />
+            </div>
+
+            <div class="form-group">
+              <label>Условие работы</label>
+              <input type="text" name="requirement_condition[]" class="form-control" value="{{ req.work_condition }}" />
+            </div>
+
+            <!-- Добавляем поле для роли по Белбину, если есть -->
+            {% if req.belbin_role %}
+            <div class="form-group">
+              <label>Роль по Белбину</label>
+              <!-- prettier-ignore -->
+              <select name="belbin_role[]" class="form-control">
+                <option value="">Не выбрана</option>
+                <option value="implementer" {% if req.belbin_role == 'implementer' %}selected{% endif %}>Исполнитель</option>
+                <option value="coordinator" {% if req.belbin_role == 'coordinator' %}selected{% endif %}>Координатор</option>
+                <option value="shaper" {% if req.belbin_role == 'shaper' %}selected{% endif %}>Формирователь</option>
+                <option value="plant" {% if req.belbin_role == 'plant' %}selected{% endif %}>Генератор идей</option>
+                <option value="resource_investigator" {% if req.belbin_role == 'resource_investigator' %}selected{% endif %}>Разведчик</option>
+                <option value="teamworker" {% if req.belbin_role == 'teamworker' %}selected{% endif %}>Душа команды</option>
+                <option value="monitor_evaluator" {% if req.belbin_role == 'monitor_evaluator' %}selected{% endif %}>Аналитик</option>
+                <option value="completer_finisher" {% if req.belbin_role == 'completer_finisher' %}selected{% endif %}>Педантичность</option>
+                <option value="specialist" {% if req.belbin_role == 'specialist' %}selected{% endif %}>Специалист</option>
+              </select>
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+
+        <button type="button" class="add-requirement-btn" id="addRequirementBtn">+ Добавить требование</button>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        <a href="{% url 'project_detail' project.id %}" class="btn btn-secondary">Отмена</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const requirementsList = document.getElementById('requirements-list');
+    const addBtn = document.getElementById('addRequirementBtn');
+
+    function addRequirement() {
+      const newItem = document.createElement('div');
+      newItem.className = 'requirement-item';
+      newItem.innerHTML = `
+            <div class="requirement-header">
+                <h4>Требование</h4>
+                <button type="button" class="remove-requirement" title="Удалить требование">×</button>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group half">
+                    <label>Навык <span class="required">*</span></label>
+                    <input type="text" name="requirement_name[]" class="form-control" required>
+                </div>
+                <div class="form-group half">
+                    <label>Уровень</label>
+                    <select name="requirement_level[]" class="form-control">
+                        <option value="">Любой</option>
+                        <option value="beginner">Начинающий</option>
+                        <option value="junior">Junior</option>
+                        <option value="middle">Middle</option>
+                        <option value="senior">Senior</option>
+                        <option value="expert">Эксперт</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half">
+                    <label>Количество человек</label>
+                    <input type="number" name="requirement_count[]" class="form-control" value="1" min="1">
+                </div>
+                <div class="form-group half">
+                    <label>Обязательное</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" name="requirement_mandatory[]" class="form-checkbox" checked>
+                        <span class="checkbox-label">Да, требуется обязательно</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Стоимость (₽)</label>
+                <input type="number" name="requirement_price[]" class="form-control" min="0" step="0.01">
+            </div>
+
+            <div class="form-group">
+                <label>Условие работы</label>
+                <input type="text" name="requirement_condition[]" class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label>Роль по Белбину</label>
+                <select name="belbin_role[]" class="form-control">
+                    <option value="">Не выбрана</option>
+                    <option value="implementer">Исполнитель</option>
+                    <option value="coordinator">Координатор</option>
+                    <option value="shaper">Формирователь</option>
+                    <option value="plant">Генератор идей</option>
+                    <option value="resource_investigator">Разведчик</option>
+                    <option value="teamworker">Душа команды</option>
+                    <option value="monitor_evaluator">Аналитик</option>
+                    <option value="completer_finisher">Педантичность</option>
+                    <option value="specialist">Специалист</option>
+                </select>
+            </div>
+        `;
+
+      const removeBtn = newItem.querySelector('.remove-requirement');
+      removeBtn.addEventListener('click', function () {
+        newItem.remove();
+      });
+
+      requirementsList.appendChild(newItem);
+    }
+
+    if (addBtn) {
+      addBtn.addEventListener('click', addRequirement);
+    }
+
+    document.querySelectorAll('.remove-requirement').forEach(btn => {
+      btn.addEventListener('click', function () {
+        this.closest('.requirement-item').remove();
+      });
+    });
+  });
+</script>
+{% endblock %}

@@ -174,11 +174,7 @@ def hub(request):
 
 @login_required
 def profile(request):
-    """Главная страница профиля (информация о пользователе)"""
     profile_form = ProfileEditForm(instance=request.user)
-    
-    print(f"Пользователь: {request.user.email} (ID: {request.user.id})")
-    print("Открыта главная страница профиля")
     
     return render(request, 'profile/main.html', {
         'title': 'Профиль',
@@ -747,7 +743,7 @@ def project_edit(request, project_id):
         'project': project,
         'requirements': project.requirements.all(),
     }
-    return render(request, 'projects/project_edit.html', context)
+    return render(request, 'project_edit.html', context)
 
 
 @login_required
