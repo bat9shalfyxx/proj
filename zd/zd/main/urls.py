@@ -41,6 +41,9 @@ urlpatterns = [
     # Участники
     path('projects/<int:project_id>/participant/<int:participant_id>/remove/', 
          views.remove_participant, name='remove_participant'),
+    #подбор команды
+    path('projects/<int:project_id>/match-team/', views.match_team_page, name='match_team_page'),
+    path('api/projects/<int:project_id>/match-team/', views.match_team_api, name='match_team_api'),
     # Комментарии и файлы
     path('projects/<int:project_id>/comment/', views.add_comment, name='add_comment'),
     path('projects/<int:project_id>/upload/', views.upload_file, name='upload_file'),

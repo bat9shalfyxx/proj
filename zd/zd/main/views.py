@@ -933,7 +933,7 @@ from .models import CustomUser
 
 def global_search(request):
     """Глобальный поиск по всему сайту"""
-    from project.models import Project
+    from .models import Project
     query = request.GET.get('q', '').strip()
     
     context = {
@@ -1363,3 +1363,246 @@ def respond_join_request(request, request_id):
         return redirect('project_join_requests', project_id=join_request.project.id)
     
     return render(request, 'respond_join_request.html', {'join_request': join_request})
+
+def match_team_for_project(request, project_id):
+    """API для автоматического подбора команды для проекта"""
+    project = get_object_or_404(Project, id=project_id)
+    requirements = project.requirements.all()
+    
+    if not requirements.exists():
+        return JsonResponse({'success': False, 'error': 'У проекта нет требований к участникам'})
+    
+    invited_app_ids = project.invitations.values_list('application_id', flat=True)
+    participant_app_ids = project.participants.exclude(application=None).values_list('application_id', flat=True)
+    excluded_ids = list(invited_app_ids) + list(participant_app_ids)
+    
+    candidates = Application.objects.filter(status='approved').exclude(id__in=excluded_ids)
+    
+    data = json.loads(request.body)
+    priority = data.get('priority', 'balanced')
+    min_match_score = data.get('min_match_score', 60)
+    
+    candidates_with_scores = []
+    for candidate in candidates:
+        score = calculate_candidate_match(candidate, requirements, priority)
+        if score >= min_match_score:
+            candidates_with_scores.append({
+                'id': candidate.id,
+                'contact_first_name': candidate.contact_first_name,
+                'contact_last_name': candidate.contact_last_name,
+                'contact_email': candidate.contact_email,
+                'contact_phone': candidate.contact_phone,
+                'organization_name': candidate.organization_name,
+                'skill_list': candidate.skill_list,
+                'team_role': candidate.team_role,
+                'team_role_display': candidate.get_team_role_display(),
+                'age': candidate.age,
+                'match_score': score,
+                'matched_skills': get_matched_skills(candidate, requirements)
+            })
+    
+    candidates_with_scores.sort(key=lambda x: x['match_score'], reverse=True)
+    
+    matched_team = greedy_team_selection(candidates_with_scores, requirements)
+    
+    coverage = calculate_coverage(matched_team, requirements)
+    
+    return JsonResponse({
+        'success': True,
+        'matched_team': matched_team,
+        'coverage_percentage': coverage,
+        'total_candidates': len(candidates_with_scores)
+    })
+
+def match_team_page(request, project_id):
+    """Страница автоматического подбора команды"""
+    from .models import Project
+    
+    project = get_object_or_404(Project, id=project_id)
+    
+    # Проверка прав: только создатель проекта может подбирать команду
+    if project.creator != request.user:
+        messages.error(request, 'У вас нет прав для подбора команды в этом проекте')
+        return redirect('project_detail', project_id=project.id)
+    
+    requirements = project.requirements.all()
+    
+    return render(request, 'team_matcher.html', {
+        'project': project,
+        'requirements': requirements,
+        'title': f'Автоподбор команды - {project.name}'
+    })
+
+
+def match_team_api(request, project_id):
+    """API для автоматического подбора команды для проекта"""
+    from .models import Project
+    
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Метод не разрешен'}, status=405)
+    
+    project = get_object_or_404(Project, id=project_id)
+    
+    if project.creator != request.user:
+        return JsonResponse({'success': False, 'error': 'У вас нет прав'}, status=403)
+    
+    requirements = project.requirements.all()
+    
+    if not requirements.exists():
+        return JsonResponse({'success': False, 'error': 'У проекта нет требований к участникам'})
+    
+    from main.models_application import Application
+    
+    invited_app_ids = project.invitations.values_list('application_id', flat=True)
+    participant_app_ids = project.participants.exclude(application=None).values_list('application_id', flat=True)
+    excluded_ids = list(invited_app_ids) + list(participant_app_ids)
+    
+    candidates = Application.objects.filter(status='approved').exclude(id__in=excluded_ids)
+    
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        data = {}
+    
+    priority = data.get('priority', 'balanced')
+    min_match_score = data.get('min_match_score', 60)
+    
+    # Рассчитываем совместимость для каждого кандидата
+    candidates_with_scores = []
+    for candidate in candidates:
+        score = calculate_candidate_match(candidate, requirements, priority)
+        if score >= min_match_score:
+            candidates_with_scores.append({
+                'id': candidate.id,
+                'contact_first_name': candidate.contact_first_name,
+                'contact_last_name': candidate.contact_last_name,
+                'contact_email': candidate.contact_email,
+                'contact_phone': candidate.contact_phone,
+                'organization_name': candidate.organization_name,
+                'skill_list': candidate.skill_list,
+                'team_role': candidate.team_role,
+                'team_role_display': candidate.get_team_role_display(),
+                'age': candidate.age,
+                'match_score': score,
+                'matched_skills': get_matched_skills(candidate, requirements)
+            })
+    
+    # Сортируем по убыванию рейтинга
+    candidates_with_scores.sort(key=lambda x: x['match_score'], reverse=True)
+    
+    # Оптимальный подбор команды (жадный алгоритм)
+    matched_team = greedy_team_selection(candidates_with_scores, requirements)
+    
+    # Расчет покрытия требований
+    coverage = calculate_coverage(matched_team, requirements)
+    
+    return JsonResponse({
+        'success': True,
+        'matched_team': matched_team,
+        'coverage_percentage': coverage,
+        'total_candidates': len(candidates_with_scores)
+    })
+
+
+def calculate_candidate_match(candidate, requirements, priority='balanced'):
+    """Расчет совместимости кандидата с требованиями проекта"""
+    if not requirements.exists():
+        return 0
+    
+    candidate_skills = set(s.lower().strip() for s in candidate.skill_list.split(',') if s.strip())
+    
+    skill_match_score = 0
+    role_bonus = 0
+    max_skill_score = len(requirements) * 100
+    
+    for req in requirements:
+        req_skill = req.skill_name.lower().strip()
+        
+        if req_skill in candidate_skills:
+            skill_match_score += 100
+        else:
+            for skill in candidate_skills:
+                if req_skill in skill or skill in req_skill:
+                    skill_match_score += 50
+                    break
+    
+    # Бонус за совпадение роли (по Белбину)
+    if candidate.team_role:
+        req_roles = [req.belbin_role for req in requirements if req.belbin_role]
+        if candidate.team_role in req_roles:
+            role_bonus = 30
+    
+    skill_percentage = (skill_match_score / max_skill_score) * 100 if max_skill_score > 0 else 0
+    
+    if priority == 'skills':
+        return int(skill_percentage)
+    elif priority == 'roles':
+        return int(min(100, skill_percentage + role_bonus))
+    else:  # balanced
+        return int(min(100, skill_percentage * 0.7 + role_bonus))
+
+
+def get_matched_skills(candidate, requirements):
+    """Возвращает список навыков кандидата, совпадающих с требованиями"""
+    candidate_skills = set(s.lower().strip() for s in candidate.skill_list.split(',') if s.strip())
+    req_skills = set(req.skill_name.lower().strip() for req in requirements)
+    return list(candidate_skills.intersection(req_skills))
+
+
+def greedy_team_selection(candidates, requirements):
+    """Жадный алгоритм подбора команды"""
+    selected_team = []
+    used_candidates = set()
+    
+    # Сортируем кандидатов по рейтингу
+    sorted_candidates = sorted(candidates, key=lambda x: x['match_score'], reverse=True)
+    
+    for requirement in requirements:
+        req_skill = requirement.skill_name.lower().strip()
+        needed_count = requirement.people_count
+        found = 0
+        
+        for candidate in sorted_candidates:
+            if candidate['id'] in used_candidates:
+                continue
+            
+            candidate_skills = set(s.lower().strip() for s in candidate['skill_list'].split(',') if s.strip())
+            if req_skill in candidate_skills:
+                selected_team.append(candidate)
+                used_candidates.add(candidate['id'])
+                found += 1
+                
+                if found >= needed_count:
+                    break
+        
+        # Если не нашли достаточно кандидатов для требования
+        if found < needed_count:
+            for candidate in sorted_candidates:
+                if candidate['id'] in used_candidates:
+                    continue
+                if len(selected_team) < sum(r.people_count for r in requirements):
+                    selected_team.append(candidate)
+                    used_candidates.add(candidate['id'])
+    
+    # Ограничиваем количество участников суммарной потребностью
+    max_team_size = sum(r.people_count for r in requirements)
+    return selected_team[:max_team_size]
+
+
+def calculate_coverage(team, requirements):
+    """Расчет процента покрытия требований"""
+    if not requirements.exists():
+        return 100
+    
+    covered_skills = set()
+    for candidate in team:
+        candidate_skills = set(s.lower().strip() for s in candidate['skill_list'].split(',') if s.strip())
+        covered_skills.update(candidate_skills)
+    
+    required_skills = set(req.skill_name.lower().strip() for req in requirements)
+    
+    if not required_skills:
+        return 100
+    
+    covered_count = len(covered_skills.intersection(required_skills))
+    return int((covered_count / len(required_skills)) * 100)

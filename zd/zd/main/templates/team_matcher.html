@@ -1,0 +1,523 @@
+{% extends "index.html" %} {% load static %} {% block title %}Подбор команды для проекта - {{ project.name }}{% endblock %} {% block content %}
+<style>
+  .team-matcher-page {
+    min-height: calc(100vh - 60px);
+    background: linear-gradient(135deg, #a7182d 60%, #fff 40%);
+    padding: 100px 20px;
+  }
+
+  .matcher-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .matcher-header {
+    background: linear-gradient(135deg, #c72039 0%, #e12a4b 100%);
+    color: white;
+    padding: 30px 40px;
+  }
+
+  .matcher-header h1 {
+    font-size: 28px;
+    margin: 0 0 10px 0;
+  }
+
+  .matcher-header p {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 0;
+  }
+
+  .matcher-content {
+    display: flex;
+    gap: 30px;
+    padding: 30px 40px;
+  }
+
+  /* Левая панель - требования проекта */
+  .project-requirements-panel {
+    flex: 1;
+    background: #f8fafc;
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .project-requirements-panel h2 {
+    font-size: 20px;
+    color: #1e293b;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #a7182d;
+  }
+
+  .requirement-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .requirement-item-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .requirement-skill {
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .requirement-count {
+    color: #a7182d;
+    font-weight: 600;
+  }
+
+  .requirement-level {
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  /* Правая панель - подобранная команда */
+  .team-recommendation-panel {
+    flex: 2;
+    background: #f8fafc;
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .team-recommendation-panel h2 {
+    font-size: 20px;
+    color: #1e293b;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #a7182d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .match-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+  }
+
+  .btn-match {
+    background: linear-gradient(135deg, #a7182d 0%, #8b1a2e 100%);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-match:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(167, 24, 45, 0.3);
+  }
+
+  .btn-match-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+  }
+
+  .btn-match-secondary:hover {
+    background: #e2e8f0;
+    transform: translateY(-2px);
+  }
+
+  .match-params {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 15px;
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 25px;
+  }
+
+  .param-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .param-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+  }
+
+  .param-group input {
+    width: 80px;
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .param-group select {
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    background: white;
+  }
+
+  /* Результаты подбора */
+  .team-matches {
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  .match-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.3s ease;
+  }
+
+  .match-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateX(4px);
+  }
+
+  .match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .match-candidate-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .match-score {
+    background: #a7182d;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .match-role {
+    font-size: 14px;
+    color: #a7182d;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  .match-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .match-skill-tag {
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    color: #475569;
+  }
+
+  .match-skill-tag.matched {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .match-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  .btn-invite {
+    background: linear-gradient(135deg, #a7182d 0%, #8b1a2e 100%);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-invite:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(167, 24, 45, 0.3);
+  }
+
+  .loading {
+    text-align: center;
+    padding: 60px;
+    color: #64748b;
+  }
+
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #a7182d;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .empty-matches {
+    text-align: center;
+    padding: 60px;
+    color: #64748b;
+  }
+
+  @media (max-width: 768px) {
+    .matcher-content {
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .matcher-header {
+      padding: 20px;
+    }
+
+    .match-params {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+</style>
+
+<div class="team-matcher-page">
+  <div class="matcher-container">
+    <div class="matcher-header">
+      <h1>Автоматический подбор команды</h1>
+      <p>Система подберет идеальный состав для вашего проекта на основе требований и навыков кандидатов</p>
+    </div>
+
+    <div class="matcher-content">
+      <div class="project-requirements-panel">
+        <h2>📋 Требования проекта</h2>
+        <div class="requirement-summary">
+          {% for req in requirements %}
+          <div class="requirement-item-summary">
+            <div>
+              <span class="requirement-skill">{{ req.skill_name }}</span>
+              {% if req.level_requirement %}
+              <span class="requirement-level"> ({{ req.get_level_requirement_display }})</span>
+              {% endif %}
+            </div>
+            <div class="requirement-count">{{ req.people_count }} чел.</div>
+          </div>
+          {% empty %}
+          <p>Нет требований</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="team-recommendation-panel">
+        <h2>
+          🎯 Подобранная команда
+          <button class="btn-match-secondary" onclick="resetMatch()" style="padding: 6px 12px; font-size: 12px">Сбросить</button>
+        </h2>
+
+        <div class="match-params">
+          <div class="param-group">
+            <label>Приоритет:</label>
+            <select id="prioritySelect">
+              <option value="skills">Навыки</option>
+              <option value="roles">Роли в команде</option>
+              <option value="balanced" selected>Сбалансированный</option>
+            </select>
+          </div>
+          <div class="param-group">
+            <label>Мин. совпадение:</label>
+            <input type="number" id="minMatchScore" value="60" min="0" max="100" step="10" />
+          </div>
+        </div>
+
+        <button class="btn-match" id="startMatchBtn">🚀 Начать подбор команды</button>
+
+        <div id="matchResults" class="team-matches" style="margin-top: 25px">
+          <div class="empty-matches">Нажмите "Начать подбор команды" для поиска идеального состава</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const projectId = '{{ project.id }}';
+  const csrfToken = '{{ csrf_token }}';
+
+  document.getElementById('startMatchBtn').addEventListener('click', function () {
+    startTeamMatching();
+  });
+
+  async function startTeamMatching() {
+    const priority = document.getElementById('prioritySelect').value;
+    const minMatchScore = parseInt(document.getElementById('minMatchScore').value);
+
+    const resultsDiv = document.getElementById('matchResults');
+    resultsDiv.innerHTML = `
+          <div class="loading">
+              <div class="loading-spinner"></div>
+              <p>Анализируем кандидатов и подбираем идеальный состав...</p>
+          </div>
+      `;
+
+    try {
+      const response = await fetch(`/api/projects/${projectId}/match-team/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: JSON.stringify({
+          priority: priority,
+          min_match_score: minMatchScore,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        displayMatchResults(data);
+      } else {
+        resultsDiv.innerHTML = `<div class="empty-matches">❌ ${data.error || 'Ошибка при подборе команды'}</div>`;
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      resultsDiv.innerHTML = '<div class="empty-matches">❌ Произошла ошибка при подборе команды</div>';
+    }
+  }
+
+  function displayMatchResults(data) {
+    const resultsDiv = document.getElementById('matchResults');
+
+    if (!data.matched_team || data.matched_team.length === 0) {
+      resultsDiv.innerHTML = `
+              <div class="empty-matches">
+                  😕 Не удалось подобрать идеальную команду<br>
+                  Попробуйте изменить параметры поиска или добавьте больше кандидатов
+              </div>
+          `;
+      return;
+    }
+
+    let html = `<div style="margin-bottom: 15px; padding: 12px; background: #dcfce7; border-radius: 12px; text-align: center;">
+          ✅ Подобрано ${data.matched_team.length} участников (${data.coverage_percentage}% требований покрыто)
+      </div>`;
+
+    data.matched_team.forEach((candidate, index) => {
+      const candidateSkills = candidate.skill_list ? candidate.skill_list.split(',').map(s => s.trim()) : [];
+
+      html += `
+              <div class="match-card" data-candidate-id="${candidate.id}">
+                  <div class="match-header">
+                      <span class="match-candidate-name">${candidate.contact_first_name} ${candidate.contact_last_name}</span>
+                      <span class="match-score">${candidate.match_score}% совпадение</span>
+                  </div>
+                  <div class="match-role">🎭 ${candidate.team_role_display || 'Роль не указана'}</div>
+                  <div class="match-skills">
+                      ${candidateSkills
+                        .map(
+                          skill => `
+                          <span class="match-skill-tag ${candidate.matched_skills && candidate.matched_skills.includes(skill) ? 'matched' : ''}">
+                              ${skill}
+                          </span>
+                      `
+                        )
+                        .join('')}
+                  </div>
+                  <div class="match-actions">
+                      <button class="btn-invite" onclick="inviteCandidate(${candidate.id})">📨 Пригласить в проект</button>
+                  </div>
+              </div>
+          `;
+    });
+
+    resultsDiv.innerHTML = html;
+  }
+
+  async function inviteCandidate(applicationId) {
+    try {
+      const response = await fetch(`/projects/${projectId}/invite/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': csrfToken,
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: `application_id=${applicationId}&message=Приглашаем вас присоединиться к проекту на основе автоматического подбора команды`,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('✅ Приглашение отправлено!');
+      } else {
+        alert('❌ ' + (data.error || 'Ошибка при отправке приглашения'));
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('❌ Произошла ошибка');
+    }
+  }
+
+  function resetMatch() {
+    document.getElementById('prioritySelect').value = 'balanced';
+    document.getElementById('minMatchScore').value = '60';
+    document.getElementById('matchResults').innerHTML = `
+          <div class="empty-matches">
+              Нажмите "Начать подбор команды" для поиска идеального состава
+          </div>
+      `;
+  }
+</script>
+{% endblock %}

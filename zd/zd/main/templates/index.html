@@ -8,16 +8,16 @@
     
         <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
         <link rel="stylesheet" href="{% static 'main/css/reset.css' %}">
-        <link rel="icon" href="../../static/main/src/section1/stonks.svg" type="image/x-icon">
+        <link rel="icon" href="{% static 'main/src/section1/stonks.svg' %}" type="image/x-icon">
     </head>
     
-    <script src="../../static/main/scripts/profileSkillsFiltration.js" defer></script>
-    <script src="../../static/main/scripts/profileEditInfo.js" defer></script>
-    <script src="../../static/main/scripts/hub-search.js" defer></script>
-    <script src="../../static/main/scripts/formPage.js" defer></script>
-    <script src="../../static/main/scripts/nav.js" defer></script>
-    <script src="../../static/main/scripts/notifications.js" defer></script>
-    <script src="../../static/main/scripts/createProject.js" defer></script>
+    <script src="{% static 'main/scripts/profileSkillsFiltration.js' %}" defer></script>
+    <script src="{% static 'main/scripts/profileEditInfo.js' %}" defer></script>
+    <script src="{% static 'main/scripts/hub-search.js' %}" defer></script>
+    <script src="{% static 'main/scripts/formPage.js' %}" defer></script>
+    <script src="{% static 'main/scripts/nav.js' %}" defer></script>
+    <script src="{% static 'main/scripts/notifications.js' %}" defer></script>
+    <script src="{% static 'main/scripts/createProject.js' %}" defer></script>
     {% include "scripts.html" %}
 
     <body>
@@ -25,7 +25,7 @@
             <header class="header">
                 <div class="header-left">
                     <a class="link active"  href="{% url 'hub' %}">
-                        <img class="header-left-logo" src="../../static/main/src/section1/цнп.svg" alt="Цифровая научная платформа" />
+                        <img class="header-left-logo" src="{% static 'main/src/section1/цнп.svg' %}" alt="Цифровая научная платформа" />
                     </a>
 
                     <div class="header-left-info">    
@@ -50,7 +50,7 @@
                         <a class="header-right-profile-button link" href="{% url 'logout' %}">Выйти</a>
 
                         <a class="link" href="{% url 'profile' %}">
-                            <img class="header-right-profile-logo" src="../../static/main/src/section1/profile-icon.svg" alt="profile"/>
+                            <img class="header-right-profile-logo" src="{% static 'main/src/section1/profile-icon.svg' %}" alt="profile"/>
                         </a>
                         {% else %}
                         <a class="header-right-profile-button link" href="{% url 'form_page' %}">Войти</a>
@@ -79,7 +79,7 @@
                                 <p>Нет информации</p>
 
                                 <button class="nav-dropdown-button">Перейти</button>
-                                <img src="../../static/main/src/section1/invest.svg" />
+                                <img src="{% static 'main/src/section1/invest.svg' %}" />
                             </div>
 
                             <div class="nav-dropdown-right">
@@ -99,7 +99,7 @@
                                 <p>Нет информации</p>
 
                                 <button class="nav-dropdown-button">Перейти</button>
-                                <img src="../../static/main/src/section1/hands.svg" />
+                                <img src="{% static 'main/src/section1/hands.svg' %}" />
                             </div>
 
                             <div class="nav-dropdown-right">
@@ -119,7 +119,7 @@
                                 <p>Нет информации</p>
 
                                 <a class="nav-dropdown-button nav-project-link" href="{% url 'project_list' %}" target="_self">Перейти</a>
-                                <img src="../../static/main/src/section1/money.svg" />
+                                <img src="{% static 'main/src/section1/money.svg' %}" />
                             </div>
 
                             <div class="nav-dropdown-right">
@@ -139,7 +139,7 @@
                                 <p>Нет информации</p>
 
                                 <button class="nav-dropdown-button">Перейти</button>
-                                <img src="../../static/main/src/section1/building.svg" />
+                                <img src="{% static 'main/src/section1/building.svg' %}" />
                             </div>
 
                             <div class="nav-dropdown-right">
@@ -159,7 +159,7 @@
                                 <p>Нет информации</p>
 
                                 <button class="nav-dropdown-button">Перейти</button>
-                                <img src="../../static/main/src/section1/book.svg" />
+                                <img src="{% static 'main/src/section1/book.svg' %}" />
                             </div>
 
                             <div class="nav-dropdown-right">
@@ -179,7 +179,7 @@
                                 <p>Нет информации</p>
 
                                 <button class="nav-dropdown-button">Перейти</button>
-                                <img src="../../static/main/src/section1/book.svg" />
+                                <img src="{% static 'main/src/section1/book.svg' %}" />
                             </div>
 
                             <div class="nav-dropdown-right">
