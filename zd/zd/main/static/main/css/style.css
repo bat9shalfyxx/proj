@@ -167,7 +167,7 @@
   display: block;
 }
 .nav-link > a h1 {
-  font-size: clamp(14px, 1.8vw, 24px);
+  font-size: clamp(10px, 1.4vw, 16px);
   margin: 0;
   white-space: nowrap;
   color: var(--dark-col, #1f2937);
@@ -1692,22 +1692,18 @@
   margin-left: 70px;
 }
 
-.block-4,
 .block-5 {
   display: grid;
   gap: 46px;
 }
-.block-4 h2,
 .block-5 h2 {
   font-size: 53px;
   color: var(--dark-col);
 }
-.block-4-first-line,
 .block-5-first-line {
   display: grid;
   gap: 26px;
 }
-.block-4-first-line-info,
 .block-5-first-line-info {
   display: flex;
   justify-content: space-between !important;
@@ -1718,18 +1714,15 @@
   padding: 34px 83px 46px 42px;
   background: linear-gradient(to right, var(--light-red-col), var(--dark-red-col), var(--light-red-col));
 }
-.block-4-second-line,
 .block-5-second-line {
   display: grid;
   gap: 30px;
 }
-.block-4-second-line-search input,
 .block-5-second-line-search input {
   width: 100%;
   height: 100%;
   margin: 23px 33px 23px 53px;
 }
-.block-4-second-line-search,
 .block-5-second-line-search {
   display: flex;
   align-items: center;
@@ -1737,13 +1730,11 @@
   border-radius: 30px;
   border: 3px solid var(--dark-gray-col);
 }
-.block-4-main,
 .block-5-main {
   display: flex;
   flex-wrap: wrap;
   gap: 70px;
 }
-.block-4-main-block,
 .block-5-main-block {
   display: grid;
   text-align: left;
@@ -1751,17 +1742,14 @@
   border-radius: 20px;
   box-shadow: 10px 10px 20px gray;
 }
-.block-4-main-block img,
 .block-5-main-block img {
   margin-bottom: 22px;
 }
-.block-4-main-block p,
 .block-5-main-block p {
   color: var(--dark-col);
   font-size: 25px;
   margin-bottom: 60px;
 }
-.block-4-main-block button,
 .block-5-main-block button {
   font-size: 15px;
   color: var(--light-col);
@@ -1810,7 +1798,6 @@
   border-bottom: 3px dotted var(--light-col);
 }
 
-/* Основной контейнер */
 .profilePage {
   min-height: 100vh;
   background: linear-gradient(135deg, #a7182d 60%, #fff 40%);
@@ -1849,46 +1836,6 @@
   margin-bottom: 25px;
   padding-bottom: 15px;
   border-bottom: 2px solid #f0f0f0;
-}
-
-.sidebar-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.sidebar-el {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 15px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-}
-.sidebar-el:hover {
-  background: rgba(167, 24, 45, 0.1);
-  transform: translateX(5px);
-}
-.sidebar-el.active {
-  background: linear-gradient(135deg, #a7182d 0%, #764ba2 100%);
-}
-.sidebar-el.active p {
-  color: white;
-}
-.sidebar-el.active img {
-  filter: brightness(0) invert(1);
-}
-.sidebar-el p {
-  margin: 0;
-  font-size: 16px;
-  color: #555;
-  font-weight: 500;
-}
-.sidebar-el img {
-  width: 24px;
-  height: 24px;
 }
 
 /* Основной блок профиля */

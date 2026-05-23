@@ -83,16 +83,16 @@
 
               <!-- prettier-ignore -->
               <div class="form-group half">
-                <label>Уровень</label>
-                <select name="requirement_level[]" class="form-control">
-                    <option value="">Любой</option>
-                    <option value="beginner" {% if req.level_requirement == 'beginner' %}selected{% endif %}>Начинающий</option>
-                    <option value="junior" {% if req.level_requirement == 'junior' %}selected{% endif %}>Junior</option>
-                    <option value="middle" {% if req.level_requirement == 'middle' %}selected{% endif %}>Middle</option>
-                    <option value="senior" {% if req.level_requirement == 'senior' %}selected{% endif %}>Senior</option>
-                    <option value="expert" {% if req.level_requirement == 'expert' %}selected{% endif %}>Эксперт</option>
-                </select>
-            </div>
+                  <label>Уровень</label>
+                  <select name="requirement_level[]" class="form-control">
+                      <option value="">Любой</option>
+                      <option value="beginner" {% if req.level_requirement == 'beginner' %}selected{% endif %}>Начинающий</option>
+                      <option value="junior" {% if req.level_requirement == 'junior' %}selected{% endif %}>Junior</option>
+                      <option value="middle" {% if req.level_requirement == 'middle' %}selected{% endif %}>Middle</option>
+                      <option value="senior" {% if req.level_requirement == 'senior' %}selected{% endif %}>Senior</option>
+                      <option value="expert" {% if req.level_requirement == 'expert' %}selected{% endif %}>Эксперт</option>
+                  </select>
+              </div>
             </div>
 
             <div class="form-row">

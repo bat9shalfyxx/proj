@@ -214,16 +214,36 @@ def profile_events(request):
     })
 
 @login_required
-def profile_services(request):
-    """Страница сервисов"""
+def profile_bank(request):
+    """Страница банка идей (завершенные проекты)"""
     profile_form = ProfileEditForm(instance=request.user)
     
-    return render(request, 'profile/services.html', {
-        'title': 'Сервисы',
+    completed_projects = Project.objects.filter(
+        status='completed'
+    ).order_by('-created_at')
+    
+    for project in completed_projects:
+        project.tags_list = [tag.strip() for tag in project.keywords.split(',')] if project.keywords else []
+        project.formatted_budget = f"{project.budget:,.0f} ₽".replace(',', ' ') if project.budget else "Не указан"
+        project.formatted_date = project.end_date.strftime('%B %Y') if project.end_date else "Дата не указана"
+        project.implementation_status = get_implementation_status(project)
+    
+    return render(request, 'profile/bank.html', {
+        'title': 'Банк идей',
         'user': request.user,
         'form': profile_form,
+        'completed_projects': completed_projects,
         'active_tab': 'services'
     })
+
+def get_implementation_status(project):
+    """Определяет статус внедрения проекта"""
+    if project.end_date and project.end_date < timezone.now().date():
+        if (timezone.now().date() - project.end_date).days > 365:
+            return 'scaling'
+        else:
+            return 'ready'
+    return 'ready'
 
 @login_required
 def profile_education(request):
@@ -709,6 +729,7 @@ def project_edit(request, project_id):
                 project.start_date = request.POST.get('start_date') or None
                 project.end_date = request.POST.get('end_date') or None
                 project.budget = request.POST.get('budget') or None
+                project.keywords = request.POST.get('keywords', '')
                 project.save()
                 
                 project.requirements.all().delete()
@@ -719,6 +740,7 @@ def project_edit(request, project_id):
                 requirement_mandatory = request.POST.getlist('requirement_mandatory[]')
                 requirement_prices = request.POST.getlist('requirement_price[]')
                 requirement_conditions = request.POST.getlist('requirement_condition[]')
+                belbin_roles = request.POST.getlist('belbin_role[]')
                 
                 for i in range(len(requirement_names)):
                     if requirement_names[i].strip():
@@ -727,9 +749,10 @@ def project_edit(request, project_id):
                             skill_name=requirement_names[i],
                             level_requirement=requirement_levels[i] if i < len(requirement_levels) else '',
                             people_count=int(requirement_counts[i]) if i < len(requirement_counts) else 1,
-                            is_mandatory=(requirement_mandatory[i] == 'on') if i < len(requirement_mandatory) else False,
+                            is_mandatory=(requirement_mandatory[i] == 'on' or requirement_mandatory[i] == 'true') if i < len(requirement_mandatory) else False,
                             price=requirement_prices[i] if i < len(requirement_prices) and requirement_prices[i] else None,
-                            work_condition=requirement_conditions[i] if i < len(requirement_conditions) else ''
+                            work_condition=requirement_conditions[i] if i < len(requirement_conditions) else '',
+                            belbin_role=belbin_roles[i] if i < len(belbin_roles) else ''
                         )
                 
                 messages.success(request, 'Проект успешно обновлен!')
@@ -738,7 +761,6 @@ def project_edit(request, project_id):
         except Exception as e:
             messages.error(request, f'Ошибка при обновлении: {e}')
     
-
     context = {
         'project': project,
         'requirements': project.requirements.all(),

@@ -3,109 +3,332 @@
 <div class="profilePage">
   <div class="profile-container">
     <div class="profile-main-content">
+
       <aside class="sidebar">
         <div class="sidebar-menu-header">
           <p>Меню</p>
         </div>
 
         <div class="sidebar-list">
-          <a
-            href="{% url 'profile' %}"
-            class="sidebar-el link {% if active_tab == 'profile' %}active{% endif %}"
-          >
-            <img
-              src="{% static 'main/src/profile/user.svg' %}"
-              alt="user"
-              class="sidebar-img"
-            />
-            <p>Профиль</p>
+          <a href="{% url 'profile' %}" class="sidebar-el link {% if active_tab == 'profile' %}active{% endif %}">
+            <div class="sidebar-el-content">
+              <img src="{% static 'main/src/profile/user.svg' %}" alt="user" class="sidebar-img" />
+              <p>Профиль</p>
+            </div>
           </a>
 
-          <a
-            href="{% url 'profile_applications' %}"
-            class="sidebar-el link {% if active_tab == 'applications' %}active{% endif %}"
-          >
-            <img
-              src="{% static 'main/src/profile/folder.svg' %}"
-              alt="folder"
-              class="sidebar-img"
-            />
-            <p>Заявки</p>
+          <a href="{% url 'profile_applications' %}" class="sidebar-el link {% if active_tab == 'applications' %}active{% endif %}">
+            <div class="sidebar-el-content">
+              <img src="{% static 'main/src/profile/folder.svg' %}" alt="folder" class="sidebar-img" />
+              <p>Заявки</p>
+            </div>
+          </a>
+          
+          <a href="{% url 'profile_bank' %}" class="sidebar-el link {% if active_tab == 'bank' %}active{% endif %}">
+            <div class="sidebar-el-content">
+              <img src="{% static 'main/src/profile/server.svg' %}" alt="server" class="sidebar-img" />
+              <p>Банк идей</p>
+            </div>
+          </a>
+          
+          <!-- Мероприятия - в разработке -->
+          <a href="{% url 'profile_events' %}" class="sidebar-el link in-development" data-dev-message="Раздел мероприятий находится в разработке. Функционал будет добавлен позже.">
+            <div class="sidebar-el-content">
+              <img src="{% static 'main/src/profile/calendar.svg' %}" alt="calendar" class="sidebar-img" />
+              <p>Мероприятия</p>
+            </div>
+            <span class="dev-badge soon">Скоро</span>
           </a>
 
-          <a
-            href="{% url 'profile_events' %}"
-            class="sidebar-el link {% if active_tab == 'events' %}active{% endif %}"
-          >
-            <img
-              src="{% static 'main/src/profile/calendar.svg' %}"
-              alt="calendar"
-              class="sidebar-img"
-            />
-            <p>Мероприятия</p>
+          <!-- Обучение - в разработке -->
+          <a href="{% url 'profile_education' %}" class="sidebar-el link in-development" data-dev-message="Раздел обучения находится в разработке. Скоро здесь появятся курсы и материалы.">
+            <div class="sidebar-el-content">
+              <img src="{% static 'main/src/profile/educate.svg' %}" alt="educate" class="sidebar-img" />
+              <p>Обучение</p>
+            </div>
+            <span class="dev-badge soon">Скоро</span>
           </a>
-
-          <a
-            href="{% url 'profile_services' %}"
-            class="sidebar-el link {% if active_tab == 'services' %}active{% endif %}"
-          >
-            <img
-              src="{% static 'main/src/profile/server.svg' %}"
-              alt="server"
-              class="sidebar-img"
-            />
-            <p>Сервисы</p>
-          </a>
-
-          <a
-            href="{% url 'profile_education' %}"
-            class="sidebar-el link {% if active_tab == 'education' %}active{% endif %}"
-          >
-            <img
-              src="{% static 'main/src/profile/educate.svg' %}"
-              alt="educate"
-              class="sidebar-img"
-            />
-            <p>Обучение</p>
-          </a>
-
-          <a
-            href="{% url 'profile_support' %}"
-            class="sidebar-el link {% if active_tab == 'support' %}active{% endif %}"
-          >
-            <img
-              src="{% static 'main/src/profile/dialog.svg' %}"
-              alt="dialog"
-              class="sidebar-img"
-            />
-            <p>Поддержка</p>
+          
+          <!-- Поддержка - в разработке -->
+          <a href="{% url 'profile_support' %}" class="sidebar-el link in-development" data-dev-message="Раздел поддержки находится в разработке. Свяжитесь с нами по email или телефону.">
+            <div class="sidebar-el-content">
+              <img src="{% static 'main/src/profile/dialog.svg' %}" alt="dialog" class="sidebar-img" />
+              <p>Поддержка</p>
+            </div>
+            <span class="dev-badge soon">Скоро</span>
           </a>
         </div>
       </aside>
 
-      <div class="profile-block">
-        {% block profile_content %} {% endblock %}
-      </div>
+      <div class="profile-block">{% block profile_content %} {% endblock %}</div>
 
       <button class="profile-menu-btn menu-btn">
-        <img
-          src="{% static 'main/src/section2/square.svg' %}"
-          class="menu-btn"
-        />
-        <img
-          src="{% static 'main/src/section2/square.svg' %}"
-          class="menu-btn"
-        />
-        <img
-          src="{% static 'main/src/section2/square.svg' %}"
-          class="menu-btn"
-        />
-        <img
-          src="{% static 'main/src/section2/square.svg' %}"
-          class="menu-btn"
-        />
+        <img src="{% static 'main/src/section2/square.svg' %}" class="menu-btn" />
+        <img src="{% static 'main/src/section2/square.svg' %}" class="menu-btn" />
+        <img src="{% static 'main/src/section2/square.svg' %}" class="menu-btn" />
+        <img src="{% static 'main/src/section2/square.svg' %}" class="menu-btn" />
       </button>
     </div>
   </div>
 </div>
+
+
+<style>
+.sidebar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar-el {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  background: transparent;
+}
+.sidebar-el-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sidebar-img {
+  width: 22px;
+  height: 22px;
+  transition: filter 0.3s ease;
+}
+.sidebar-el p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  color: #1e293b;
+}
+.sidebar-el.active {
+  background: linear-gradient(135deg, #a7182d 0%, #8b1a2e 100%);
+}
+.sidebar-el.active p {
+  color: white;
+}
+.sidebar-el.active .sidebar-img {
+  filter: brightness(0) invert(1);
+}
+.sidebar-el:not(.active):not(.disabled) {
+  cursor: pointer;
+}
+.sidebar-el:not(.active):not(.disabled):hover {
+  background: rgba(167, 24, 45, 0.08);
+  transform: translateX(4px);
+}
+.sidebar-el:not(.active):not(.disabled):hover p {
+  color: #a7182d;
+}
+.sidebar-el:not(.active):not(.disabled):hover .sidebar-img {
+  filter: brightness(0) saturate(100%) invert(28%) sepia(68%) saturate(2000%) hue-rotate(340deg);
+}
+.sidebar-el.disabled {
+  cursor: pointer;
+  opacity: 0.6;
+}
+.sidebar-el.disabled:hover {
+  background: transparent;
+  transform: none;
+}
+.sidebar-el.disabled:hover p {
+  color: inherit;
+}
+.dev-badge {
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.dev-confirm-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.dev-confirm-modal.show {
+  opacity: 1;
+}
+.dev-confirm-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+.dev-confirm-container {
+  position: relative;
+  background: white;
+  border-radius: 24px;
+  max-width: 400px;
+  width: 90%;
+  padding: 28px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+.dev-confirm-modal.show .dev-confirm-container {
+  transform: scale(1);
+}
+.dev-confirm-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+.dev-confirm-container h3 {
+  font-size: 22px;
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+.dev-confirm-container p {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+.dev-confirm-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.dev-confirm-cancel,
+.dev-confirm-ok {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+.dev-confirm-cancel {
+  background: #f1f5f9;
+  color: #64748b;
+}
+.dev-confirm-cancel:hover {
+  background: #e2e8f0;
+}
+.dev-confirm-ok {
+  background: linear-gradient(135deg, #a7182d 0%, #8b1a2e 100%);
+  color: white;
+}
+.dev-confirm-ok:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(167, 24, 45, 0.3);
+}
+.dev-badge {
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.dev-badge.soon {
+  background: #dbeafe;
+  color: #2563eb;
+}
+.sidebar-el.in-development {
+  position: relative;
+  cursor: pointer;
+}
+.sidebar-el.in-development:hover {
+  background: rgba(167, 24, 45, 0.05);
+}
+.sidebar-el.in-development .dev-badge {
+  transition: all 0.3s ease;
+}
+.sidebar-el.in-development:hover .dev-badge {
+  transform: scale(1.05);
+}
+</style>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const devLinks = document.querySelectorAll('.sidebar-el.in-development');
+  
+  devLinks.forEach(link => {
+    const originalHref = link.getAttribute('href');
+    let hasShownWarning = false;
+    
+    link.addEventListener('click', function(e) {
+      if (hasShownWarning) {
+        return true;
+      }
+      
+      e.preventDefault();
+      
+      const message = this.getAttribute('data-dev-message') || 'Данный раздел находится в разработке. Функционал будет доступен в ближайшее время.';
+      const sectionName = this.querySelector('p')?.textContent || 'Раздел';
+      
+      showDevelopmentNotification(message, sectionName, () => {
+        hasShownWarning = true;
+        window.location.href = originalHref;
+      });
+    });
+  });
+});
+
+function showDevelopmentNotification(message, sectionName, onConfirm) {
+  const oldNotification = document.querySelector('.dev-confirm-modal');
+  if (oldNotification) oldNotification.remove();
+  
+  const modal = document.createElement('div');
+  modal.className = 'dev-confirm-modal';
+  modal.innerHTML = `
+    <div class="dev-confirm-overlay"></div>
+    <div class="dev-confirm-container">
+      <div class="dev-confirm-icon">🚧</div>
+      <h3>Раздел "${sectionName}" в разработке</h3>
+      <p>${message}</p>
+      <div class="dev-confirm-buttons">
+        <button class="dev-confirm-cancel">Остаться</button>
+        <button class="dev-confirm-ok">Всё равно перейти</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  setTimeout(() => {
+    modal.classList.add('show');
+  }, 10);
+  
+  const cancelBtn = modal.querySelector('.dev-confirm-cancel');
+  const okBtn = modal.querySelector('.dev-confirm-ok');
+  const overlay = modal.querySelector('.dev-confirm-overlay');
+  
+  const closeModal = () => {
+    modal.classList.remove('show');
+    setTimeout(() => modal.remove(), 300);
+  };
+  
+  cancelBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', closeModal);
+  
+  okBtn.addEventListener('click', () => {
+    closeModal();
+    if (onConfirm) onConfirm();
+  });
+}
+</script>
 {% endblock %}

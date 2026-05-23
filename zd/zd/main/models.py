@@ -155,6 +155,15 @@ class Project(models.Model):
     status = models.CharField('Статус', max_length=20, 
                              choices=STATUS_CHOICES, default='draft')
     
+    results = models.TextField('Результаты проекта', blank=True)
+    tech_stack = models.TextField('Технологический стек', blank=True)
+    activity_category = models.CharField(
+        'Категория деятельности',
+        max_length=50,
+        choices=[('it', 'IT'), ('energy', 'Энергетика'), ('automation', 'Автоматика'), ('construction', 'Строительство')],
+        blank=True
+    )
+    
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 

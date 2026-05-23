@@ -12,7 +12,7 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('profile/applications/', views.profile_applications, name='profile_applications'),
     path('profile/events/', views.profile_events, name='profile_events'),
-    path('profile/services/', views.profile_services, name='profile_services'),
+    path('profile/bank/', views.profile_bank, name='profile_bank'),
     path('profile/education/', views.profile_education, name='profile_education'),
     path('profile/support/', views.profile_support, name='profile_support'),
     # Проекты (все маршруты здесь, без отдельного приложения)
@@ -30,7 +30,7 @@ urlpatterns = [
     path('api/projects/<int:project_id>/join-request/', views.send_join_request, name='send_join_request'),
     path('api/projects/<int:project_id>/join-requests/', views.project_join_requests, name='project_join_requests'),
     path('api/join-request/<int:request_id>/respond/', views.respond_join_request, name='respond_join_request'),
-    # Приглашения
+    # Приглашения на участие в проекте
     path('projects/<int:project_id>/invite/', views.invite_to_project, name='invite_to_project'),
     path('invitation/<int:invitation_id>/cancel/', views.cancel_invitation, name='cancel_invitation'),
     path('invitation/<int:invitation_id>/respond/', views.respond_to_invitation, name='respond_to_invitation'),

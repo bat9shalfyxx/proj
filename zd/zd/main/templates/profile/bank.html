@@ -1,0 +1,508 @@
+{% extends "profile/base.html" %} {% load static %} {% block profile_content %}
+<div class="profile-block block-bank">
+  <div class="bank-header">
+    <div class="bank-header-text">
+      <h2>Банк идей</h2>
+      <p>Здесь собраны завершенные проекты, которые могут стать основой для ваших новых начинаний</p>
+    </div>
+    <div class="bank-search">
+      <input type="search" placeholder="Поиск по проектам, технологиям, ключевым словам..." id="bankSearchInput" />
+      <button class="search-btn" id="bankSearchBtn">
+        <img src="{% static 'main/src/profile/lupka.svg' %}" alt="лупа" />
+      </button>
+    </div>
+  </div>
+
+  <div class="bank-stats">
+    <div class="stat-card">
+      <div class="stat-value">{{ completed_projects.count }}</div>
+      <div class="stat-label">Завершенных проектов</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ completed_projects|length|add:"-2" }}</div>
+      <div class="stat-label">Доступно для внедрения</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ total_participants|default:"0" }}</div>
+      <div class="stat-label">Участников проектов</div>
+    </div>
+  </div>
+
+  <div class="bank-filters">
+    <div class="filter-group">
+      <label>Категория:</label>
+      <select id="categoryFilter">
+        <option value="all">Все категории</option>
+        <option value="it">Информационные технологии</option>
+        <option value="energy">Энергетика</option>
+        <option value="automation">Автоматика</option>
+        <option value="construction">Строительство</option>
+        <option value="education">Образование</option>
+        <option value="medicine">Медицина</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Статус внедрения:</label>
+      <select id="statusFilter">
+        <option value="all">Все</option>
+        <option value="ready">Готов к внедрению</option>
+        <option value="scaling">Масштабируется</option>
+      </select>
+    </div>
+    <button id="resetFiltersBtn" class="reset-filters-btn">Сбросить фильтры</button>
+  </div>
+
+  <div class="bank-projects-list" id="bankProjectsList">
+    {% for project in completed_projects %}
+    <div class="bank-project-card" data-category="{{ project.activity_category|default:'it' }}" data-status="{{ project.implementation_status|default:'ready' }}">
+      <div class="project-card-badge {{ project.implementation_status|default:'ready' }}">
+        {% if project.implementation_status == 'ready' %}Готов к внедрению {% elif project.implementation_status == 'scaling' %}Масштабируется {% else %}Завершен{% endif %}
+      </div>
+      <div class="project-card-content">
+        <h3>{{ project.name }}</h3>
+        <p class="project-description">{{ project.description|truncatechars:200 }}</p>
+        <div class="project-tags">
+          {% for tag in project.tags_list|slice:":6" %}
+          <span class="tag">{{ tag }}</span>
+          {% endfor %}
+        </div>
+        <div class="project-meta">
+          <div class="meta-item">
+            <span class="meta-label">Автор:</span>
+            <span class="meta-value">{{ project.creator.get_full_name|default:project.creator.username }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Завершен:</span>
+            <span class="meta-value">{{ project.formatted_date }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Бюджет:</span>
+            <span class="meta-value">{{ project.formatted_budget }}</span>
+          </div>
+        </div>
+        <a href="{% url 'project_detail' project.id %}" class="view-details-link">Подробнее →</a>
+      </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+      <p>Пока нет завершенных проектов</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if completed_projects.has_other_pages %}
+  <div class="bank-pagination">
+    {% if completed_projects.has_previous %}
+    <a href="?page={{ completed_projects.previous_page_number }}" class="pagination-btn">← Предыдущая</a>
+    {% else %}
+    <button class="pagination-btn" disabled>← Предыдущая</button>
+    {% endif %}
+
+    <div class="pagination-pages">
+      {% for i in completed_projects.paginator.page_range %} {% if completed_projects.number == i %}
+      <span class="page active">{{ i }}</span>
+      {% else %}
+      <a href="?page={{ i }}" class="page">{{ i }}</a>
+      {% endif %} {% endfor %}
+    </div>
+
+    {% if completed_projects.has_next %}
+    <a href="?page={{ completed_projects.next_page_number }}" class="pagination-btn">Следующая →</a>
+    {% else %}
+    <button class="pagination-btn" disabled>Следующая →</button>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  .profile-block.block-bank {
+    padding: 30px;
+    background: #f8fafc;
+    border-radius: 24px;
+  }
+
+  .bank-header {
+    margin-bottom: 30px;
+  }
+
+  .bank-header-text h2 {
+    font-size: 28px;
+    color: #1e293b;
+    margin-bottom: 8px;
+  }
+
+  .bank-header-text p {
+    color: #64748b;
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+
+  .bank-search {
+    display: flex;
+    gap: 10px;
+    max-width: 500px;
+  }
+
+  .bank-search input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 14px;
+    transition: all 0.3s;
+  }
+
+  .bank-search input:focus {
+    border-color: #a7182d;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .search-btn {
+    background: linear-gradient(135deg, #a7182d, #764ba2);
+    border: none;
+    border-radius: 12px;
+    padding: 0 18px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  .search-btn img {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) invert(1);
+  }
+
+  .bank-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+  }
+
+  .stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #a7182d;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: #64748b;
+  }
+
+  .bank-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .filter-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+  }
+
+  .filter-group select {
+    padding: 8px 32px 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+  }
+
+  .reset-filters-btn {
+    padding: 8px 20px;
+    background: #f1f5f9;
+    border: none;
+    border-radius: 10px;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .reset-filters-btn:hover {
+    background: #e2e8f0;
+  }
+
+  .bank-projects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .bank-project-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+    border: 1px solid #e2e8f0;
+  }
+
+  .bank-project-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .project-card-badge {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+    margin: 16px 0 0 20px;
+    border-radius: 20px;
+  }
+
+  .project-card-badge.ready {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .project-card-badge.scaling {
+    background: #fed7aa;
+    color: #9a3412;
+  }
+
+  .project-card-content {
+    padding: 20px;
+  }
+
+  .project-card-content h3 {
+    font-size: 20px;
+    color: #1e293b;
+    margin-bottom: 12px;
+  }
+
+  .project-description {
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .tag {
+    padding: 4px 12px;
+    background: #f1f5f9;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #475569;
+  }
+
+  .project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 16px;
+    padding: 12px 0;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .meta-item {
+    display: flex;
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .meta-label {
+    color: #94a3b8;
+  }
+
+  .meta-value {
+    color: #334155;
+    font-weight: 500;
+  }
+
+  .view-details-link {
+    display: inline-block;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #a7182d, #764ba2);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+    text-align: center;
+  }
+
+  .view-details-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 16px;
+    color: #64748b;
+  }
+
+  .bank-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 30px;
+  }
+
+  .pagination-btn {
+    padding: 8px 20px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    color: #475569;
+  }
+
+  .pagination-btn:hover:not(:disabled) {
+    background: #a7182d;
+    color: white;
+    border-color: #a7182d;
+  }
+
+  .pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .pagination-pages {
+    display: flex;
+    gap: 8px;
+  }
+
+  .page {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    color: #475569;
+  }
+
+  .page:hover {
+    background: #e2e8f0;
+  }
+
+  .page.active {
+    background: linear-gradient(135deg, #a7182d, #764ba2);
+    color: white;
+  }
+
+  @media (max-width: 768px) {
+    .profile-block.block-bank {
+      padding: 20px;
+    }
+
+    .bank-stats {
+      grid-template-columns: 1fr;
+    }
+
+    .bank-filters {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .project-meta {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .view-details-link {
+      display: block;
+      text-align: center;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('bankSearchInput');
+    const searchBtn = document.getElementById('bankSearchBtn');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const resetBtn = document.getElementById('resetFiltersBtn');
+    const projects = document.querySelectorAll('.bank-project-card');
+
+    function filterProjects() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const category = categoryFilter.value;
+      const status = statusFilter.value;
+
+      projects.forEach(project => {
+        const title = project.querySelector('h3').textContent.toLowerCase();
+        const description = project.querySelector('.project-description').textContent.toLowerCase();
+        const tags = Array.from(project.querySelectorAll('.tag'))
+          .map(t => t.textContent.toLowerCase())
+          .join(' ');
+        const projectCategory = project.dataset.category;
+        const projectStatus = project.dataset.status;
+
+        const matchesSearch = searchTerm === '' || title.includes(searchTerm) || description.includes(searchTerm) || tags.includes(searchTerm);
+
+        const matchesCategory = category === 'all' || projectCategory === category;
+        const matchesStatus = status === 'all' || projectStatus === status;
+
+        project.style.display = matchesSearch && matchesCategory && matchesStatus ? 'block' : 'none';
+      });
+    }
+
+    searchBtn.addEventListener('click', filterProjects);
+    searchInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') filterProjects();
+    });
+    categoryFilter.addEventListener('change', filterProjects);
+    statusFilter.addEventListener('change', filterProjects);
+    resetBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      categoryFilter.value = 'all';
+      statusFilter.value = 'all';
+      filterProjects();
+    });
+  });
+</script>
+{% endblock %}
