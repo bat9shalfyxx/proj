@@ -5,66 +5,56 @@
 
 {% block content %}
 <div class="respond-invitation-page">
-    <div class="container" style="max-width: 600px; margin: 100px auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.1); overflow: hidden;">
+    <div class="container" style="max-width: 600px; margin: 100px auto; background: white; border-radius: 20px; padding: 40px; text-align: center;">
         
-        <!-- Заголовок -->
-        <div style="background: linear-gradient(135deg, #a7182d 0%, #764ba2 100%); padding: 30px; text-align: center;">
-            <h2 style="color: white; margin: 0; font-size: 24px;">Приглашение в проект</h2>
-        </div>
-        
-        <!-- Содержание -->
-        <div style="padding: 30px;">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <p style="color: #666; font-size: 16px; margin-bottom: 10px;">Вас приглашают в проект:</p>
-                <h3 style="color: #a7182d; font-size: 24px; margin: 0;">{{ invitation.project.name }}</h3>
+        {% if invitation.status != 'pending' %}
+            <div class="status-icon">
+                {% if invitation.status == 'accepted' %}
+                    <div style="font-size: 64px;">✅</div>
+                    <h2 style="color: #28a745;">Приглашение принято!</h2>
+                    <p>Вы уже являетесь участником проекта <strong>"{{ invitation.project.name }}"</strong></p>
+                {% elif invitation.status == 'declined' %}
+                    <div style="font-size: 64px;">❌</div>
+                    <h2 style="color: #dc3545;">Приглашение отклонено</h2>
+                    <p>Вы отклонили приглашение в проект <strong>"{{ invitation.project.name }}"</strong></p>
+                {% else %}
+                    <div style="font-size: 64px;">ℹ️</div>
+                    <h2>Приглашение обработано</h2>
+                    <p>Статус: <strong>{{ invitation.get_status_display }}</strong></p>
+                {% endif %}
             </div>
             
-            <!-- Информация о проекте -->
-            <div style="background: #f8f9fa; border-radius: 15px; padding: 20px; margin-bottom: 25px;">
-                <p style="margin: 0 0 10px 0;">
-                    <strong style="color: #333;">Описание проекта:</strong>
-                </p>
-                <p style="color: #666; margin: 0 0 15px 0; line-height: 1.5;">
-                    {{ invitation.project.description|truncatechars:200|default:"Нет описания" }}
-                </p>
-                
-                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 15px 0;">
-                
-                <p style="margin: 0 0 5px 0;">
-                    <strong style="color: #333;">Пригласил:</strong>
-                    <span style="color: #666;">{{ invitation.invited_by.get_full_name|default:invitation.invited_by.username }}</span>
-                </p>
-                
+            <a href="{% url 'project_detail' invitation.project.id %}" class="btn btn-primary" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: #a7182d; color: white; text-decoration: none; border-radius: 10px;">
+                Перейти к проекту
+            </a>
+            
+        {% else %}
+            <h2>Приглашение в проект</h2>
+            <p>Вас приглашают присоединиться к проекту:</p>
+            <h3 style="color: #a7182d;">{{ invitation.project.name }}</h3>
+            
+            <div style="margin: 30px 0;">
+                <p><strong>Пригласил:</strong> {{ invitation.invited_by.get_full_name|default:invitation.invited_by.username }}</p>
                 {% if invitation.message %}
-                    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px 15px; margin-top: 15px; border-radius: 8px;">
-                        <p style="margin: 0;"><strong>Сообщение:</strong></p>
-                        <p style="margin: 5px 0 0 0; color: #666;">{{ invitation.message }}</p>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                        <p><strong>Сообщение:</strong> {{ invitation.message }}</p>
                     </div>
                 {% endif %}
             </div>
             
-            <!-- Кнопки действий -->
-            <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 20px;">
-                <form method="post" style="display: inline; margin: 0;">
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="accept">
-                    <button type="submit" class="btn-accept-invitation">
-                        ✓ Принять приглашение
-                    </button>
+                    <button type="submit" style="background: #28a745; color: white; padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer;">Принять</button>
                 </form>
-                <form method="post" style="display: inline; margin: 0;">
+                <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="decline">
-                    <button type="submit" class="btn-decline-invitation">
-                        ✗ Отклонить
-                    </button>
+                    <button type="submit" style="background: #dc3545; color: white; padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer;">Отклонить</button>
                 </form>
             </div>
-            
-            <p style="text-align: center; font-size: 12px; color: #999; margin-top: 20px;">
-                Если вы не ожидали этого приглашения, просто проигнорируйте его.
-            </p>
-        </div>
+        {% endif %}
     </div>
 </div>
 

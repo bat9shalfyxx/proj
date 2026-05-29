@@ -1100,15 +1100,17 @@ def api_applications_for_project(request, project_id):
 
 @login_required
 def invite_to_project(request, project_id):
+    """Приглашение участника в проект"""
     project = get_object_or_404(Project, id=project_id, creator=request.user)
     
     if request.method == 'POST':
         application_id = request.POST.get('application_id')
-        message = request.POST.get('message', '')
+        message = request.POST.get('message', '')  # Добавьте эту строку!
         
         try:
-            application = get_object_or_404(Application, id=application_id)
+            application = Application.objects.get(id=application_id)
             
+            # Проверяем, не приглашен ли уже
             existing = ProjectInvitation.objects.filter(
                 project=project, 
                 application=application
@@ -1124,16 +1126,22 @@ def invite_to_project(request, project_id):
                 project=project,
                 application=application,
                 invited_by=request.user,
-                message=message
+                message=message  # Теперь message определен
             )
             
-            email_sent = invitation.send_invitation_email()
+            # Отправляем уведомление
+            Notification.objects.create(
+                user=application.user,
+                title=f'Новое приглашение в проект "{project.name}"',
+                message=f'Пользователь {request.user.get_full_name() or request.user.username} приглашает вас присоединиться к проекту',
+                type='invitation',
+                invitation=invitation
+            )
             
             return JsonResponse({
                 'success': True,
                 'invitation_id': invitation.id,
-                'email_sent': email_sent,
-                'message': 'Приглашение отправлено' + (' на email' if email_sent else ' (email не отправлен)')
+                'message': 'Приглашение отправлено'
             })
             
         except Application.DoesNotExist:
@@ -1161,40 +1169,70 @@ def cancel_invitation(request, invitation_id):
 @login_required
 def respond_to_invitation(request, invitation_id):
     """Ответ на приглашение"""
-    invitation = get_object_or_404(
-        ProjectInvitation,
-        id=invitation_id,
-        application__user=request.user,
-        status='pending'
-    )
+    from .models import ProjectInvitation
     
+    print(f"=== ОТВЕТ НА ПРИГЛАШЕНИЕ ===")
+    print(f"Invitation ID: {invitation_id}")
+    
+    # Пытаемся найти приглашение
+    try:
+        invitation = ProjectInvitation.objects.get(id=invitation_id)
+    except ProjectInvitation.DoesNotExist:
+        messages.error(request, 'Приглашение не найдено')
+        return redirect('project_list')
+    
+    # Проверка, что приглашение для текущего пользователя
+    if invitation.application.user != request.user:
+        messages.error(request, 'Это приглашение не для вас')
+        return redirect('project_list')
+    
+    # Если приглашение уже обработано
+    if invitation.status != 'pending':
+        status_text = dict(invitation.STATUS_CHOICES).get(invitation.status, invitation.status)
+        
+        if invitation.status == 'accepted':
+            messages.success(request, f'Вы уже приняли это приглашение и являетесь участником проекта "{invitation.project.name}"')
+        elif invitation.status == 'declined':
+            messages.info(request, f'Вы отклонили это приглашение в проект "{invitation.project.name}"')
+        else:
+            messages.warning(request, f'Это приглашение уже {status_text.lower()}')
+        
+        # Перенаправляем на страницу проекта
+        return redirect('project_detail', project_id=invitation.project.id)
+    
+    # GET запрос из email
     if request.method == 'GET':
         action = request.GET.get('action')
         
         if action == 'accept':
             invitation.accept()
-            messages.success(request, f'Вы присоединились к проекту "{invitation.project.name}"')
-            return redirect('project_list')
+            messages.success(request, f'✅ Вы присоединились к проекту "{invitation.project.name}"')
+            return redirect('project_detail', project_id=invitation.project.id)
+        
         elif action == 'decline':
             invitation.decline()
-            messages.success(request, 'Приглашение отклонено')
+            messages.success(request, f'❌ Вы отклонили приглашение в проект "{invitation.project.name}"')
             return redirect('project_list')
+        
         else:
-            return render(request, 'emails/respond_invitation.html', {'invitation': invitation})
+            # Показываем страницу с выбором
+            return render(request, 'respond_invitation.html', {'invitation': invitation})
     
+    # POST запрос из формы
     if request.method == 'POST':
         action = request.POST.get('action')
         
         if action == 'accept':
             invitation.accept()
-            messages.success(request, f'Вы присоединились к проекту "{invitation.project.name}"')
+            messages.success(request, f'✅ Вы присоединились к проекту "{invitation.project.name}"')
         elif action == 'decline':
             invitation.decline()
-            messages.success(request, 'Приглашение отклонено')
+            messages.success(request, f'❌ Вы отклонили приглашение в проект "{invitation.project.name}"')
         
-        return redirect('project_list')
+        return redirect('project_detail', project_id=invitation.project.id)
     
     return redirect('project_list')
+
 
 #УВЕДОМЛЕНИЯ О СООБЩЕ   НИЯХ
 @login_required
@@ -1332,23 +1370,38 @@ def project_join_requests(request, project_id):
 @login_required
 def respond_join_request(request, request_id):
     """Ответ на запрос о присоединении"""
-    from django.apps import apps
-    JoinRequest = apps.get_model('main', 'JoinRequest')
-    Notification = apps.get_model('main', 'Notification')
+    from .models import JoinRequest
     
-    join_request = get_object_or_404(JoinRequest, id=request_id)
+    try:
+        join_request = JoinRequest.objects.get(id=request_id)
+    except JoinRequest.DoesNotExist:
+        messages.error(request, 'Запрос не найден')
+        return redirect('project_list')
     
+    # Проверка: только создатель проекта может отвечать
     if join_request.project.creator != request.user:
         messages.error(request, 'У вас нет прав для этого действия')
-        return redirect('project_list')
+        return redirect('project_detail', project_id=join_request.project.id)
+    
+    # Если запрос уже обработан
+    if join_request.status != 'pending':
+        status_text = dict(join_request.STATUS_CHOICES).get(join_request.status, join_request.status)
+        
+        if join_request.status == 'accepted':
+            messages.success(request, f'Вы уже приняли этот запрос. Пользователь добавлен в проект.')
+        elif join_request.status == 'rejected':
+            messages.info(request, f'Вы уже отклонили этот запрос')
+        
+        return redirect('project_detail', project_id=join_request.project.id)
     
     if request.method == 'POST':
         action = request.POST.get('action')
         
         if action == 'accept':
             join_request.accept()
-            messages.success(request, f'Заявка от {join_request.user.username} принята')
+            messages.success(request, f'✅ Заявка от {join_request.user.username} принята')
             
+            # Уведомление пользователю
             Notification.objects.create(
                 user=join_request.user,
                 title=f'Заявка на проект "{join_request.project.name}" принята',
@@ -1358,9 +1411,9 @@ def respond_join_request(request, request_id):
             
         elif action == 'reject':
             join_request.reject()
-            messages.success(request, 'Заявка отклонена')
+            messages.success(request, '❌ Заявка отклонена')
         
-        return redirect('project_join_requests', project_id=join_request.project.id)
+        return redirect('project_detail', project_id=join_request.project.id)
     
     return render(request, 'respond_join_request.html', {'join_request': join_request})
 
@@ -1436,42 +1489,59 @@ def match_team_page(request, project_id):
 
 def match_team_api(request, project_id):
     """API для автоматического подбора команды для проекта"""
-    from .models import Project
+    from .models import Project, ProjectRequirement, ProjectInvitation, ProjectParticipant
+    from .models_application import Application
+    
+    print("=" * 50)
+    print("MATCH TEAM API CALLED")
+    print(f"Project ID: {project_id}")
+    print(f"Method: {request.method}")
+    print("=" * 50)
     
     if request.method != 'POST':
         return JsonResponse({'success': False, 'error': 'Метод не разрешен'}, status=405)
     
-    project = get_object_or_404(Project, id=project_id)
+    try:
+        project = get_object_or_404(Project, id=project_id)
+        print(f"✅ Project found: {project.name}")
+    except Exception as e:
+        print(f"❌ Project not found: {e}")
+        return JsonResponse({'success': False, 'error': 'Проект не найден'})
     
+    # Проверка прав
     if project.creator != request.user:
         return JsonResponse({'success': False, 'error': 'У вас нет прав'}, status=403)
     
     requirements = project.requirements.all()
+    print(f"Requirements count: {requirements.count()}")
     
     if not requirements.exists():
         return JsonResponse({'success': False, 'error': 'У проекта нет требований к участникам'})
     
-    from main.models_application import Application
+    try:
+        # Парсим JSON тело запроса
+        data = json.loads(request.body)
+        priority = data.get('priority', 'balanced')
+        min_match_score = data.get('min_match_score', 60)
+        fallback_mode = data.get('fallback_mode', False)
+        print(f"Params: priority={priority}, min_match_score={min_match_score}, fallback_mode={fallback_mode}")
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON decode error: {e}")
+        return JsonResponse({'success': False, 'error': 'Неверный формат данных'})
     
+    # Получаем всех кандидатов
     invited_app_ids = project.invitations.values_list('application_id', flat=True)
     participant_app_ids = project.participants.exclude(application=None).values_list('application_id', flat=True)
     excluded_ids = list(invited_app_ids) + list(participant_app_ids)
     
-    candidates = Application.objects.filter(status='approved').exclude(id__in=excluded_ids)
+    all_candidates = Application.objects.filter(status='approved').exclude(id__in=excluded_ids)
+    print(f"Candidates count: {all_candidates.count()}")
     
-    try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError:
-        data = {}
-    
-    priority = data.get('priority', 'balanced')
-    min_match_score = data.get('min_match_score', 60)
-    
-    # Рассчитываем совместимость для каждого кандидата
+    # Рассчитываем совместимость
     candidates_with_scores = []
-    for candidate in candidates:
-        score = calculate_candidate_match(candidate, requirements, priority)
-        if score >= min_match_score:
+    for candidate in all_candidates:
+        try:
+            score = calculate_candidate_match(candidate, requirements, priority)
             candidates_with_scores.append({
                 'id': candidate.id,
                 'contact_first_name': candidate.contact_first_name,
@@ -1486,60 +1556,177 @@ def match_team_api(request, project_id):
                 'match_score': score,
                 'matched_skills': get_matched_skills(candidate, requirements)
             })
+        except Exception as e:
+            print(f"Error calculating score for candidate {candidate.id}: {e}")
     
-    # Сортируем по убыванию рейтинга
+    # Сортируем
     candidates_with_scores.sort(key=lambda x: x['match_score'], reverse=True)
     
-    # Оптимальный подбор команды (жадный алгоритм)
-    matched_team = greedy_team_selection(candidates_with_scores, requirements)
+    try:
+        if fallback_mode:
+            matched_team = fallback_team_selection(candidates_with_scores, requirements)
+            coverage = calculate_fallback_coverage(matched_team, requirements)
+            match_type = 'fallback'
+        else:
+            matched_team = greedy_team_selection(candidates_with_scores, requirements)
+            coverage = calculate_coverage(matched_team, requirements)
+            match_type = 'optimal'
+        
+        print(f"Match type: {match_type}, team size: {len(matched_team)}, coverage: {coverage}%")
+        
+        return JsonResponse({
+            'success': True,
+            'matched_team': matched_team,
+            'coverage_percentage': coverage,
+            'total_candidates': len(candidates_with_scores),
+            'match_type': match_type,
+            'suggest_fallback': not fallback_mode and coverage < 50 and len(candidates_with_scores) > 0
+        })
+        
+    except Exception as e:
+        print(f"❌ Error in team selection: {e}")
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+def bulk_invite_to_project(request, project_id):
+    """Массовая отправка приглашений в проект"""
+    from .models import Project
     
-    # Расчет покрытия требований
-    coverage = calculate_coverage(matched_team, requirements)
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Метод не разрешен'}, status=405)
+    
+    project = get_object_or_404(Project, id=project_id, creator=request.user)
+    
+    try:
+        data = json.loads(request.body)
+        application_ids = data.get('application_ids', [])
+        message = data.get('message', '')
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Неверный формат данных'})
+    
+    if not application_ids:
+        return JsonResponse({'success': False, 'error': 'Не выбраны кандидаты'})
+    
+    from .models import ProjectInvitation
+    from main.models_application import Application
+    
+    invited_count = 0
+    errors = []
+    
+    for app_id in application_ids:
+        try:
+            application = Application.objects.get(id=app_id)
+            
+            # Проверяем, не приглашен ли уже
+            existing = ProjectInvitation.objects.filter(
+                project=project, 
+                application=application
+            ).exists()
+            
+            if existing:
+                errors.append(f"Пользователь {application.contact_first_name} {application.contact_last_name} уже приглашен")
+                continue
+            
+            invitation = ProjectInvitation.objects.create(
+                project=project,
+                application=application,
+                invited_by=request.user,
+                message=message
+            )
+            invited_count += 1
+            
+            # Создаем уведомление
+            from .models import Notification
+            Notification.objects.create(
+                user=application.user,
+                title=f'Новое приглашение в проект "{project.name}"',
+                message=f'Пользователь {request.user.get_full_name() or request.user.username} приглашает вас присоединиться к проекту',
+                type='invitation',
+                invitation=invitation
+            )
+            
+        except Application.DoesNotExist:
+            errors.append(f"Заявка с ID {app_id} не найдена")
+        except Exception as e:
+            errors.append(str(e))
     
     return JsonResponse({
         'success': True,
-        'matched_team': matched_team,
-        'coverage_percentage': coverage,
-        'total_candidates': len(candidates_with_scores)
+        'invited_count': invited_count,
+        'errors': errors,
+        'message': f'Приглашения отправлены {invited_count} пользователям'
     })
 
+def fallback_team_selection(candidates, requirements):
+    """Fallback: берем лучших кандидатов (до нужного количества)"""
+    if not candidates:
+        return []
+    
+    total_needed = sum(req.people_count for req in requirements)
+    # Берем лучших кандидатов (до нужного количества)
+    return candidates[:total_needed]
+
+
+def calculate_fallback_coverage(team, requirements):
+    """Расчет покрытия для fallback команды"""
+    if not requirements.exists():
+        return 100
+    
+    if not team:
+        return 0
+    
+    # Проверяем, какие требования покрыты
+    covered_requirements = set()
+    for requirement in requirements:
+        req_skill = requirement.skill_name.lower().strip()
+        for candidate in team:
+            candidate_skills = set(s.lower().strip() for s in candidate['skill_list'].split(',') if s.strip())
+            if req_skill in candidate_skills:
+                covered_requirements.add(req_skill)
+                break
+    
+    total_requirements = set(req.skill_name.lower().strip() for req in requirements)
+    coverage = int((len(covered_requirements) / len(total_requirements)) * 100)
+    return coverage
 
 def calculate_candidate_match(candidate, requirements, priority='balanced'):
     """Расчет совместимости кандидата с требованиями проекта"""
     if not requirements.exists():
         return 0
     
+    if not candidate.skill_list:
+        return 0
+    
     candidate_skills = set(s.lower().strip() for s in candidate.skill_list.split(',') if s.strip())
     
+    if not candidate_skills:
+        return 0
+    
     skill_match_score = 0
-    role_bonus = 0
     max_skill_score = len(requirements) * 100
     
     for req in requirements:
         req_skill = req.skill_name.lower().strip()
-        
+        if not req_skill:
+            continue
+            
         if req_skill in candidate_skills:
             skill_match_score += 100
         else:
+            # Частичное совпадение
             for skill in candidate_skills:
                 if req_skill in skill or skill in req_skill:
                     skill_match_score += 50
                     break
     
-    # Бонус за совпадение роли (по Белбину)
-    if candidate.team_role:
-        req_roles = [req.belbin_role for req in requirements if req.belbin_role]
-        if candidate.team_role in req_roles:
-            role_bonus = 30
-    
     skill_percentage = (skill_match_score / max_skill_score) * 100 if max_skill_score > 0 else 0
     
     if priority == 'skills':
         return int(skill_percentage)
-    elif priority == 'roles':
-        return int(min(100, skill_percentage + role_bonus))
-    else:  # balanced
-        return int(min(100, skill_percentage * 0.7 + role_bonus))
+    else:
+        return int(skill_percentage)
 
 
 def get_matched_skills(candidate, requirements):

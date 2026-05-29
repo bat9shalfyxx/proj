@@ -141,7 +141,7 @@ EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'shokirovttt192@gmail.com'
 EMAIL_HOST_PASSWORD = 'tlib eeja edxu pmve'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-# SITE_URL = 'https://cnp.samgups.ru'
-SITE_URL = 'http://127.0.0.1:8000'
+SITE_URL = 'https://cnp.samgups.ru'
+# SITE_URL = 'http://localhost:8000'
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

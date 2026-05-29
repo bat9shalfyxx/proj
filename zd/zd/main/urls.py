@@ -34,6 +34,7 @@ urlpatterns = [
     path('projects/<int:project_id>/invite/', views.invite_to_project, name='invite_to_project'),
     path('invitation/<int:invitation_id>/cancel/', views.cancel_invitation, name='cancel_invitation'),
     path('invitation/<int:invitation_id>/respond/', views.respond_to_invitation, name='respond_to_invitation'),
+    path('api/projects/<int:project_id>/bulk-invite/', views.bulk_invite_to_project, name='bulk_invite_to_project'),
     # Уведомления
     path('api/notifications/', views.get_notifications, name='get_notifications'),
     path('api/notifications/<int:notification_id>/read/', views.mark_notification_read, name='mark_notification_read'),

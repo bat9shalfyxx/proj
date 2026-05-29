@@ -319,10 +319,15 @@ class ProjectInvitation(models.Model):
             return False
     
     def accept(self):
+        """Принять приглашение"""
+        if self.status != 'pending':
+            return False
+        
         self.status = 'accepted'
         self.responded_at = timezone.now()
         self.save()
         
+        # Создаем участника
         ProjectParticipant.objects.get_or_create(
             project=self.project,
             application=self.application,
@@ -334,9 +339,11 @@ class ProjectInvitation(models.Model):
                 'skills': self.application.skill_list,
                 'requirements': self.application.requirement_name,
                 'requirement_price': self.application.requirement_price,
+                'role': self.application.get_team_role_display() or 'Участник',
                 'status': 'active'
             }
         )
+        return True
     
     def decline(self):
         self.status = 'declined'

@@ -385,6 +385,16 @@
         <div id="matchResults" class="team-matches" style="margin-top: 25px">
           <div class="empty-matches">Нажмите "Начать подбор команды" для поиска идеального состава</div>
         </div>
+
+        <div class="match-controls">
+            <button class="btn-match" id="startMatchBtn">🎯 Оптимальный подбор</button>
+            <button class="btn-match btn-match-secondary" id="fallbackMatchBtn">👥 Подобрать всех доступных</button>
+        </div>
+
+        <div id="bulkActions" style="display: none; margin-bottom: 20px;">
+            <button id="inviteAllBtn" class="btn-match" style="background: #28a745;">📨 Пригласить всех</button>
+            <span id="selectedCount" style="margin-left: 15px; color: #64748b;">Выбрано: 0</span>
+        </div>
       </div>
     </div>
   </div>
@@ -394,130 +404,228 @@
   const projectId = '{{ project.id }}';
   const csrfToken = '{{ csrf_token }}';
 
-  document.getElementById('startMatchBtn').addEventListener('click', function () {
-    startTeamMatching();
-  });
+  let currentMatchedTeam = [];
+let currentMatchType = '';
 
-  async function startTeamMatching() {
+async function startTeamMatching(fallbackMode = false) {
     const priority = document.getElementById('prioritySelect').value;
     const minMatchScore = parseInt(document.getElementById('minMatchScore').value);
-
+    
     const resultsDiv = document.getElementById('matchResults');
     resultsDiv.innerHTML = `
-          <div class="loading">
-              <div class="loading-spinner"></div>
-              <p>Анализируем кандидатов и подбираем идеальный состав...</p>
-          </div>
-      `;
-
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <p>Анализируем кандидатов и подбираем идеальный состав...</p>
+        </div>
+    `;
+    
     try {
-      const response = await fetch(`/api/projects/${projectId}/match-team/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        body: JSON.stringify({
-          priority: priority,
-          min_match_score: minMatchScore,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        displayMatchResults(data);
-      } else {
-        resultsDiv.innerHTML = `<div class="empty-matches">❌ ${data.error || 'Ошибка при подборе команды'}</div>`;
-      }
+        const response = await fetch(`/api/projects/${projectId}/match-team/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                priority: priority,
+                min_match_score: minMatchScore,
+                fallback_mode: fallbackMode
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            currentMatchedTeam = data.matched_team;
+            currentMatchType = data.match_type;
+            
+            if (data.suggest_fallback) {
+                showFallbackSuggestion(data);
+            } else {
+                displayMatchResults(data);
+            }
+        } else {
+            resultsDiv.innerHTML = `<div class="empty-matches">❌ ${data.error || 'Ошибка при подборе команды'}</div>`;
+        }
     } catch (error) {
-      console.error('Error:', error);
-      resultsDiv.innerHTML = '<div class="empty-matches">❌ Произошла ошибка при подборе команды</div>';
+        console.error('Error:', error);
+        resultsDiv.innerHTML = '<div class="empty-matches">❌ Произошла ошибка при подборе команды</div>';
     }
-  }
+}
 
-  function displayMatchResults(data) {
+function showFallbackSuggestion(data) {
     const resultsDiv = document.getElementById('matchResults');
+    resultsDiv.innerHTML = `
+        <div style="background: #fef3c7; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
+            <div style="font-size: 48px;">⚠️</div>
+            <h3>Идеальная команда не найдена</h3>
+            <p>Не удалось подобрать идеальную команду (покрытие: ${data.coverage_percentage}%)</p>
+            <button class="btn-match" onclick="startTeamMatching(true)" style="margin-top: 10px;">👥 Показать всех доступных кандидатов</button>
+        </div>
+        <div style="margin-top: 20px;">
+            <h4>Лучшие кандидаты (${data.matched_team.length}):</h4>
+            ${renderCandidateList(data.matched_team)}
+        </div>
+    `;
+}
 
-    if (!data.matched_team || data.matched_team.length === 0) {
-      resultsDiv.innerHTML = `
-              <div class="empty-matches">
-                  😕 Не удалось подобрать идеальную команду<br>
-                  Попробуйте изменить параметры поиска или добавьте больше кандидатов
-              </div>
-          `;
-      return;
-    }
-
-    let html = `<div style="margin-bottom: 15px; padding: 12px; background: #dcfce7; border-radius: 12px; text-align: center;">
-          ✅ Подобрано ${data.matched_team.length} участников (${data.coverage_percentage}% требований покрыто)
-      </div>`;
-
-    data.matched_team.forEach((candidate, index) => {
-      const candidateSkills = candidate.skill_list ? candidate.skill_list.split(',').map(s => s.trim()) : [];
-
-      html += `
-              <div class="match-card" data-candidate-id="${candidate.id}">
-                  <div class="match-header">
-                      <span class="match-candidate-name">${candidate.contact_first_name} ${candidate.contact_last_name}</span>
-                      <span class="match-score">${candidate.match_score}% совпадение</span>
-                  </div>
-                  <div class="match-role">🎭 ${candidate.team_role_display || 'Роль не указана'}</div>
-                  <div class="match-skills">
-                      ${candidateSkills
-                        .map(
-                          skill => `
-                          <span class="match-skill-tag ${candidate.matched_skills && candidate.matched_skills.includes(skill) ? 'matched' : ''}">
-                              ${skill}
-                          </span>
-                      `
-                        )
-                        .join('')}
-                  </div>
-                  <div class="match-actions">
-                      <button class="btn-invite" onclick="inviteCandidate(${candidate.id})">📨 Пригласить в проект</button>
-                  </div>
-              </div>
-          `;
-    });
-
+function displayMatchResults(data) {
+    const resultsDiv = document.getElementById('matchResults');
+    const matchTypeText = data.match_type === 'optimal' ? 'Оптимальный подбор' : 'Все доступные кандидаты';
+    const matchTypeColor = data.match_type === 'optimal' ? '#10b981' : '#f59e0b';
+    
+    let html = `
+        <div style="background: ${matchTypeColor}20; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <strong style="color: ${matchTypeColor};">${matchTypeText}</strong>
+                    <span style="margin-left: 10px; color: #64748b;">Покрытие: ${data.coverage_percentage}%</span>
+                </div>
+                <button id="selectAllBtn" class="btn-match-secondary" style="padding: 6px 12px;">Выбрать всех</button>
+            </div>
+        </div>
+        <div id="candidatesListContainer">
+            ${renderCandidateListWithCheckboxes(data.matched_team)}
+        </div>
+        <div id="bulkActions" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <span id="selectedCountDisplay">Выбрано: 0</span>
+            <button id="inviteSelectedBtn" class="btn-match" style="background: #28a745;">📨 Пригласить выбранных</button>
+        </div>
+    `;
+    
     resultsDiv.innerHTML = html;
-  }
+    
+    // Обработчики для выбора
+    document.querySelectorAll('.candidate-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateSelectedCount);
+    });
+    
+    document.getElementById('selectAllBtn')?.addEventListener('click', selectAllCandidates);
+    document.getElementById('inviteSelectedBtn')?.addEventListener('click', () => inviteSelectedCandidates());
+}
 
-  async function inviteCandidate(applicationId) {
-    try {
-      const response = await fetch(`/projects/${projectId}/invite/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-CSRFToken': csrfToken,
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        body: `application_id=${applicationId}&message=Приглашаем вас присоединиться к проекту на основе автоматического подбора команды`,
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        alert('✅ Приглашение отправлено!');
-      } else {
-        alert('❌ ' + (data.error || 'Ошибка при отправке приглашения'));
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('❌ Произошла ошибка');
+function renderCandidateListWithCheckboxes(candidates) {
+    if (!candidates || candidates.length === 0) {
+        return '<div class="empty-matches">Нет кандидатов для отображения</div>';
     }
-  }
+    
+    return candidates.map(candidate => `
+        <div class="match-card">
+            <div style="display: flex; align-items: flex-start; gap: 15px;">
+                <input type="checkbox" class="candidate-checkbox" data-id="${candidate.id}" style="margin-top: 5px;">
+                <div style="flex: 1;">
+                    <div class="match-header">
+                        <span class="match-candidate-name">${escapeHtml(candidate.contact_first_name)} ${escapeHtml(candidate.contact_last_name)}</span>
+                        <span class="match-score" style="background: ${candidate.match_score >= 70 ? '#28a745' : candidate.match_score >= 50 ? '#f59e0b' : '#ef4444'}">
+                            ${candidate.match_score}% совпадение
+                        </span>
+                    </div>
+                    <div class="match-role">🎭 ${candidate.team_role_display || 'Роль не указана'}</div>
+                    <div class="match-skills">
+                        ${renderSkills(candidate.skill_list, candidate.matched_skills || [])}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
 
-  function resetMatch() {
-    document.getElementById('prioritySelect').value = 'balanced';
-    document.getElementById('minMatchScore').value = '60';
-    document.getElementById('matchResults').innerHTML = `
-          <div class="empty-matches">
-              Нажмите "Начать подбор команды" для поиска идеального состава
-          </div>
-      `;
-  }
+function renderCandidateList(candidates) {
+    if (!candidates || candidates.length === 0) {
+        return '<div class="empty-matches">Нет кандидатов</div>';
+    }
+    
+    return candidates.map(candidate => `
+        <div class="match-card">
+            <div class="match-header">
+                <span class="match-candidate-name">${escapeHtml(candidate.contact_first_name)} ${escapeHtml(candidate.contact_last_name)}</span>
+                <span class="match-score">${candidate.match_score}% совпадение</span>
+            </div>
+            <div class="match-role">🎭 ${candidate.team_role_display || 'Роль не указана'}</div>
+            <div class="match-skills">
+                ${renderSkills(candidate.skill_list, candidate.matched_skills || [])}
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderSkills(skillList, matchedSkills) {
+    if (!skillList) return '<span class="match-skill-tag">Навыки не указаны</span>';
+    
+    const skills = skillList.split(',').map(s => s.trim());
+    const matchedSet = new Set(matchedSkills.map(s => s.toLowerCase()));
+    
+    return skills.map(skill => `
+        <span class="match-skill-tag ${matchedSet.has(skill.toLowerCase()) ? 'matched' : ''}">
+            ${escapeHtml(skill)}
+        </span>
+    `).join('');
+}
+
+function updateSelectedCount() {
+    const checkboxes = document.querySelectorAll('.candidate-checkbox:checked');
+    const count = checkboxes.length;
+    document.getElementById('selectedCountDisplay').innerText = `Выбрано: ${count}`;
+}
+
+function selectAllCandidates() {
+    const checkboxes = document.querySelectorAll('.candidate-checkbox');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    checkboxes.forEach(cb => cb.checked = !allChecked);
+    updateSelectedCount();
+}
+
+async function inviteSelectedCandidates() {
+    const selectedIds = Array.from(document.querySelectorAll('.candidate-checkbox:checked'))
+        .map(cb => parseInt(cb.dataset.id));
+    
+    if (selectedIds.length === 0) {
+        alert('Выберите хотя бы одного кандидата');
+        return;
+    }
+    
+    const message = prompt('Введите сообщение для приглашаемых (необязательно):', 'Приглашаем вас присоединиться к проекту!');
+    
+    const inviteBtn = document.getElementById('inviteSelectedBtn');
+    const originalText = inviteBtn.textContent;
+    inviteBtn.textContent = 'Отправка...';
+    inviteBtn.disabled = true;
+    
+    try {
+        const response = await fetch(`/api/projects/${projectId}/bulk-invite/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                application_ids: selectedIds,
+                message: message || ''
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(`✅ ${data.message}\nПриглашено: ${data.invited_count}\n${data.errors.length ? 'Ошибки: ' + data.errors.join(', ') : ''}`);
+            // Обновляем список, убирая приглашенных
+            startTeamMatching(currentMatchType === 'fallback');
+        } else {
+            alert('❌ Ошибка: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Произошла ошибка при отправке приглашений');
+    } finally {
+        inviteBtn.textContent = originalText;
+        inviteBtn.disabled = false;
+    }
+}
+
+// Обновите кнопки
+document.getElementById('startMatchBtn').addEventListener('click', () => startTeamMatching(false));
+document.getElementById('fallbackMatchBtn')?.addEventListener('click', () => startTeamMatching(true));
 </script>
 {% endblock %}
