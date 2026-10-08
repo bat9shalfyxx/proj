@@ -361,7 +361,6 @@ from django.dispatch import receiver
 def create_notification_on_invitation(sender, instance, created, **kwargs):
     """Создает уведомление при создании нового приглашения"""
     if created:
-        from main.models import Notification
         Notification.objects.create(
             user=instance.application.user,
             invitation=instance,
@@ -402,6 +401,7 @@ class Notification(models.Model):
         verbose_name = 'Уведомление'
         verbose_name_plural = 'Уведомления'
         ordering = ['-created_at']
+        unique_together = ['user', 'invitation', 'type'] 
     
     def __str__(self):
         return f"{self.title} - {self.user.username}"

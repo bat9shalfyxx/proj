@@ -1101,42 +1101,54 @@ def api_applications_for_project(request, project_id):
 @login_required
 def invite_to_project(request, project_id):
     """Приглашение участника в проект"""
+    from .models import Project, ProjectInvitation
+    from .models import Notification
+    from main.models_application import Application
+    
     project = get_object_or_404(Project, id=project_id, creator=request.user)
     
     if request.method == 'POST':
         application_id = request.POST.get('application_id')
-        message = request.POST.get('message', '')  # Добавьте эту строку!
+        message = request.POST.get('message', '')
         
         try:
             application = Application.objects.get(id=application_id)
             
-            # Проверяем, не приглашен ли уже
             existing = ProjectInvitation.objects.filter(
                 project=project, 
                 application=application
-            ).exists()
+            ).first()
             
-            if existing:
+            if existing and existing.status == 'pending':
                 return JsonResponse({
                     'success': False,
-                    'error': 'Этот пользователь уже приглашен'
+                    'error': 'Приглашение уже отправлено'
                 })
             
             invitation = ProjectInvitation.objects.create(
                 project=project,
                 application=application,
                 invited_by=request.user,
-                message=message  # Теперь message определен
+                message=message
             )
             
-            # Отправляем уведомление
-            Notification.objects.create(
-                user=application.user,
-                title=f'Новое приглашение в проект "{project.name}"',
-                message=f'Пользователь {request.user.get_full_name() or request.user.username} приглашает вас присоединиться к проекту',
-                type='invitation',
-                invitation=invitation
-            )
+            if not invitation.id:
+                return JsonResponse({'success': False, 'error': 'Ошибка создания приглашения'})
+            
+            if application.user:
+                existing_notification = Notification.objects.filter(
+                    user=application.user,
+                    invitation=invitation
+                ).first()
+                
+                if not existing_notification:
+                    Notification.objects.create(
+                        user=application.user,
+                        title=f'Новое приглашение в проект "{project.name}"',
+                        message=f'Пользователь {request.user.get_full_name() or request.user.username} приглашает вас присоединиться к проекту',
+                        type='invitation',
+                        invitation=invitation
+                    )
             
             return JsonResponse({
                 'success': True,
@@ -1147,6 +1159,7 @@ def invite_to_project(request, project_id):
         except Application.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Заявка не найдена'})
         except Exception as e:
+            print(f"Error in invite_to_project: {e}")
             return JsonResponse({'success': False, 'error': str(e)})
     
     return JsonResponse({'success': False, 'error': 'Неверный метод запроса'})
@@ -1234,7 +1247,7 @@ def respond_to_invitation(request, invitation_id):
     return redirect('project_list')
 
 
-#УВЕДОМЛЕНИЯ О СООБЩЕ   НИЯХ
+#УВЕДОМЛЕНИЯ О СООБЩЕНИЯХ
 @login_required
 def get_notifications(request):
     """API для получения уведомлений пользователя"""
@@ -1243,6 +1256,14 @@ def get_notifications(request):
     
     data = []
     for notif in notifications:
+        invitation_id = notif.invitation.id if notif.invitation else None
+        
+        link = '#'
+        if notif.type == 'invitation' and invitation_id:
+            link = f'/invitation/{invitation_id}/respond/'
+        elif notif.type == 'join_request' and notif.join_request:
+            link = f'/join-request/{notif.join_request.id}/respond/'
+        
         data.append({
             'id': notif.id,
             'title': notif.title,
@@ -1250,7 +1271,8 @@ def get_notifications(request):
             'type': notif.type,
             'is_read': notif.is_read,
             'created_at': notif.created_at.strftime('%d.%m.%Y %H:%M'),
-            'invitation_id': notif.invitation_id,
+            'link': link,
+            'invitation_id': invitation_id
         })
     
     return JsonResponse({

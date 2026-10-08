@@ -43,39 +43,53 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  function renderNotifications(notifications) {
-    if (!notificationsList) return;
+function renderNotifications(notifications) {
+  if (!notificationsList) return;
 
-    if (notifications.length === 0) {
-      notificationsList.innerHTML = '<div class="notification-empty">У вас нет уведомлений</div>';
-      return;
-    }
+  if (notifications.length === 0) {
+    notificationsList.innerHTML = '<div class="notification-empty">У вас нет уведомлений</div>';
+    return;
+  }
 
-    notificationsList.innerHTML = notifications
-      .map(
-        notif => `
-            <div class="notification-item ${!notif.is_read ? 'unread' : ''}" data-id="${notif.id}" data-invitation-id="${notif.invitation_id}">
+  notificationsList.innerHTML = notifications
+    .map(notif => {
+      // Проверяем, что ссылка существует и не ведет на null
+      let link = notif.link || '#';
+
+      // Дополнительная проверка на null/invitation/null
+      if (link.includes('/null/')) {
+        link = '#';
+        console.warn('Invalid link detected:', link);
+      }
+
+      return `
+            <div class="notification-item ${!notif.is_read ? 'unread' : ''}" 
+                 data-id="${notif.id}" 
+                 data-link="${link}">
                 <div class="notification-title">${escapeHtml(notif.title)}</div>
                 <div class="notification-message">${escapeHtml(notif.message)}</div>
                 <div class="notification-time">${notif.created_at}</div>
             </div>
-        `
-      )
-      .join('');
+        `;
+    })
+    .join('');
 
-    document.querySelectorAll('.notification-item').forEach(item => {
-      item.addEventListener('click', function () {
-        const notifId = this.dataset.id;
-        const invitationId = this.dataset.invitationId;
+  document.querySelectorAll('.notification-item').forEach(item => {
+    item.addEventListener('click', function (e) {
+      e.stopPropagation();
+      const notifId = this.dataset.id;
+      const link = this.dataset.link;
 
-        markAsRead(notifId);
+      markAsRead(notifId);
 
-        if (invitationId) {
-          window.location.href = `/invitation/${invitationId}/respond/`;
-        }
-      });
+      if (link && link !== '#') {
+        window.location.href = link;
+      } else {
+        console.warn('No valid link for notification');
+      }
     });
-  }
+  });
+}
 
   function markAsRead(notificationId) {
     fetch(`/api/notifications/${notificationId}/read/`, {
