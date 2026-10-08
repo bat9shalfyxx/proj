@@ -7924,3 +7924,13 @@ button:hover,
     display: none; /* Только стрелка */
   }
 }
+.top-match-badge.team-badge {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+}
+.top-match-badge.recommended-badge {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+}
+.candidate-card.group-team { border-left: 4px solid #22c55e; }
+.candidate-card.group-recommended { border-left: 4px solid #f59e0b; }

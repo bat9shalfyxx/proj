@@ -1440,7 +1440,6 @@ def respond_join_request(request, request_id):
     return render(request, 'respond_join_request.html', {'join_request': join_request})
 
 def match_team_for_project(request, project_id):
-    """API для автоматического подбора команды для проекта"""
     project = get_object_or_404(Project, id=project_id)
     requirements = project.requirements.all()
     
@@ -1455,8 +1454,9 @@ def match_team_for_project(request, project_id):
     
     data = json.loads(request.body)
     priority = data.get('priority', 'balanced')
-    min_match_score = data.get('min_match_score', 60)
+    min_match_score = data.get('min_match_score', 30)
     
+    # ===== Скоринг всех кандидатов =====
     candidates_with_scores = []
     for candidate in candidates:
         score = calculate_candidate_match(candidate, requirements, priority)
@@ -1473,20 +1473,37 @@ def match_team_for_project(request, project_id):
                 'team_role_display': candidate.get_team_role_display(),
                 'age': candidate.age,
                 'match_score': score,
-                'matched_skills': get_matched_skills(candidate, requirements)
+                'matched_skills': get_matched_skills(candidate, requirements),
             })
     
     candidates_with_scores.sort(key=lambda x: x['match_score'], reverse=True)
     
     matched_team = greedy_team_selection(candidates_with_scores, requirements)
     
+    if len(candidates_with_scores) == 0:
+        match_type = 'no_candidates'
+    elif len(matched_team) == 0:
+        match_type = 'no_team'
+    else:
+        avg_score = sum(c['match_score'] for c in matched_team) / len(matched_team)
+        if avg_score >= 80:
+            match_type = 'optimal'
+        elif avg_score >= 50:
+            match_type = 'good'
+        else:
+            match_type = 'partial'
+    
     coverage = calculate_coverage(matched_team, requirements)
+
     
     return JsonResponse({
         'success': True,
-        'matched_team': matched_team,
-        'coverage_percentage': coverage,
-        'total_candidates': len(candidates_with_scores)
+        'team': matched_team,
+        'candidates': candidates_with_scores,
+        'coverage': coverage,
+        'team_size': len(matched_team),
+        'total_candidates': len(candidates_with_scores),
+        'match_type': match_type,   
     })
 
 def match_team_page(request, project_id):
@@ -1598,13 +1615,13 @@ def match_team_api(request, project_id):
         
         return JsonResponse({
             'success': True,
-            'matched_team': matched_team,
-            'coverage_percentage': coverage,
+            'team': matched_team,                       # ← переименовали
+            'candidates': candidates_with_scores,       # ← ДОБАВИЛИ
+            'coverage': coverage,                       # ← переименовали
+            'team_size': len(matched_team),             # ← ДОБАВИЛИ
             'total_candidates': len(candidates_with_scores),
             'match_type': match_type,
-            'suggest_fallback': not fallback_mode and coverage < 50 and len(candidates_with_scores) > 0
         })
-        
     except Exception as e:
         print(f"❌ Error in team selection: {e}")
         import traceback

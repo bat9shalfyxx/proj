@@ -1,596 +1,644 @@
 <!-- templates/project_detail.html -->
-{% extends "index.html" %}
-{% load static %}
-
-{% block title %}{{ project.name }}{% endblock %}
-
-{% block content %}
+{% extends "index.html" %} {% load static %} {% block title %}{{ project.name }}{% endblock %} {% block content %}
 <div id="notificationContainer" class="notification-container"></div>
 
 <div id="candidateModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Поиск участников для проекта "{{ project.name }}"</h3>
-            <button type="button" class="modal-close" onclick="closeCandidateModal()">×</button>
-        </div>
-        <div class="modal-body">
-            <div class="filter-controls-modal">
-                <label for="skillFilterModal">Фильтровать по навыкам (через запятую):</label>
-                <input type="text" id="skillFilterModal" class="filter-input-modal" 
-                       placeholder="Например: Python, JS, React">
-                <div class="filter-actions-modal">
-                    <button id="applyFilterModal" class="btn-filter">Применить фильтр</button>
-                    <button id="resetFilterModal" class="btn-filter reset">Сбросить фильтр</button>
-                </div>
-            </div>
-            
-            <div id="candidatesList" class="candidates-list">
-                <div class="no-candidates">
-                    <p>Загрузка кандидатов...</p>
-                </div>
-            </div>
-        </div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Поиск участников для проекта "{{ project.name }}"</h3>
+      <button type="button" class="modal-close" onclick="closeCandidateModal()">×</button>
     </div>
+    <div class="modal-body">
+      <div class="filter-controls-modal">
+        <label for="skillFilterModal">Фильтровать по навыкам (через запятую):</label>
+        <input type="text" id="skillFilterModal" class="filter-input-modal" placeholder="Например: Python, JS, React" />
+        <div class="filter-actions-modal">
+          <button id="applyFilterModal" class="btn-filter">Применить фильтр</button>
+          <button id="resetFilterModal" class="btn-filter reset">Сбросить фильтр</button>
+        </div>
+      </div>
+
+      <div id="candidatesList" class="candidates-list">
+        <div class="no-candidates">
+          <p>Загрузка кандидатов...</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="project-detail-page">
-    <div class="container">
-        <div class="page-header">
-            <div>
-                <h1>{{ project.name }}</h1>
-                <span class="project-status status-{{ project.status }}">
-                    {{ project.get_status_display }}
-                </span>
-            </div>
+  <div class="container">
+    <div class="page-header">
+      <div>
+        <h1>{{ project.name }}</h1>
+        <span class="project-status status-{{ project.status }}"> {{ project.get_status_display }} </span>
+      </div>
 
-            {% if not is_creator and not is_participant %}
-                <button type="button" class="btn btn-apply" onclick="openJoinRequestModal()">
-                    Подать заявку на участие
-                </button>
-            {% endif %}
+      {% if not is_creator and not is_participant %}
+      <button type="button" class="btn btn-apply" onclick="openJoinRequestModal()">Подать заявку на участие</button>
+      {% endif %} {% if can_edit %}
+      <div class="project-actions">
+        {% if is_creator %}
+        <a href="{% url 'project_edit' project.id %}" class="btn btn-primary">Редактировать</a>
+        <a href="{% url 'project_join_requests' project.id %}" class="btn btn-info">Запросы на участие</a>
+        <a href="{% url 'match_team_page' project.id %}" class="btn btn-primary">Автоподбор команды</a>
+        <form method="post" action="{% url 'project_change_status' project.id %}" style="display: inline">
+          {% csrf_token %}
+          <select name="status" class="status-select" onchange="this.form.submit()">
+            {% for status_code, status_name in project.STATUS_CHOICES %}
 
-            {% if can_edit %}
-            <div class="project-actions">
-                {% if is_creator %}
-                    <a href="{% url 'project_edit' project.id %}" class="btn btn-primary">Редактировать</a>
-                    <a href="{% url 'project_join_requests' project.id %}" class="btn btn-info">Запросы на участие</a>
-                    <a href="{% url 'match_team_page' project.id %}" class="btn btn-primary">Автоподбор команды</a>
-                    <form method="post" action="{% url 'project_change_status' project.id %}" style="display: inline;">
-                        {% csrf_token %}
-                        <select name="status" class="status-select" onchange="this.form.submit()">
-                            {% for status_code, status_name in project.STATUS_CHOICES %}
-                            <option value="{{ status_code }}" {% if project.status == status_code %}selected{% endif %}>
-                                {{ status_name }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </form>
-                    <button type="button" class="btn btn-success" onclick="openCandidateModal()">Добавить участников</button>
-                    <button type="button" class="btn btn-danger" onclick="showDeleteModal()">Удалить</button>
-                {% elif is_participant %}
-                    <form method="post" action="{% url 'leave_project' project.id %}" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('Покинуть проект?')">Покинуть проект</button>
-                    </form>
-                {% endif %}
-            </div>
-            {% endif %}
-        </div>
-
-        <div id="joinRequestModal" class="modal-overlay" style="display: none;">
-            <div class="modal-content" style="max-width: 600px;">
-                <div class="modal-header">
-                    <h3>Подача заявки на участие в проекте "{{ project.name }}"</h3>
-                    <button type="button" class="modal-close" onclick="closeJoinRequestModal()">×</button>
-                </div>
-                <div class="modal-body">
-                    <p>Выберите заявку, которую хотите прикрепить к заявке на участие:</p>
-                    
-                    <div class="user-applications-list" id="userApplicationsList">
-                        <!-- Список заявок пользователя будет загружен здесь -->
-                        <div class="loading">Загрузка ваших заявок...</div>
-                    </div>
-                    
-                    <div class="form-group" style="margin-top: 20px;">
-                        <label for="joinMessage">Сопроводительное сообщение (необязательно):</label>
-                        <textarea id="joinMessage" class="form-textarea" rows="4" 
-                            placeholder="Расскажите, почему вы хотите присоединиться к проекту..."></textarea>
-                    </div>
-                    
-                    <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                        <button type="button" class="btn-cancel" onclick="closeJoinRequestModal()">Отмена</button>
-                        <button type="button" class="btn-send" id="sendJoinRequestBtn" disabled>Отправить заявку</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="project-info">
-            {% if project.description %}
-            <div class="info-section">
-                <h3>Описание</h3>
-                <p>{{ project.description|linebreaks }}</p>
-            </div>
-            {% endif %}
-
-            {% if project.team_activities %}
-            <div class="info-section">
-                <h3>Чем занимается команда</h3>
-                <p>{{ project.team_activities|linebreaks }}</p>
-            </div>
-            {% endif %}
-
-            {% if project.work_conditions %}
-            <div class="info-section">
-                <h3>Условия работы</h3>
-                <p>{{ project.work_conditions|linebreaks }}</p>
-            </div>
-            {% endif %}
-
-            <div class="info-grid">
-                {% if project.start_date %}
-                <div class="info-item">
-                    <strong>Дата начала</strong>
-                    <span>{{ project.start_date|date:"d.m.Y" }}</span>
-                </div>
-                {% endif %}
-                
-                {% if project.end_date %}
-                <div class="info-item">
-                    <strong>Дата окончания</strong>
-                    <span>{{ project.end_date|date:"d.m.Y" }}</span>
-                </div>
-                {% endif %}
-                
-                {% if project.budget %}
-                <div class="info-item">
-                    <strong>Бюджет проекта</strong>
-                    <span>{{ project.budget|floatformat:0 }} ₽</span>
-                </div>
-                {% endif %}
-
-                <div class="info-item">
-                    <strong>Всего бюджет требований</strong>
-                    <span>{{ total_requirements_sum|floatformat:0 }} ₽</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="requirements-section">
-            <h2>Требования к участникам</h2>
-            {% if requirements %}
-            <div class="requirements-list">
-                {% for req in requirements %}
-                <div class="requirement-item" data-skill="{{ req.skill_name }}" data-level="{{ req.level_requirement }}">
-                    <h4>{{ req.skill_name|default:"Без навыка" }}</h4>
-                    <div class="requirement-details">
-                        {% if req.level_requirement %}
-                        <span>Уровень: {{ req.get_level_requirement_display }}</span>
-                        {% endif %}
-                        <span>Количество: {{ req.people_count }} чел.</span>
-                        {% if req.price %}
-                        <span>Стоимость: {{ req.price|floatformat:0 }} ₽</span>
-                        {% endif %}
-                        {% if req.work_condition %}
-                        <span>Условия: {{ req.work_condition }}</span>
-                        {% endif %}
-                        {% if req.is_mandatory %}
-                        <span class="badge mandatory">Обязательно</span>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <p>Требования не добавлены</p>
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="participants-section">
-            <h2>Участники ({{ participants.count }})</h2>
-            {% if participants %}
-            <div class="participants-list">
-                {% for participant in participants %}
-                <div class="participant-card">
-                    <h4>{{ participant.full_name }}</h4>
-                    <p>{{ participant.role }}</p>
-                    <p>{{ participant.email }}</p>
-                    {% if participant.phone %}
-                    <p>{{ participant.phone }}</p>
-                    {% endif %}
-                    {% if is_creator %}
-                    <form method="post" action="{% url 'remove_participant' project.id participant.id %}" 
-                          style="margin-top: 15px;" onsubmit="return confirm('Удалить участника из проекта?')">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger" style="padding: 6px 12px; font-size: 14px;">Удалить</button>
-                    </form>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <p>Нет участников</p>
-            </div>
-            {% endif %}
-        </div>
+            {% for status_code, status_name in project.STATUS_CHOICES %}
+              <option value="{{ status_code }}" {% if project.status == status_code %}selected{% endif %}>
+                {{ status_name }}
+              </option>
+            {% endfor %}
+          </select>
+        </form>
+        <button type="button" class="btn btn-success" onclick="openCandidateModal()">Добавить участников</button>
+        <button type="button" class="btn btn-danger" onclick="showDeleteModal()">Удалить</button>
+        {% elif is_participant %}
+        <form method="post" action="{% url 'leave_project' project.id %}" style="display: inline">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger" onclick="return confirm('Покинуть проект?');">Покинуть проект</button>
+        </form>
+        {% endif %}
+      </div>
+      {% endif %}
     </div>
+
+    <div id="joinRequestModal" class="modal-overlay" style="display: none">
+      <div class="modal-content" style="max-width: 600px">
+        <div class="modal-header">
+          <h3>Подача заявки на участие в проекте "{{ project.name }}"</h3>
+          <button type="button" class="modal-close" onclick="closeJoinRequestModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <p>Выберите заявку, которую хотите прикрепить к заявке на участие:</p>
+
+          <div class="user-applications-list" id="userApplicationsList">
+            <!-- Список заявок пользователя будет загружен здесь -->
+            <div class="loading">Загрузка ваших заявок...</div>
+          </div>
+
+          <div class="form-group" style="margin-top: 20px">
+            <label for="joinMessage">Сопроводительное сообщение (необязательно):</label>
+            <textarea id="joinMessage" class="form-textarea" rows="4" placeholder="Расскажите, почему вы хотите присоединиться к проекту..."></textarea>
+          </div>
+
+          <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px">
+            <button type="button" class="btn-cancel" onclick="closeJoinRequestModal()">Отмена</button>
+            <button type="button" class="btn-send" id="sendJoinRequestBtn" disabled>Отправить заявку</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-info">
+      {% if project.description %}
+      <div class="info-section">
+        <h3>Описание</h3>
+        <p>{{ project.description|linebreaks }}</p>
+      </div>
+      {% endif %} {% if project.team_activities %}
+      <div class="info-section">
+        <h3>Чем занимается команда</h3>
+        <p>{{ project.team_activities|linebreaks }}</p>
+      </div>
+      {% endif %} {% if project.work_conditions %}
+      <div class="info-section">
+        <h3>Условия работы</h3>
+        <p>{{ project.work_conditions|linebreaks }}</p>
+      </div>
+      {% endif %}
+
+      <div class="info-grid">
+        {% if project.start_date %}
+        <div class="info-item">
+          <strong>Дата начала</strong>
+          <span>{{ project.start_date|date:"d.m.Y" }}</span>
+        </div>
+        {% endif %} {% if project.end_date %}
+        <div class="info-item">
+          <strong>Дата окончания</strong>
+          <span>{{ project.end_date|date:"d.m.Y" }}</span>
+        </div>
+        {% endif %} {% if project.budget %}
+        <div class="info-item">
+          <strong>Бюджет проекта</strong>
+          <span>{{ project.budget|floatformat:0 }} ₽</span>
+        </div>
+        {% endif %}
+
+        <div class="info-item">
+          <strong>Всего бюджет требований</strong>
+          <span>{{ total_requirements_sum|floatformat:0 }} ₽</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="requirements-section">
+      <h2>Требования к участникам</h2>
+      {% if requirements %}
+      <div class="requirements-list">
+        {% for req in requirements %}
+        <div class="requirement-item" data-skill="{{ req.skill_name }}" data-level="{{ req.level_requirement }}">
+          <h4>{{ req.skill_name|default:"Без навыка" }}</h4>
+          <div class="requirement-details">
+            {% if req.level_requirement %}
+            <span>Уровень: {{ req.get_level_requirement_display }}</span>
+            {% endif %}
+            <span>Количество: {{ req.people_count }} чел.</span>
+            {% if req.price %}
+            <span>Стоимость: {{ req.price|floatformat:0 }} ₽</span>
+            {% endif %} {% if req.work_condition %}
+            <span>Условия: {{ req.work_condition }}</span>
+            {% endif %} {% if req.is_mandatory %}
+            <span class="badge mandatory">Обязательно</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <p>Требования не добавлены</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="participants-section">
+      <h2>Участники ({{ participants.count }})</h2>
+      {% if participants %}
+      <div class="participants-list">
+        {% for participant in participants %}
+        <div class="participant-card">
+          <h4>{{ participant.full_name }}</h4>
+          <p>{{ participant.role }}</p>
+          <p>{{ participant.email }}</p>
+          {% if participant.phone %}
+          <p>{{ participant.phone }}</p>
+          {% endif %} {% if is_creator %}
+          <form method="post" action="{% url 'remove_participant' project.id participant.id %}" style="margin-top: 15px" onsubmit="return confirm('Удалить участника из проекта?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" style="padding: 6px 12px; font-size: 14px">Удалить</button>
+          </form>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <p>Нет участников</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
 </div>
 
-<div id="deleteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
-    <div style="background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-        <h3 style="margin: 0 0 15px 0; color: #2c3e50; font-size: 20px;">Удаление проекта</h3>
-        <p style="margin: 0 0 20px 0; color: #6c757d; font-size: 16px;">Вы уверены, что хотите удалить проект "{{ project.name }}"?</p>
-        <p style="margin: 0 0 25px 0; color: #dc3545; font-size: 14px; font-weight: 500;">Это действие нельзя отменить!</p>
-        <form method="post" action="{% url 'project_delete' project.id %}">
-            {% csrf_token %}
-            <div style="display: flex; gap: 12px; justify-content: flex-end;">
-                <button type="button" onclick="hideDeleteModal()" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #dee2e6; background: white; color: #495057; font-size: 14px; cursor: pointer;">Отмена</button>
-                <button type="submit" style="padding: 10px 20px; border-radius: 8px; border: none; background: #dc3545; color: white; font-size: 14px; cursor: pointer;">Удалить</button>
-            </div>
-        </form>
-    </div>
+<div
+  id="deleteModal"
+  style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center"
+>
+  <div style="background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 90%; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2)">
+    <h3 style="margin: 0 0 15px 0; color: #2c3e50; font-size: 20px">Удаление проекта</h3>
+    <p style="margin: 0 0 20px 0; color: #6c757d; font-size: 16px">Вы уверены, что хотите удалить проект "{{ project.name }}"?</p>
+    <p style="margin: 0 0 25px 0; color: #dc3545; font-size: 14px; font-weight: 500">Это действие нельзя отменить!</p>
+    <form method="post" action="{% url 'project_delete' project.id %}">
+      {% csrf_token %}
+      <div style="display: flex; gap: 12px; justify-content: flex-end">
+        <button
+          type="button"
+          onclick="hideDeleteModal()"
+          style="padding: 10px 20px; border-radius: 8px; border: 1px solid #dee2e6; background: white; color: #495057; font-size: 14px; cursor: pointer"
+        >
+          Отмена
+        </button>
+        <button type="submit" style="padding: 10px 20px; border-radius: 8px; border: none; background: #dc3545; color: white; font-size: 14px; cursor: pointer">Удалить</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <script>
+(function () {
+  'use strict';
 
-const csrfToken = '{{ csrf_token }}';
-let notificationId = 0;
+  // Токен и утилиты берём из utils.js / meta-тега
+  const csrfToken = window.csrfToken || document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+  const safeEscape = window.escapeHtml || function (text) {
+    if (text === null || text === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+  };
 
-function showNotification(title, message, type = 'info') {
+  let notificationId = 0;
+
+  // ==================== УВЕДОМЛЕНИЯ ====================
+  function showNotification(title, message, type = 'info') {
     const container = document.getElementById('notificationContainer');
+    if (!container) return;
+
     const id = notificationId++;
-    
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.id = `notification-${id}`;
-    
     notification.innerHTML = `
-        <div class="notification-content">
-            <h4>${title}</h4>
-            <p>${message}</p>
-        </div>
-        <button class="notification-close" onclick="closeNotification(${id})">×</button>
+      <div class="notification-content">
+        <h4>${escapeHtml(title)}</h4>
+        <p>${escapeHtml(message)}</p>
+      </div>
+      <button class="notification-close" onclick="closeNotification(${id})">×</button>
     `;
-    
     container.appendChild(notification);
-    
     setTimeout(() => closeNotification(id), 5000);
-}
+  }
 
-function closeNotification(id) {
-    const notification = document.getElementById(`notification-${id}`);
-    if (notification) {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => notification.remove(), 300);
+  function closeNotification(id) {
+    const n = document.getElementById(`notification-${id}`);
+    if (n) {
+      n.style.animation = 'slideOut 0.3s ease';
+      setTimeout(() => n.remove(), 300);
     }
-}
+  }
 
-// ==================== МОДАЛЬНОЕ ОКНО ПОИСКА КАНДИДАТОВ ====================
-let allCandidates = [];
-let currentSkillFilter = '';
+  // Публикуем наружу (для inline-onclick)
+  window.showNotification = showNotification;
+  window.closeNotification = closeNotification;
 
-function openCandidateModal() {
+  // ==================== МОДАЛКА КАНДИДАТОВ ====================
+  let allCandidates = [];
+
+  function openCandidateModal() {
     document.getElementById('candidateModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
     loadProjectCandidates();
-}
+  }
 
-function closeCandidateModal() {
+  function closeCandidateModal() {
     document.getElementById('candidateModal').style.display = 'none';
     document.body.style.overflow = '';
-    currentSkillFilter = '';
     const filterInput = document.getElementById('skillFilterModal');
     if (filterInput) filterInput.value = '';
-}
+  }
 
-function loadProjectCandidates() {
-    const candidatesList = document.getElementById('candidatesList');
-    candidatesList.innerHTML = '<div class="no-candidates"><div class="loading-spinner"></div><p>Загрузка кандидатов...</p></div>';
+  function loadProjectCandidates() {
+    const list = document.getElementById('candidatesList');
+    if (!list) return;
 
-    const url = `/api/projects/{{ project.id }}/candidates/`;
-    
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            allCandidates = data.candidates;
-            filterAndDisplayCandidates();
-        })
-        .catch(error => {
-            console.error('Ошибка загрузки кандидатов:', error);
-            candidatesList.innerHTML = '<div class="no-candidates"><p>Ошибка загрузки кандидатов</p></div>';
-        });
-}
+    list.innerHTML = '<div class="no-candidates"><div class="loading-spinner"></div><p>Загрузка кандидатов...</p></div>';
 
-function filterAndDisplayCandidates() {
-    const candidatesList = document.getElementById('candidatesList');
-    const skillFilter = document.getElementById('skillFilterModal').value.trim();
-    
-    let filteredCandidates = [...allCandidates];
-    
+    fetch(`/api/projects/{{ project.id }}/candidates/`)
+      .then(r => r.json())
+      .then(data => {
+        allCandidates = data.candidates || [];
+        filterAndDisplayCandidates();
+      })
+      .catch(err => {
+        console.error('Ошибка загрузки кандидатов:', err);
+        list.innerHTML = '<div class="no-candidates"><p>Ошибка загрузки кандидатов</p></div>';
+      });
+  }
+
+  function filterAndDisplayCandidates() {
+    const list = document.getElementById('candidatesList');
+    if (!list) return;
+
+    const skillInput = document.getElementById('skillFilterModal');
+    const skillFilter = skillInput ? skillInput.value.trim() : '';
+
+    let filtered = [...allCandidates];
+
     if (skillFilter) {
-        const skillsToFilter = skillFilter.toLowerCase().split(',').map(s => s.trim());
-        filteredCandidates = filteredCandidates.filter(candidate => {
-            if (!candidate.skill_list) return false;
-            const candidateSkills = candidate.skill_list.toLowerCase().split(',').map(s => s.trim());
-            return skillsToFilter.some(filterSkill => candidateSkills.includes(filterSkill));
-        });
+      const want = skillFilter.toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+      filtered = filtered.filter(c => {
+        if (!c.skill_list) return false;
+        const has = c.skill_list.toLowerCase().split(',').map(s => s.trim());
+        return want.some(w => has.includes(w));
+      });
     }
-    
-    filteredCandidates.sort((a, b) => (b.match_score || 0) - (a.match_score || 0));
-    
-    if (filteredCandidates.length === 0) {
-        candidatesList.innerHTML = `<div class="no-candidates"><p>${skillFilter ? 'Нет кандидатов с указанными навыками' : 'Нет доступных кандидатов'}</p></div>`;
-        return;
-    }
-    
-    const topCandidates = filteredCandidates.slice(0, 3);
-    const otherCandidates = filteredCandidates.slice(3);
-    
-    let html = '';
-    
-    if (topCandidates.length > 0) {
-        html += `<div class="section-title">⭐ Рекомендуемые кандидаты</div>`;
-        html += topCandidates.map((candidate, index) => renderCandidateCard(candidate, index, true, skillFilter)).join('');
-    }
-    
-    if (topCandidates.length > 0 && otherCandidates.length > 0) {
-        html += `
-            <div class="candidates-divider">
-                <div class="candidates-divider-line"></div>
-                <span class="candidates-divider-text">Другие кандидаты (${otherCandidates.length})</span>
-                <div class="candidates-divider-line"></div>
-            </div>
-        `;
-    } else if (otherCandidates.length > 0) {
-        html += `<div class="section-title">📋 Все кандидаты</div>`;
-    }
-    
-    if (otherCandidates.length > 0) {
-        html += otherCandidates.map((candidate, index) => renderCandidateCard(candidate, index + 3, false, skillFilter)).join('');
-    }
-    
-    candidatesList.innerHTML = html;
-}
 
-function inviteCandidate(applicationId) {
+    filtered.sort((a, b) => (b.match_score || 0) - (a.match_score || 0));
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="no-candidates"><p>${skillFilter ? 'Нет кандидатов с указанными навыками' : 'Нет доступных кандидатов'}</p></div>`;
+      return;
+    }
+
+    const top = filtered.slice(0, 3);
+    const rest = filtered.slice(3);
+
+    let html = '';
+
+    if (top.length) {
+      html += `<div class="section-title">⭐ Рекомендуемые кандидаты</div>`;
+      html += top.map(c => renderCandidateCard(c, skillFilter, 'recommended')).join('');
+    }
+
+    if (top.length && rest.length) {
+      html += `
+        <div class="candidates-divider">
+          <div class="candidates-divider-line"></div>
+          <span class="candidates-divider-text">Другие кандидаты (${rest.length})</span>
+          <div class="candidates-divider-line"></div>
+        </div>`;
+    } else if (rest.length) {
+      html += `<div class="section-title">📋 Все кандидаты</div>`;
+    }
+
+    if (rest.length) {
+      html += rest.map(c => renderCandidateCard(c, skillFilter, 'other')).join('');
+    }
+
+    list.innerHTML = html;
+  }
+
+  // ==================== РЕНДЕР РЕЗУЛЬТАТОВ АВТОПОДБОРА ====================
+  // Вызывайте эту функцию после ответа /api/projects/<id>/match-team/
+  function renderMatchResults(data) {
+    const container = document.getElementById('matchResults') || document.getElementById('candidatesList');
+    if (!container) return;
+
+    const teamIds = new Set((data.team || []).map(m => m.id));
+    const all = data.candidates || [];
+
+    const team = all.filter(c => teamIds.has(c.id));
+    const recommended = all.filter(c => !teamIds.has(c.id) && (c.match_score || 0) >= 60);
+    const others = all.filter(c => !teamIds.has(c.id) && (c.match_score || 0) < 60);
+
+    let html = '';
+
+    if (team.length) {
+      html += `<div class="section-title">✅ Сформированная команда (${team.length})</div>`;
+      html += team.map(c => renderCandidateCard(c, '', 'team')).join('');
+    }
+
+    if (recommended.length) {
+      html += `
+        <div class="candidates-divider">
+          <div class="candidates-divider-line"></div>
+          <span class="candidates-divider-text">⭐ Рекомендуемые кандидаты (${recommended.length})</span>
+          <div class="candidates-divider-line"></div>
+        </div>`;
+      html += recommended.map(c => renderCandidateCard(c, '', 'recommended')).join('');
+    }
+
+    if (others.length) {
+      html += `
+        <div class="candidates-divider">
+          <div class="candidates-divider-line"></div>
+          <span class="candidates-divider-text">📋 Другие кандидаты (${others.length})</span>
+          <div class="candidates-divider-line"></div>
+        </div>`;
+      html += others.map(c => renderCandidateCard(c, '', 'other')).join('');
+    }
+
+    if (!html) {
+      html = '<div class="no-candidates"><p>Кандидаты не найдены</p></div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  // ==================== КАРТОЧКА КАНДИДАТА ====================
+  function renderCandidateCard(candidate, skillFilter = '', group = 'other') {
+    const candidateSkills = candidate.skill_list
+      ? candidate.skill_list.split(',').map(s => s.trim()).filter(Boolean)
+      : [];
+    const filterList = skillFilter
+      ? skillFilter.toLowerCase().split(',').map(s => s.trim()).filter(Boolean)
+      : [];
+
+    const score = candidate.match_score || 0;
+
+    let matchClass = 'match-none';
+    let matchText = 'Низкое соответствие';
+    if (score >= 80) { matchClass = 'match-high'; matchText = 'Отличное соответствие'; }
+    else if (score >= 60) { matchClass = 'match-medium'; matchText = 'Хорошее соответствие'; }
+    else if (score >= 40) { matchClass = 'match-low'; matchText = 'Среднее соответствие'; }
+
+    const badge =
+      group === 'team' ? '<div class="top-match-badge team-badge">✅ В команде</div>' :
+      group === 'recommended' ? '<div class="top-match-badge recommended-badge">⭐ Рекомендуем</div>' :
+      '';
+
+    return `
+      <div class="candidate-card group-${group}" data-score="${score}">
+        ${badge}
+
+        <div class="candidate-header">
+          <div>
+            <h4 class="candidate-name">
+              ${escapeHtml(candidate.contact_first_name)} ${escapeHtml(candidate.contact_last_name)}
+            </h4>
+            <span class="organization-name">${escapeHtml(candidate.organization_name || 'Не указана')}</span>
+          </div>
+          <div class="match-score-container">
+            <span class="match-score ${matchClass}" title="${matchText}">
+              ${score}% совпадение
+            </span>
+          </div>
+        </div>
+
+        <div class="match-progress">
+          <div class="match-progress-bar" style="width: ${score}%"></div>
+        </div>
+
+        <div class="candidate-details">
+          <div class="detail-item">
+            <span class="detail-label">Роль в команде</span>
+            <span class="detail-value">${escapeHtml(candidate.team_role_display || 'Не указана')}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Email</span>
+            <span class="detail-value">${escapeHtml(candidate.contact_email || '')}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Телефон</span>
+            <span class="detail-value">${escapeHtml(candidate.contact_phone || '')}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Возраст</span>
+            <span class="detail-value">${candidate.age || 'Не указан'}</span>
+          </div>
+        </div>
+
+        ${
+          candidateSkills.length
+            ? `
+          <div class="candidate-skills">
+            <strong>Навыки:</strong>
+            <div class="skills-list">
+              ${candidateSkills.map(s => `
+                <span class="skill-tag ${filterList.includes(s.toLowerCase()) ? 'match' : ''}">
+                  ${escapeHtml(s)}
+                </span>
+              `).join('')}
+            </div>
+          </div>`
+            : ''
+        }
+
+        <button class="invite-button" onclick="inviteCandidate(${candidate.id})">
+          Пригласить в проект
+        </button>
+      </div>
+    `;
+  }
+
+  // ==================== ПРИГЛАШЕНИЕ ====================
+  function inviteCandidate(applicationId) {
     const button = event?.target;
     const originalText = button?.innerText;
     if (button) {
-        button.innerText = 'Отправка...';
-        button.disabled = true;
+      button.innerText = 'Отправка...';
+      button.disabled = true;
     }
-    
+
     fetch(`/projects/{{ project.id }}/invite/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-CSRFToken': '{{ csrf_token }}',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: `application_id=${applicationId}&message=Приглашаем вас присоединиться к проекту "${escapeHtml('{{ project.name }}')}"`
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': csrfToken,
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: `application_id=${applicationId}&message=Приглашаем вас присоединиться к проекту "${encodeURIComponent('{{ project.name }}')}"`,
     })
-    .then(response => response.json())
-    .then(data => {
+      .then(r => r.json())
+      .then(data => {
         if (data.success) {
-            showNotification('Успех', 'Приглашение успешно отправлено', 'success');
-            loadProjectCandidates();
+          showNotification('Успех', 'Приглашение успешно отправлено', 'success');
+          loadProjectCandidates();
         } else {
-            showNotification('Ошибка', data.error || 'Не удалось отправить приглашение', 'error');
+          showNotification('Ошибка', data.error || 'Не удалось отправить приглашение', 'error');
         }
-        if (button) {
-            button.innerText = originalText;
-            button.disabled = false;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
+      })
+      .catch(err => {
+        console.error('Error:', err);
         showNotification('Ошибка', 'Произошла ошибка при отправке приглашения', 'error');
+      })
+      .finally(() => {
         if (button) {
-            button.innerText = originalText;
-            button.disabled = false;
+          button.innerText = originalText;
+          button.disabled = false;
         }
-    });
-}
+      });
+  }
 
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function renderCandidateCard(candidate, index, isTopMatch, skillFilter) {
-    const candidateSkills = candidate.skill_list ? candidate.skill_list.split(',').map(s => s.trim()) : [];
-    const skillFilterList = skillFilter ? skillFilter.toLowerCase().split(',').map(s => s.trim()) : [];
-    const matchScore = candidate.match_score || 0;
-    
-    let matchClass = '';
-    let matchText = '';
-    if (matchScore >= 80) {
-        matchClass = 'match-high';
-        matchText = 'Отличное соответствие';
-    } else if (matchScore >= 60) {
-        matchClass = 'match-medium';
-        matchText = 'Хорошее соответствие';
-    } else if (matchScore >= 40) {
-        matchClass = 'match-low';
-        matchText = 'Среднее соответствие';
-    } else {
-        matchClass = 'match-none';
-        matchText = 'Низкое соответствие';
-    }
-    
-    return `
-        <div class="candidate-card ${isTopMatch ? 'top-match' : ''}" data-score="${matchScore}">
-            ${isTopMatch ? '<div class="top-match-badge">⭐ Рекомендуемый кандидат</div>' : ''}
-            
-            <div class="candidate-header">
-                <div>
-                    <h4 class="candidate-name">${escapeHtml(candidate.contact_first_name)} ${escapeHtml(candidate.contact_last_name)}</h4>
-                    <span class="organization-name">${escapeHtml(candidate.organization_name || 'Не указана')}</span>
-                </div>
-                <div class="match-score-container">
-                    <span class="match-score ${matchClass}" title="${matchText}">
-                        ${matchScore}% совпадение
-                    </span>
-                    ${isTopMatch ? '<span class="top-badge">Рекомендуемый</span>' : ''}
-                </div>
-            </div>
-            
-            <div class="match-progress">
-                <div class="match-progress-bar" style="width: ${matchScore}%"></div>
-            </div>
-            
-            <div class="candidate-details">
-                <div class="detail-item">
-                    <span class="detail-label">Роль в команде</span>
-                    <span class="detail-value">${escapeHtml(candidate.team_role_display || 'Не указана')}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Email</span>
-                    <span class="detail-value">${escapeHtml(candidate.contact_email)}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Телефон</span>
-                    <span class="detail-value">${escapeHtml(candidate.contact_phone)}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Возраст</span>
-                    <span class="detail-value">${candidate.age || 'Не указан'}</span>
-                </div>
-            </div>
-            
-            ${candidate.skill_list ? `
-            <div class="candidate-skills">
-                <strong>Навыки:</strong>
-                <div class="skills-list">
-                    ${candidateSkills.map(skill => `
-                        <span class="skill-tag ${skillFilterList.includes(skill.toLowerCase()) ? 'match' : ''}">
-                            ${escapeHtml(skill)}
-                        </span>
-                    `).join('')}
-                </div>
-            </div>
-            ` : ''}
-            
-            <button class="invite-button" onclick="inviteCandidate(${candidate.id})">
-                Пригласить в проект
-            </button>
-        </div>
-    `;
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    const applyFilterBtn = document.getElementById('applyFilterModal');
-    const resetFilterBtn = document.getElementById('resetFilterModal');
+  // ==================== ОБРАБОТЧИКИ ====================
+  document.addEventListener('DOMContentLoaded', function () {
+    const applyBtn = document.getElementById('applyFilterModal');
+    const resetBtn = document.getElementById('resetFilterModal');
     const skillInput = document.getElementById('skillFilterModal');
-    
-    if (applyFilterBtn) {
-        applyFilterBtn.addEventListener('click', function() {
-            filterAndDisplayCandidates();
-        });
+
+    if (applyBtn) applyBtn.addEventListener('click', filterAndDisplayCandidates);
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        if (skillInput) skillInput.value = '';
+        filterAndDisplayCandidates();
+      });
     }
-    
-    if (resetFilterBtn) {
-        resetFilterBtn.addEventListener('click', function() {
-            if (skillInput) skillInput.value = '';
-            filterAndDisplayCandidates();
-        });
-    }
-    
+
     if (skillInput) {
-        skillInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                filterAndDisplayCandidates();
-            }
-        });
+      skillInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') filterAndDisplayCandidates();
+      });
     }
-});
+  });
 
-function showDeleteModal() {
+  // ==================== МОДАЛКА УДАЛЕНИЯ ====================
+  function showDeleteModal() {
     document.getElementById('deleteModal').style.display = 'flex';
-}
+  }
 
-function hideDeleteModal() {
+  function hideDeleteModal() {
     document.getElementById('deleteModal').style.display = 'none';
-}
+  }
 
-window.onclick = function(event) {
+  window.onclick = function (event) {
     const deleteModal = document.getElementById('deleteModal');
     const candidateModal = document.getElementById('candidateModal');
-    
-    if (event.target == deleteModal) {
-        hideDeleteModal();
-    }
-    if (event.target == candidateModal) {
-        closeCandidateModal();
-    }
-}
 
-document.addEventListener('keydown', function(event) {
+    if (event.target === deleteModal) hideDeleteModal();
+    if (event.target === candidateModal) closeCandidateModal();
+  };
+
+  document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') {
-        hideDeleteModal();
-        closeCandidateModal();
+      hideDeleteModal();
+      closeCandidateModal();
     }
-});
+  });
+
+  // ==================== ПУБЛИЧНЫЕ ФУНКЦИИ ====================
+  window.openCandidateModal = openCandidateModal;
+  window.closeCandidateModal = closeCandidateModal;
+  window.loadProjectCandidates = loadProjectCandidates;
+  window.filterAndDisplayCandidates = filterAndDisplayCandidates;
+  window.renderMatchResults = renderMatchResults;   // ← вызывайте после автоподбора
+  window.renderCandidateCard = renderCandidateCard;
+  window.inviteCandidate = inviteCandidate;
+  window.showDeleteModal = showDeleteModal;
+  window.hideDeleteModal = hideDeleteModal;
+})();
 </script>
 
 <script>
-// ==================== ЗАЯВКА НА УЧАСТИЕ ====================
-let selectedApplicationId = null;
-const csrfTokenGlobal = '{{ csrf_token }}';
+  // ==================== ЗАЯВКА НА УЧАСТИЕ ====================
+  let selectedApplicationId = null;
+  const csrfTokenGlobal = '{{ csrf_token }}';
 
-function openJoinRequestModal() {
+  function openJoinRequestModal() {
     const modal = document.getElementById('joinRequestModal');
     if (modal) {
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        loadUserApplications();
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      loadUserApplications();
     }
-}
+  }
 
-function closeJoinRequestModal() {
+  function closeJoinRequestModal() {
     const modal = document.getElementById('joinRequestModal');
     if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
-        selectedApplicationId = null;
-        const sendBtn = document.getElementById('sendJoinRequestBtn');
-        if (sendBtn) sendBtn.disabled = true;
-        const messageField = document.getElementById('joinMessage');
-        if (messageField) messageField.value = '';
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+      selectedApplicationId = null;
+      const sendBtn = document.getElementById('sendJoinRequestBtn');
+      if (sendBtn) sendBtn.disabled = true;
+      const messageField = document.getElementById('joinMessage');
+      if (messageField) messageField.value = '';
     }
-}
+  }
 
-function loadUserApplications() {
+  function loadUserApplications() {
     const listContainer = document.getElementById('userApplicationsList');
     if (!listContainer) return;
-    
+
     listContainer.innerHTML = '<div class="loading" style="text-align: center; padding: 20px;">Загрузка ваших заявок...</div>';
-    
+
     fetch('/api/my-applications/')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Ошибка загрузки');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.length === 0) {
-                listContainer.innerHTML = `
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Ошибка загрузки');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.length === 0) {
+          listContainer.innerHTML = `
                     <div class="empty-state">
                         <p>У вас нет активных заявок</p>
                         <a href="{% url 'form_page' %}" class="btn-primary">Создать заявку</a>
                     </div>
                 `;
-                return;
-            }
-            
-            listContainer.innerHTML = data.map(app => `
+          return;
+        }
+
+        listContainer.innerHTML = data
+          .map(
+            app => `
                 <div class="application-option" data-app-id="${app.id}" onclick="selectApplication(${app.id})">
                     <div class="application-header">
                         <strong>${escapeHtmlGlobal(app.organization_name) || 'Заявка №' + app.id}</strong>
@@ -603,103 +651,105 @@ function loadUserApplications() {
                         <strong>Роль:</strong> ${escapeHtmlGlobal(app.team_role_display) || 'Не указана'}
                     </div>
                 </div>
-            `).join('');
-        })
-        .catch(error => {
-            console.error('Ошибка загрузки заявок:', error);
-            listContainer.innerHTML = '<div class="error" style="text-align: center; padding: 20px; color: #dc3545;">Ошибка загрузки заявок</div>';
-        });
-}
+            `
+          )
+          .join('');
+      })
+      .catch(error => {
+        console.error('Ошибка загрузки заявок:', error);
+        listContainer.innerHTML = '<div class="error" style="text-align: center; padding: 20px; color: #dc3545;">Ошибка загрузки заявок</div>';
+      });
+  }
 
-function getStatusText(status) {
+  function getStatusText(status) {
     const statusMap = {
-        'new': 'Новая',
-        'in_progress': 'В обработке',
-        'approved': 'Одобрена',
-        'rejected': 'Отклонена'
+      new: 'Новая',
+      in_progress: 'В обработке',
+      approved: 'Одобрена',
+      rejected: 'Отклонена',
     };
     return statusMap[status] || status;
-}
+  }
 
-function selectApplication(appId) {
+  function selectApplication(appId) {
     selectedApplicationId = appId;
-    
+
     document.querySelectorAll('.application-option').forEach(el => {
-        el.classList.remove('selected');
+      el.classList.remove('selected');
     });
-    
+
     const selectedEl = document.querySelector(`.application-option[data-app-id="${appId}"]`);
     if (selectedEl) {
-        selectedEl.classList.add('selected');
+      selectedEl.classList.add('selected');
     }
-    
+
     const sendBtn = document.getElementById('sendJoinRequestBtn');
     if (sendBtn) sendBtn.disabled = false;
-}
+  }
 
-function sendJoinRequest() {
+  function sendJoinRequest() {
     if (!selectedApplicationId) {
-        alert('Выберите заявку для отправки');
-        return;
+      alert('Выберите заявку для отправки');
+      return;
     }
-    
+
     const message = document.getElementById('joinMessage')?.value || '';
     const sendBtn = document.getElementById('sendJoinRequestBtn');
     const originalText = sendBtn?.textContent || 'Отправить';
-    
+
     if (sendBtn) {
-        sendBtn.textContent = 'Отправка...';
-        sendBtn.disabled = true;
+      sendBtn.textContent = 'Отправка...';
+      sendBtn.disabled = true;
     }
-    
+
     // ПРАВИЛЬНЫЙ URL - с /api/ в начале
     const url = `/api/projects/{{ project.id }}/join-request/`;
     console.log('Отправка запроса на URL:', url);
-    
+
     fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfTokenGlobal,
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({
-            application_id: selectedApplicationId,
-            message: message
-        })
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfTokenGlobal,
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: JSON.stringify({
+        application_id: selectedApplicationId,
+        message: message,
+      }),
     })
-    .then(response => {
+      .then(response => {
         console.log('Статус ответа:', response.status);
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         return response.json();
-    })
-    .then(data => {
+      })
+      .then(data => {
         console.log('Ответ сервера:', data);
         if (data.success) {
-            showNotificationGlobal('✅ Заявка успешно отправлена!', 'success');
-            closeJoinRequestModal();
+          showNotificationGlobal('✅ Заявка успешно отправлена!', 'success');
+          closeJoinRequestModal();
         } else {
-            showNotificationGlobal(data.error || 'Ошибка при отправке заявки', 'error');
+          showNotificationGlobal(data.error || 'Ошибка при отправке заявки', 'error');
         }
-    })
-    .catch(error => {
+      })
+      .catch(error => {
         console.error('Ошибка:', error);
         showNotificationGlobal(error.message || 'Произошла ошибка при отправке', 'error');
-    })
-    .finally(() => {
+      })
+      .finally(() => {
         if (sendBtn) {
-            sendBtn.textContent = originalText;
-            sendBtn.disabled = false;
+          sendBtn.textContent = originalText;
+          sendBtn.disabled = false;
         }
-    });
-}
+      });
+  }
 
-function showNotificationGlobal(message, type) {
+  function showNotificationGlobal(message, type) {
     const existingNotif = document.querySelector('.custom-notification');
     if (existingNotif) existingNotif.remove();
-    
+
     const notification = document.createElement('div');
     notification.className = `custom-notification ${type}`;
     notification.textContent = message;
@@ -717,27 +767,27 @@ function showNotificationGlobal(message, type) {
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         animation: slideIn 0.3s ease;
     `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
 
-function escapeHtmlGlobal(text) {
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.3s ease';
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+
+  function escapeHtmlGlobal(text) {
     if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
-}
+  }
 
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     const sendBtn = document.getElementById('sendJoinRequestBtn');
     if (sendBtn) {
-        sendBtn.addEventListener('click', sendJoinRequest);
+      sendBtn.addEventListener('click', sendJoinRequest);
     }
-});
+  });
 </script>
 {% endblock %}
