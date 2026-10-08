@@ -1451,7 +1451,7 @@ def match_team_for_project(request, project_id):
     participant_app_ids = project.participants.exclude(application=None).values_list('application_id', flat=True)
     excluded_ids = list(invited_app_ids) + list(participant_app_ids)
     
-    candidates = Application.objects.filter(status='approved').exclude(id__in=excluded_ids)
+    candidates = Application.objects.exclude(status='rejected').exclude(id__in=excluded_ids)
     
     data = json.loads(request.body)
     priority = data.get('priority', 'balanced')
