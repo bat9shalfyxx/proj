@@ -1,5 +1,8 @@
 <!-- templates/project_detail.html -->
-{% extends "index.html" %} {% load static %} {% block title %}{{ project.name }}{% endblock %} {% block content %}
+{% extends "index.html" %}
+{% load static %}
+{% block title %}{{ project.name }}{% endblock %}
+{% block content %}
 <div id="notificationContainer" class="notification-container"></div>
 
 <div id="candidateModal" class="modal-overlay">
@@ -32,22 +35,23 @@
     <div class="page-header">
       <div>
         <h1>{{ project.name }}</h1>
-        <span class="project-status status-{{ project.status }}"> {{ project.get_status_display }} </span>
+        <span class="project-status status-{{ project.status }}">{{ project.get_status_display }}</span>
       </div>
 
       {% if not is_creator and not is_participant %}
       <button type="button" class="btn btn-apply" onclick="openJoinRequestModal()">Подать заявку на участие</button>
-      {% endif %} {% if can_edit %}
+      {% endif %}
+
+      {% if can_edit %}
       <div class="project-actions">
         {% if is_creator %}
         <a href="{% url 'project_edit' project.id %}" class="btn btn-primary">Редактировать</a>
         <a href="{% url 'project_join_requests' project.id %}" class="btn btn-info">Запросы на участие</a>
         <a href="{% url 'match_team_page' project.id %}" class="btn btn-primary">Автоподбор команды</a>
+
         <form method="post" action="{% url 'project_change_status' project.id %}" style="display: inline">
           {% csrf_token %}
           <select name="status" class="status-select" onchange="this.form.submit()">
-            {% for status_code, status_name in project.STATUS_CHOICES %}
-
             {% for status_code, status_name in project.STATUS_CHOICES %}
               <option value="{{ status_code }}" {% if project.status == status_code %}selected{% endif %}>
                 {{ status_name }}
@@ -55,6 +59,7 @@
             {% endfor %}
           </select>
         </form>
+
         <button type="button" class="btn btn-success" onclick="openCandidateModal()">Добавить участников</button>
         <button type="button" class="btn btn-danger" onclick="showDeleteModal()">Удалить</button>
         {% elif is_participant %}
@@ -77,7 +82,6 @@
           <p>Выберите заявку, которую хотите прикрепить к заявке на участие:</p>
 
           <div class="user-applications-list" id="userApplicationsList">
-            <!-- Список заявок пользователя будет загружен здесь -->
             <div class="loading">Загрузка ваших заявок...</div>
           </div>
 
@@ -100,12 +104,14 @@
         <h3>Описание</h3>
         <p>{{ project.description|linebreaks }}</p>
       </div>
-      {% endif %} {% if project.team_activities %}
+      {% endif %}
+      {% if project.team_activities %}
       <div class="info-section">
         <h3>Чем занимается команда</h3>
         <p>{{ project.team_activities|linebreaks }}</p>
       </div>
-      {% endif %} {% if project.work_conditions %}
+      {% endif %}
+      {% if project.work_conditions %}
       <div class="info-section">
         <h3>Условия работы</h3>
         <p>{{ project.work_conditions|linebreaks }}</p>
@@ -118,12 +124,14 @@
           <strong>Дата начала</strong>
           <span>{{ project.start_date|date:"d.m.Y" }}</span>
         </div>
-        {% endif %} {% if project.end_date %}
+        {% endif %}
+        {% if project.end_date %}
         <div class="info-item">
           <strong>Дата окончания</strong>
           <span>{{ project.end_date|date:"d.m.Y" }}</span>
         </div>
-        {% endif %} {% if project.budget %}
+        {% endif %}
+        {% if project.budget %}
         <div class="info-item">
           <strong>Бюджет проекта</strong>
           <span>{{ project.budget|floatformat:0 }} ₽</span>
@@ -151,9 +159,11 @@
             <span>Количество: {{ req.people_count }} чел.</span>
             {% if req.price %}
             <span>Стоимость: {{ req.price|floatformat:0 }} ₽</span>
-            {% endif %} {% if req.work_condition %}
+            {% endif %}
+            {% if req.work_condition %}
             <span>Условия: {{ req.work_condition }}</span>
-            {% endif %} {% if req.is_mandatory %}
+            {% endif %}
+            {% if req.is_mandatory %}
             <span class="badge mandatory">Обязательно</span>
             {% endif %}
           </div>
@@ -178,7 +188,8 @@
           <p>{{ participant.email }}</p>
           {% if participant.phone %}
           <p>{{ participant.phone }}</p>
-          {% endif %} {% if is_creator %}
+          {% endif %}
+          {% if is_creator %}
           <form method="post" action="{% url 'remove_participant' project.id participant.id %}" style="margin-top: 15px" onsubmit="return confirm('Удалить участника из проекта?');">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger" style="padding: 6px 12px; font-size: 14px">Удалить</button>
@@ -226,7 +237,9 @@
 
   // Токен и утилиты берём из utils.js / meta-тега
   const csrfToken = window.csrfToken || document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
-  const safeEscape = window.escapeHtml || function (text) {
+
+  // Единая функция экранирования для всего файла
+  const escapeHtml = window.escapeHtml || function (text) {
     if (text === null || text === undefined) return '';
     const div = document.createElement('div');
     div.textContent = String(text);
@@ -586,9 +599,19 @@
 </script>
 
 <script>
+(function () {
+  'use strict';
+
   // ==================== ЗАЯВКА НА УЧАСТИЕ ====================
   let selectedApplicationId = null;
-  const csrfTokenGlobal = '{{ csrf_token }}';
+  const csrfTokenGlobal = window.csrfToken || document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+  const escapeHtmlLocal = window.escapeHtml || function (text) {
+    if (text === null || text === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+  };
 
   function openJoinRequestModal() {
     const modal = document.getElementById('joinRequestModal');
@@ -628,29 +651,29 @@
       .then(data => {
         if (data.length === 0) {
           listContainer.innerHTML = `
-                    <div class="empty-state">
-                        <p>У вас нет активных заявок</p>
-                        <a href="{% url 'form_page' %}" class="btn-primary">Создать заявку</a>
-                    </div>
-                `;
+            <div class="empty-state">
+              <p>У вас нет активных заявок</p>
+              <a href="{% url 'form_page' %}" class="btn-primary">Создать заявку</a>
+            </div>
+          `;
           return;
         }
 
         listContainer.innerHTML = data
           .map(
             app => `
-                <div class="application-option" data-app-id="${app.id}" onclick="selectApplication(${app.id})">
-                    <div class="application-header">
-                        <strong>${escapeHtmlGlobal(app.organization_name) || 'Заявка №' + app.id}</strong>
-                        <span class="status-badge status-${app.status}">${getStatusText(app.status)}</span>
-                    </div>
-                    <div class="application-skills">
-                        <strong>Навыки:</strong> ${escapeHtmlGlobal(app.skill_list) || 'Не указаны'}
-                    </div>
-                    <div class="application-role">
-                        <strong>Роль:</strong> ${escapeHtmlGlobal(app.team_role_display) || 'Не указана'}
-                    </div>
+              <div class="application-option" data-app-id="${app.id}" onclick="selectApplication(${app.id})">
+                <div class="application-header">
+                  <strong>${escapeHtmlLocal(app.organization_name) || 'Заявка №' + app.id}</strong>
+                  <span class="status-badge status-${app.status}">${getStatusText(app.status)}</span>
                 </div>
+                <div class="application-skills">
+                  <strong>Навыки:</strong> ${escapeHtmlLocal(app.skill_list) || 'Не указаны'}
+                </div>
+                <div class="application-role">
+                  <strong>Роль:</strong> ${escapeHtmlLocal(app.team_role_display) || 'Не указана'}
+                </div>
+              </div>
             `
           )
           .join('');
@@ -702,7 +725,6 @@
       sendBtn.disabled = true;
     }
 
-    // ПРАВИЛЬНЫЙ URL - с /api/ в начале
     const url = `/api/projects/{{ project.id }}/join-request/`;
     console.log('Отправка запроса на URL:', url);
 
@@ -754,18 +776,18 @@
     notification.className = `custom-notification ${type}`;
     notification.textContent = message;
     notification.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        background: ${type === 'success' ? '#10b981' : '#ef4444'};
-        color: white;
-        border-radius: 12px;
-        z-index: 10001;
-        font-size: 14px;
-        font-weight: 500;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        animation: slideIn 0.3s ease;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      background: ${type === 'success' ? '#10b981' : '#ef4444'};
+      color: white;
+      border-radius: 12px;
+      z-index: 10001;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease;
     `;
 
     document.body.appendChild(notification);
@@ -776,18 +798,18 @@
     }, 3000);
   }
 
-  function escapeHtmlGlobal(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
   document.addEventListener('DOMContentLoaded', function () {
     const sendBtn = document.getElementById('sendJoinRequestBtn');
     if (sendBtn) {
       sendBtn.addEventListener('click', sendJoinRequest);
     }
   });
+
+  // Публикуем функции для inline-onclick
+  window.openJoinRequestModal = openJoinRequestModal;
+  window.closeJoinRequestModal = closeJoinRequestModal;
+  window.selectApplication = selectApplication;
+  window.sendJoinRequest = sendJoinRequest;
+})();
 </script>
 {% endblock %}
