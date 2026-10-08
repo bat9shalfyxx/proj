@@ -7666,3 +7666,261 @@ button:hover,
   opacity: 0.6;
   cursor: not-allowed;
 } /*# sourceMappingURL=style.css.map */
+
+/*
+---------
+*/
+.nav-dropdown {
+  position: absolute;
+  z-index: 1001;
+  display: none;
+  background: var(--light-gray-col, #f8f9fa);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  padding: 40px;
+  gap: 40px;
+  top: calc(100% + 10px);
+  left: 0;
+}
+
+.nav-dropdown-left,
+.nav-dropdown-right {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================
+   КНОПКА "ПЕРЕЙТИ"
+   ============================================ */
+.nav-dropdown-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
+  width: fit-content;
+  min-width: 120px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--dark-red-col, #b91c1c), var(--light-red-col, #ef4444));
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.nav-dropdown-button:hover {
+  transform: scale(1.02);
+  opacity: 0.95;
+}
+
+.nav-dropdown-button:active {
+  transform: scale(0.98);
+}
+
+/* Стрелка-индикатор */
+.nav-dropdown-button::after {
+  content: '▾';
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.nav-dropdown-button[aria-expanded='true']::after {
+  transform: rotate(180deg);
+}
+
+/* ============================================
+   СПИСОК ССЫЛОК (выпадающий по кнопке)
+   ============================================ */
+.nav-dropdown-links {
+  list-style: none;
+  padding: 0;
+  margin: 15px 0 0;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.2s ease,
+    margin 0.3s ease;
+}
+
+.nav-dropdown-links.open {
+  display: flex;
+  max-height: 500px;
+  opacity: 1;
+}
+
+.nav-dropdown-links li {
+  margin: 0;
+}
+
+.nav-dropdown-links a {
+  display: block;
+  padding: 10px 14px;
+  color: #1f2937;
+  text-decoration: none;
+  font-size: 14px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.nav-dropdown-links a:hover {
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--light-red-col, #ef4444);
+  border-color: var(--light-red-col, #ef4444);
+  transform: translateX(3px);
+}
+
+.nav-dropdown-links a:active {
+  transform: translateX(1px);
+}
+
+/* ============================================
+   АДАПТИВ
+   ============================================ */
+@media (max-width: 1024px) {
+  .nav-dropdown {
+    padding: 30px;
+    gap: 25px;
+    min-width: 500px;
+  }
+
+  .nav-dropdown-links a {
+    font-size: 13px;
+    padding: 9px 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-dropdown {
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+    width: 100% !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    border-radius: 16px;
+  }
+
+  .nav-dropdown-button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .nav-dropdown-links {
+    width: 100%;
+  }
+
+  .nav-dropdown-links a {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+}
+
+/* ============================================
+   ЗАКРЫТИЕ ПРИ КЛИКЕ ВНЕ (визуальный эффект)
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .nav-dropdown-links,
+  .nav-dropdown-button,
+  .nav-dropdown-links a {
+    transition: none;
+  }
+}
+
+/* ============================================
+   БЛОК "НАЗАД" + ЗАГОЛОВОК
+   ============================================ */
+.back-arrow {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 0;
+  margin-bottom: 25px;
+}
+
+.back-arrow h1 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 34px);
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1.2;
+}
+
+/* ============================================
+   КНОПКА "НАЗАД"
+   ============================================ */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px 8px 10px;
+  color: #1f2937;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 30px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.back-btn:hover {
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--light-red-col, #ef4444);
+  border-color: var(--light-red-col, #ef4444);
+  transform: translateX(-3px);
+}
+
+.back-btn:active {
+  transform: translateX(-1px);
+}
+
+.back-btn__icon {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.back-btn:hover .back-btn__icon {
+  transform: translateX(-2px);
+}
+
+/* ============================================
+   АДАПТИВ
+   ============================================ */
+@media (max-width: 768px) {
+  .back-arrow {
+    gap: 12px;
+    padding: 15px 0;
+    margin-bottom: 18px;
+  }
+
+  .back-btn {
+    padding: 8px;
+    width: 36px;
+    height: 36px;
+    justify-content: center;
+  }
+
+  .back-btn__text {
+    display: none; /* Только стрелка */
+  }
+}

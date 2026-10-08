@@ -1,311 +1,262 @@
-{% extends "index.html" %}
-{% load static %}
+{% extends "index.html" %} {% load static %} {% block title %}Создание проекта{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/project_create.css' %}" />
+{% endblock %} {% block content %}
+<div class="create-project-page" style="background: linear-gradient(135deg, #a7182d 60%, #f3f2f2 40%)">
+  <div class="container">
+    <div class="page-header" style="background: #ff3d5a">
+      <div class="back-arrow">
+        <h1>Создание нового проекта</h1>
+        <a href="{{ url|default:'javascript:history.back()' }}" class="back-btn {{ class|default:'' }}" aria-label="{{ text|default:'Назад' }}">
+          <svg class="back-btn__icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span class="back-btn__text">{{ text|default:'Назад' }}</span>
+        </a>
+      </div>
+      <p>Заполните информацию о проекте, чтобы начать поиск команды</p>
+    </div>
 
-{% block title %}Создание проекта{% endblock %}
+    <form method="post" class="project-form" id="projectForm">
+      {% csrf_token %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/project_create.css' %}">
-{% endblock %}
+      <div class="form-section">
+        <h2>Основная информация</h2>
 
-{% block content %}
-<div class="create-project-page" style="background: linear-gradient(135deg, #a7182d 60%, #f3f2f2 40%);">
-    <div class="container">
-        <div class="page-header" style="background: #ff3d5a;">
-            <h1>Создание нового проекта</h1>
-            <p>Заполните информацию о проекте, чтобы начать поиск команды</p>
+        <div class="form-group">
+          <label for="name">Название проекта <span class="required">*</span></label>
+          <input type="text" name="name" id="name" class="form-control" placeholder="Например: Разработка мобильного приложения" required />
+          <span class="field-hint">Придумайте краткое и понятное название</span>
         </div>
 
-        <form method="post" class="project-form" id="projectForm">
-            {% csrf_token %}
-            
-            <div class="form-section">
-                <h2>Основная информация</h2>
-                
-                <div class="form-group">
-                    <label for="name">Название проекта <span class="required">*</span></label>
-                    <input type="text" 
-                           name="name" 
-                           id="name" 
-                           class="form-control" 
-                           placeholder="Например: Разработка мобильного приложения"
-                           required>
-                    <span class="field-hint">Придумайте краткое и понятное название</span>
-                </div>
+        <div class="form-group">
+          <label for="description">Описание проекта <span class="required">*</span></label>
+          <textarea name="description" id="description" class="form-control" rows="5" placeholder="Опишите идею, цели, задачи и ожидаемые результаты проекта..." required></textarea>
+          <span class="field-hint">Чем подробнее описание, тем легче найти подходящих участников</span>
+        </div>
 
-                <div class="form-group">
-                    <label for="description">Описание проекта <span class="required">*</span></label>
-                    <textarea name="description" 
-                              id="description" 
-                              class="form-control" 
-                              rows="5"
-                              placeholder="Опишите идею, цели, задачи и ожидаемые результаты проекта..."
-                              required></textarea>
-                    <span class="field-hint">Чем подробнее описание, тем легче найти подходящих участников</span>
-                </div>
+        <div class="form-group">
+          <label for="{{ form.keywords.id_for_label }}">Ключевые слова (через запятую)</label>
+          <input type="text" name="keywords" id="keywords" class="form-control" placeholder="Например: Python, веб-разработка, искусственный интеллект" required />
+          <span class="field-hint">Например: менеджмент, веб-разработка, искусственный интеллект</span>
+        </div>
 
-                <div class="form-group">
-                    <label for="{{ form.keywords.id_for_label }}">Ключевые слова (через запятую)</label>
-                    <input 
-                        type="text" 
-                        name="keywords" 
-                        id="keywords" 
-                        class="form-control" 
-                        placeholder="Например: Python, веб-разработка, искусственный интеллект"
-                        required>
-                    <span class="field-hint">Например: менеджмент, веб-разработка, искусственный интеллект</span>
-                </div>
+        <div class="form-group">
+          <label for="team_activities">Чем планирует заниматься команда</label>
+          <textarea name="team_activities" id="team_activities" class="form-control" rows="4" placeholder="Например: разработка backend, создание дизайна, тестирование..."></textarea>
+        </div>
 
-                <div class="form-group">
-                    <label for="team_activities">Чем планирует заниматься команда</label>
-                    <textarea name="team_activities" 
-                              id="team_activities" 
-                              class="form-control" 
-                              rows="4"
-                              placeholder="Например: разработка backend, создание дизайна, тестирование..."></textarea>
-                </div>
+        <div class="form-group">
+          <label for="work_conditions">Условия работы</label>
+          <textarea name="work_conditions" id="work_conditions" class="form-control" rows="4" placeholder="Формат работы (удаленно/офис), график, требования к участникам..."></textarea>
+        </div>
+      </div>
 
-                <div class="form-group">
-                    <label for="work_conditions">Условия работы</label>
-                    <textarea name="work_conditions" 
-                              id="work_conditions" 
-                              class="form-control" 
-                              rows="4"
-                              placeholder="Формат работы (удаленно/офис), график, требования к участникам..."></textarea>
-                </div>
-            </div>
+      <div class="form-section">
+        <h2>Сроки и бюджет</h2>
 
-            <div class="form-section">
-                <h2>Сроки и бюджет</h2>
-                
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label for="start_date">Дата начала</label>
-                        <input type="date" name="start_date" id="start_date" class="form-control">
-                    </div>
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="start_date">Дата начала</label>
+            <input type="date" name="start_date" id="start_date" class="form-control" />
+          </div>
 
-                    <div class="form-group half">
-                        <label for="end_date">Дата окончания</label>
-                        <input type="date" name="end_date" id="end_date" class="form-control">
-                    </div>
-                </div>
+          <div class="form-group half">
+            <label for="end_date">Дата окончания</label>
+            <input type="date" name="end_date" id="end_date" class="form-control" />
+          </div>
+        </div>
 
-                <div class="form-group">
-                    <label for="budget">Бюджет проекта (₽)</label>
-                    <input type="number" 
-                           name="budget" 
-                           id="budget" 
-                           class="form-control" 
-                           placeholder="Например: 500000"
-                           min="0"
-                           step="0.01">
-                    <span class="field-hint">Укажите общий бюджет проекта (необязательно)</span>
-                </div>
-            </div>
+        <div class="form-group">
+          <label for="budget">Бюджет проекта (₽)</label>
+          <input type="number" name="budget" id="budget" class="form-control" placeholder="Например: 500000" min="0" step="0.01" />
+          <span class="field-hint">Укажите общий бюджет проекта (необязательно)</span>
+        </div>
+      </div>
 
-            <div class="form-section">
-                <div class="section-header">
-                    <h2>Требования к участникам</h2>
-                    <span class="section-badge">Можно добавить несколько</span>
-                </div>
-                
-                <div class="requirements-list" id="requirements-list">
-                    <!-- Сюда будут добавляться требования -->
-                </div>
+      <div class="form-section">
+        <div class="section-header">
+          <h2>Требования к участникам</h2>
+          <span class="section-badge">Можно добавить несколько</span>
+        </div>
 
-                <button type="button" class="add-requirement-btn" id="addRequirementBtn">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10 5v10M5 10h10" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                    Добавить требование
-                </button>
-            </div>
+        <div class="requirements-list" id="requirements-list">
+          <!-- Сюда будут добавляться требования -->
+        </div>
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary" id="submitBtn">
-                    <span class="btn-text">Создать проект</span>
-                    <span class="btn-loader" style="display: none;">Сохранение...</span>
-                </button>
-                <a href="{% url 'profile' %}" class="btn btn-secondary">Отмена</a>
-            </div>
-        </form>
-    </div>
+        <button type="button" class="add-requirement-btn" id="addRequirementBtn">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 5v10M5 10h10" stroke="currentColor" stroke-width="2" />
+          </svg>
+          Добавить требование
+        </button>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+          <span class="btn-text">Создать проект</span>
+          <span class="btn-loader" style="display: none">Сохранение...</span>
+        </button>
+        <a href="{% url 'profile' %}" class="btn btn-secondary">Отмена</a>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- Шаблон для требования -->
 <template id="requirement-template">
-    <div class="requirement-item">
-        <div class="requirement-header">
-            <h4>Требование <span class="requirement-number"></span></h4>
-            <button type="button" class="remove-requirement" title="Удалить требование">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2"/>
-                </svg>
-            </button>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-group half">
-                <label>Навык <span class="required">*</span></label>
-                <input type="text" 
-                       name="requirement_name[]" 
-                       class="form-control" 
-                       placeholder="например: Python, аналитика, дизайн"
-                       required>
-            </div>
-            <div class="form-group half">
-                <label>Уровень</label>
-                <select name="requirement_level[]" class="form-control">
-                    <option value="">Любой</option>
-                    <option value="beginner">Начинающий</option>
-                    <option value="middle">Продвинутый</option>
-                    <option value="expert">Эксперт</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group half">
-                <label>Роль по Белбину (необязательно)</label>
-                <select name="belbin_role[]" class="form-control">
-                    <option value="">— Не выбрана —</option>
-                    <option value="implementer">Исполнитель</option>
-                    <option value="coordinator">Координатор</option>
-                    <option value="shaper">Формирователь</option>
-                    <option value="plant">Генератор идей</option>
-                    <option value="resource_investigator">Разведчик</option>
-                    <option value="teamworker">Душа команды</option>
-                    <option value="monitor_evaluator">Аналитик</option>
-                    <option value="completer_finisher">Педантичность</option>
-                    <option value="specialist">Специалист</option>
-                </select>
-            </div>
-            <div class="form-group half"></div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-group half">
-                <label>Количество человек</label>
-                <input type="number" 
-                       name="requirement_count[]" 
-                       class="form-control" 
-                       value="1" 
-                       min="1"
-                       step="1">
-            </div>
-            <div class="form-group half">
-                <label>Обязательное</label>
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" 
-                           name="requirement_mandatory[]" 
-                           class="form-checkbox" 
-                           checked>
-                    <span class="checkbox-label">Да, требуется обязательно</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label>Стоимость (₽)</label>
-            <input type="number" 
-                   name="requirement_price[]" 
-                   class="form-control" 
-                   placeholder="Например: 50000"
-                   min="0"
-                   step="0.01">
-        </div>
-
-        <div class="form-group">
-            <label>Условие работы</label>
-            <input type="text" 
-                   name="requirement_condition[]" 
-                   class="form-control" 
-                   placeholder="например: Работа в выходные, командировки">
-        </div>
+  <div class="requirement-item">
+    <div class="requirement-header">
+      <h4>Требование <span class="requirement-number"></span></h4>
+      <button type="button" class="remove-requirement" title="Удалить требование">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" />
+        </svg>
+      </button>
     </div>
+
+    <div class="form-row">
+      <div class="form-group half">
+        <label>Навык <span class="required">*</span></label>
+        <input type="text" name="requirement_name[]" class="form-control" placeholder="например: Python, аналитика, дизайн" required />
+      </div>
+      <div class="form-group half">
+        <label>Уровень</label>
+        <select name="requirement_level[]" class="form-control">
+          <option value="">Любой</option>
+          <option value="beginner">Начинающий</option>
+          <option value="middle">Продвинутый</option>
+          <option value="expert">Эксперт</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group half">
+        <label>Роль по Белбину (необязательно)</label>
+        <select name="belbin_role[]" class="form-control">
+          <option value="">— Не выбрана —</option>
+          <option value="implementer">Исполнитель</option>
+          <option value="coordinator">Координатор</option>
+          <option value="shaper">Формирователь</option>
+          <option value="plant">Генератор идей</option>
+          <option value="resource_investigator">Разведчик</option>
+          <option value="teamworker">Душа команды</option>
+          <option value="monitor_evaluator">Аналитик</option>
+          <option value="completer_finisher">Педантичность</option>
+          <option value="specialist">Специалист</option>
+        </select>
+      </div>
+      <div class="form-group half"></div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group half">
+        <label>Количество человек</label>
+        <input type="number" name="requirement_count[]" class="form-control" value="1" min="1" step="1" />
+      </div>
+      <div class="form-group half">
+        <label>Обязательное</label>
+        <div class="checkbox-wrapper">
+          <input type="checkbox" name="requirement_mandatory[]" class="form-checkbox" checked />
+          <span class="checkbox-label">Да, требуется обязательно</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Стоимость (₽)</label>
+      <input type="number" name="requirement_price[]" class="form-control" placeholder="Например: 50000" min="0" step="0.01" />
+    </div>
+
+    <div class="form-group">
+      <label>Условие работы</label>
+      <input type="text" name="requirement_condition[]" class="form-control" placeholder="например: Работа в выходные, командировки" />
+    </div>
+  </div>
 </template>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     const requirementsList = document.getElementById('requirements-list');
     const addBtn = document.getElementById('addRequirementBtn');
     const template = document.getElementById('requirement-template');
     const form = document.getElementById('projectForm');
     const submitBtn = document.getElementById('submitBtn');
-    
+
     let requirementCount = 0;
 
     // Функция добавления нового требования
     function addRequirement() {
-        requirementCount++;
-        const clone = template.content.cloneNode(true);
-        const requirementItem = clone.querySelector('.requirement-item');
-        
-        // Обновляем номер требования
-        const numberSpan = clone.querySelector('.requirement-number');
-        if (numberSpan) {
-            numberSpan.textContent = `#${requirementCount}`;
-        }
-        
-        // Добавляем обработчик для кнопки удаления
-        const removeBtn = clone.querySelector('.remove-requirement');
-        removeBtn.addEventListener('click', function() {
-            requirementItem.remove();
-            updateRequirementNumbers();
-        });
-        
-        requirementsList.appendChild(clone);
+      requirementCount++;
+      const clone = template.content.cloneNode(true);
+      const requirementItem = clone.querySelector('.requirement-item');
+
+      // Обновляем номер требования
+      const numberSpan = clone.querySelector('.requirement-number');
+      if (numberSpan) {
+        numberSpan.textContent = `#${requirementCount}`;
+      }
+
+      // Добавляем обработчик для кнопки удаления
+      const removeBtn = clone.querySelector('.remove-requirement');
+      removeBtn.addEventListener('click', function () {
+        requirementItem.remove();
+        updateRequirementNumbers();
+      });
+
+      requirementsList.appendChild(clone);
     }
 
     // Обновление номеров требований после удаления
     function updateRequirementNumbers() {
-        const items = requirementsList.querySelectorAll('.requirement-item');
-        items.forEach((item, index) => {
-            const numberSpan = item.querySelector('.requirement-number');
-            if (numberSpan) {
-                numberSpan.textContent = `#${index + 1}`;
-            }
-        });
-        requirementCount = items.length;
+      const items = requirementsList.querySelectorAll('.requirement-item');
+      items.forEach((item, index) => {
+        const numberSpan = item.querySelector('.requirement-number');
+        if (numberSpan) {
+          numberSpan.textContent = `#${index + 1}`;
+        }
+      });
+      requirementCount = items.length;
     }
 
     // Обработчик добавления требования
     addBtn.addEventListener('click', addRequirement);
 
     // Валидация формы перед отправкой
-    form.addEventListener('submit', function(e) {
-        const projectName = document.getElementById('name').value.trim();
-        const description = document.getElementById('description').value.trim();
-        
-        if (!projectName) {
-            e.preventDefault();
-            alert('Пожалуйста, укажите название проекта');
-            return;
-        }
-        
-        if (!description) {
-            e.preventDefault();
-            alert('Пожалуйста, заполните описание проекта');
-            return;
-        }
-        
-        // Проверка дат
-        const startDate = document.getElementById('start_date').value;
-        const endDate = document.getElementById('end_date').value;
-        
-        if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
-            e.preventDefault();
-            alert('Дата окончания не может быть раньше даты начала');
-            return;
-        }
-        
-        // Показываем индикатор загрузки
-        submitBtn.disabled = true;
-        const btnText = submitBtn.querySelector('.btn-text');
-        const btnLoader = submitBtn.querySelector('.btn-loader');
-        if (btnText && btnLoader) {
-            btnText.style.display = 'none';
-            btnLoader.style.display = 'inline';
-        }
+    form.addEventListener('submit', function (e) {
+      const projectName = document.getElementById('name').value.trim();
+      const description = document.getElementById('description').value.trim();
+
+      if (!projectName) {
+        e.preventDefault();
+        alert('Пожалуйста, укажите название проекта');
+        return;
+      }
+
+      if (!description) {
+        e.preventDefault();
+        alert('Пожалуйста, заполните описание проекта');
+        return;
+      }
+
+      // Проверка дат
+      const startDate = document.getElementById('start_date').value;
+      const endDate = document.getElementById('end_date').value;
+
+      if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+        e.preventDefault();
+        alert('Дата окончания не может быть раньше даты начала');
+        return;
+      }
+
+      // Показываем индикатор загрузки
+      submitBtn.disabled = true;
+      const btnText = submitBtn.querySelector('.btn-text');
+      const btnLoader = submitBtn.querySelector('.btn-loader');
+      if (btnText && btnLoader) {
+        btnText.style.display = 'none';
+        btnLoader.style.display = 'inline';
+      }
     });
 
     // Добавляем одно требование по умолчанию
@@ -313,10 +264,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Автоматическое заполнение примерами (для демо)
     const demoData = {
-        name: 'Разработка веб-платформы',
-        description: 'Создание современной веб-платформы для управления проектами с использованием Django и React',
-        team_activities: 'Разработка backend на Django, создание frontend на React, проектирование базы данных, тестирование',
-        work_conditions: 'Удаленная работа, гибкий график, еженедельные созвоны в Zoom',
+      name: 'Разработка веб-платформы',
+      description: 'Создание современной веб-платформы для управления проектами с использованием Django и React',
+      team_activities: 'Разработка backend на Django, создание frontend на React, проектирование базы данных, тестирование',
+      work_conditions: 'Удаленная работа, гибкий график, еженедельные созвоны в Zoom',
     };
 
     // Раскомментируйте для автозаполнения (для тестирования)
@@ -326,23 +277,23 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('team_activities').value = demoData.team_activities;
     document.getElementById('work_conditions').value = demoData.work_conditions;
     */
-});
+  });
 
-document.getElementById('projectForm').addEventListener('submit', function(e) {
+  document.getElementById('projectForm').addEventListener('submit', function (e) {
     console.log('📤 Форма отправляется...');
-    
+
     // Собираем данные формы для отладки
     const formData = new FormData(this);
     console.log('📋 Данные формы:');
     for (let [key, value] of formData.entries()) {
-        console.log(`  - ${key}: ${value}`);
+      console.log(`  - ${key}: ${value}`);
     }
-    
+
     // Проверяем требования
     const requirements = document.querySelectorAll('.requirement-item');
     console.log(`📋 Требований в форме: ${requirements.length}`);
-    
+
     // Не отменяем отправку, просто логируем
-});
+  });
 </script>
 {% endblock %}
